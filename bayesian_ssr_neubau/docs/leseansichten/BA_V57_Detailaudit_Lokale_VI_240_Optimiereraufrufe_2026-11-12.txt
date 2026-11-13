@@ -1,0 +1,114 @@
+V5.7 | Detailaudit der lokalen Variationsinferenz
+30 Epochen · 8 gelabelte Entwicklungsringe · 240 L-BFGS-B-Aufrufe · 12.11.2026
+Wissenschaftlicher Status: explorative Trainingsdiagnostik. Keine Vorhersagebewertung, keine neue Teststichprobe, keine Freigabe des endgültigen Modells.
+1. Ausgangspunkt und Prüfidentität
+Die hochgeladene Original-JSON LOCAL_VI_TRACE_L8_E30_01.json wurde vollständig programmatisch ausgewertet. Die Daten stammen aus dem 30-Epochen-Trainingslauf K=2, C=0,2, M2, acht maximalen lokalen L-BFGS-B-Iterationen und Seed 20261111. Trainingsbasis: 8 gelabelte sowie 4 maskiert ungelabelte DM-Entwicklungsringe. Die bisherigen äußeren Test-Ringe DM07, DM08, DM11 und DM15 wurden weder zur Qualitätswertung noch zur Auswahl verwendet.
+Die instrumentierte ELBO-Kurve reproduziert die uninstrumentierte V5.5-Referenz bis auf maximal 8,34 × 10⁻⁸. Der V5.2-Kern wurde für diese Diagnostik nicht verändert.
+2. Zentrale Ergebnisse
+Merkmal
+Ergebnis
+Bedeutung
+Lokale Aufrufe
+240 (8 × 30)
+Vollständige Ring-/Epochenabdeckung
+Optimierer meldet Erfolg
+234 / 240 (97,5 %)
+Erfolg kann auf ftol ODER gtol beruhen
+Abbruch über rel. Funktionsänderung
+179 / 240 (74,6 %)
+Alle 179 mit Rohgradient > 1 × 10⁻⁵
+Abbruch über projected-gradient
+55 / 240 (22,9 %)
+Gradiententoleranz erreicht
+Iterationsbudget ausgeschöpft
+6 / 240 (2,5 %)
+Nur Epochen 1, 3, 7–10
+Lokale Änderung übernommen
+210 / 240 (87,5 %)
+30 Null-Schritte korrekt nicht übernommen
+Größter Endgradient Epoche 30
+8,76864 × 10⁻⁵
+6 / 8 Ringe über gtol
+Lokale Gesamtverbesserung Epoche 30
+3,77335 × 10⁻⁵
+Erneute Korrektur ab prozessbedingtem Start
+3. Prüfung der sechs Iterationsabbrüche
+Ring
+Epochen
+Eigenschaft
+DM05
+1
+Endgradient 1,18230 × 10⁻⁴; lokale Änderung akzeptiert
+DM17
+3
+Endgradient 8,15818 × 10⁻⁵; lokale Änderung akzeptiert
+DM06
+7, 8, 9, 10
+Alle vier Änderungen akzeptiert; größter Endgradient 1,76826 × 10⁻⁴
+Alle sechs Limit-Abbrüche erzeugten eine endliche, positive Zielfunktionsverbesserung und wurden übernommen. Ab Epoche 11 erreicht kein Ring mehr das Iterationslimit. Für die später auftretende große globale ELBO-Steigerung in Epoche 11 ist daher eine Erklärung ausschließlich über lokale maxiter-Abbrüche nicht gedeckt.
+4. Prüfung der 30 nicht akzeptierten lokalen Updates
+29 der 30 Fälle entfallen auf DM09 (Epochen 2–30); der letzte Fall auf DM04 (Epoche 2). In sämtlichen Fällen meldet SciPy nit=0, objective_reduction=0 und bereits kleine Gradienten. Die nicht erfolgte Übernahme ist hier eine Folge fehlender Verbesserung und keine fehlgeschlagene numerische Minimierung.
+5. Gradienten und Abbruchkriterien
+L-BFGS-B meldete 179-mal regulären Stopp, weil die relative Funktionsabnahme die ftol-Schwelle erreichte. Jeder dieser 179 Fälle weist einen maximalen absoluten Endgradienten oberhalb gtol=10⁻⁵ auf. Somit ist sol.success=True kein Nachweis, dass das Gradienten-Kriterium erfüllt wurde. Für die vollständige lokale Stationarität reichen diese Logs nicht aus.
+
+Abbildung 1: Maximaler und medianer Endgradient über 30 Epochen; die gestrichelte Linie markiert gtol.
+6. Ringweise Diagnose der letzten Epoche
+Ring
+nit
+Stopp
+||grad||∞
+lokaler Gewinn
+DM04
+4
+ftol
+6.366e-05
+7.753e-06
+DM05
+4
+ftol
+8.769e-05
+5.516e-06
+DM06
+6
+ftol
+3.879e-05
+2.004e-05
+DM09
+0
+gtol
+1.929e-09
+0.000e+00
+DM12
+1
+ftol
+4.015e-05
+2.750e-07
+DM16
+1
+gtol
+6.460e-06
+9.361e-09
+DM17
+4
+ftol
+4.278e-05
+3.579e-06
+DM18
+2
+ftol
+3.181e-05
+5.570e-07
+DM09 startet in den späten Epochen bereits mit praktisch stationärem lokalen Ziel (maximale Gradientenkomponente etwa 1,93 × 10⁻⁹), während andere Ringe weiterhin kleine, wiederholte lokale Korrekturen erfahren. Die Unterschiede können auf ringabhängige Kopplungsstärke und Skalierung zurückgehen; eine Ursache ist durch diese Datei allein nicht festgestellt.
+7. Bedeutung für die große ELBO-Änderung nach Epoche 10
+Die gesamte ELBO verbessert sich im uninstrumentierten 30-Epochen-Lauf zwischen Epoche 10 und 11 um rund +1322,45. Im V5.7-Trace summieren sich die akzeptierten lokalen Zielfunktionsverbesserungen der Epoche 11 hingegen nur auf rund 5,02 × 10⁻⁵. Die Größen sind nicht direkt identisch: Die ELBO umfasst zugleich globale Prozess- und Regressionsposterioren, ihre KL-Terme und Änderungen zwischen den Epochen. Der starke Sprung kann nach diesen Daten nicht der lokalen Iterationszahl zugeschrieben werden; als Nächstes ist eine Komponentenzerlegung der ELBO erforderlich.
+8. Wichtiger Befund aus dem Originalcode
+Die Funktion local_joint in dynamic_quality_v2.py berechnet bei JEDEM Epochenaufruf zunächst über die aktuellen Prozessparameter eine neue prozessbasierte Forward–Backward-Zustandsverteilung und erzeugt daraus lokale Startlogits. Sie verwendet nicht unmittelbar die optimierten lokalen Logits der vorigen Epoche als Warmstart. Daher kann auch bei einer stabilen globalen ELBO in jeder Epoche erneut ein kleiner positiver lokaler „Gain“ entstehen. Dieser wiederholte Gain allein belegt keine fortschreitende globale Optimierung und auch keine Nichtkonvergenz.
+9. Wissenschaftliche Bewertung und offene Belege
+Gesichert: 8 versus 16 lokale Iterationen ergaben praktisch dieselbe finale Trainings-ELBO; die beobachteten 6/240 Limit-Abbrüche liegen früh; die nicht akzeptierten Updates sind Null-Schritte.
+Nicht gesichert: strenge Stationarität aller lokalen Variationsparameter, globales ELBO-Optimum, robuste Startwertunabhängigkeit und eine Verbesserung der Vorhersagequalität.
+Kausalanalyse offen: Ob der ELBO-Sprung von Prozess-Emissionsposterioren, Übergangsverteilung, Qualitätsköpfen oder KL-Beiträgen getragen wird, lässt sich mit diesem Trace nicht entscheiden.
+10. Nächster kontrollierter Versuch
+Zuerst ein V5.7-Instrumentierungslauf mit genau derselben Anfangskonfiguration und 16 lokalen Iterationen; die bereits vorhandene V5.6-L16-30E-JSON dient als unveränderte ELBO-Referenz. Entscheidend: Anzahl ftol-/gtol-Abbrüche, 6 Limit-Fälle, Endgradienten je Ring, akzeptierte Updates und maximale ELBO-Abweichung. Danach eine ELBO-Zerlegung und gezielte Variation der lokalen Abbruchtoleranzen statt ungerichteter Erhöhung der Trainingsdauer.
+Der bestehende Forschungsfahrplan bleibt unverändert: nach der Trainings- und Konvergenzdiagnostik folgen kontrollierte HMM-, Bayesian-, SSL- und Generalisierungsstudien. Der formale Modell-Freeze bleibt ausdrücklich offen.
+Daten- und Quellenstatus
+Vollständig ausgewertet: LOCAL_VI_TRACE_L8_E30_01.json (240 Einzelprotokolle, Aggregationen); Quellcode audit_local_optimizer_v57.py sowie dynamic_quality_v2.py aus der SHA-gebundenen V5.2-Fassung. Verglichen mit den früher berichteten V5.5/V5.6-Trainingsverläufen. Externe wissenschaftliche Originalpaper und die vollständigen Herleitungen A–D wurden für diesen numerischen Ergebnisbericht nicht erneut im Original geprüft; es werden daher keine ungeprüften Literaturseiten zitiert.

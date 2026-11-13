@@ -1,0 +1,83 @@
+# Python bytecode, native extensions and Numba caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.nbc
+*.nbi
+
+# Virtual environments and local Python configuration
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Packaging and build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Test, coverage, lint and notebook caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# Local credentials and machine-specific settings
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+.aws/
+.codex/
+.vscode/
+.idea/
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+~$*
+*.swp
+*.swo
+*~
+*.tmp
+*.log
+
+# Generated training, evaluation and notebook-demo artifacts
+/results/
+/bayesian_ssr_neubau/outputs/
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Keep raw manufacturing data local; retain the data documentation
+/input/*
+!/input/README.txt
+!/input/manifest_pruefbericht.json
+
+# Local transfer archives, duplicate handover and third-party literature
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+/uebergabe_2026_11_13/
+/handover/07_ORIGINALQUELLEN_PDF/

@@ -1,0 +1,182 @@
+BAYESIAN BACHELOR – V5.1
+Technischer Änderungs- und Prüfbericht: Eingangsvalidierung für das Bayesian-SSR-Hauptmodell
+Stand: 12.11.2026  |  Zweck: reproduzierbare Sicherheitsfreigabe vor einem späteren offiziellen Trainingslauf
+Status: VORLÄUFIGER FORSCHUNGSKANDIDAT. In dieser Version wurde das Hauptmodell nicht neu trainiert, keine Hyperparameter geändert und kein alter äußerer Testsatz evaluiert.
+1. Kurzfazit
+V5.1 behebt drei im Audit konkret reproduzierte Eingaberisiken: falsche „neue“ Ring-IDs, unvollständige Prozessläufe und große Zeitlücken. Zusätzlich wurden trainingsbasierte Sensorbereichs- und Flatline-Prüfungen sowie eine getrennte Abschlussbestätigung ergänzt. Der mathematische Kern bleibt unverändert.
+Ergebnis des Qualitätssicherungslaufs: 18/18 synthetische Vertragstests bestanden; bei 12/12 zulässigen Originalrohloggern wurde das F2-Fenster bitgenau reproduziert. Ein separates technisches Replay mit dem alten V5-QA-Modell lieferte dieselben Vorhersagewerte. Dies belegt Kompatibilität, nicht unabhängige Prognosegüte.
+2. Unveränderte wissenschaftliche Modellkonfiguration
+Eigenschaft
+Fixierter V5-Kandidatenstand
+Datensatz
+16 aktive DM-Ringe; bekanntes SHA256-Original, nur 8 L + 4 U genutzt
+Labeled
+DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18
+U-Prozessdaten
+DM01, DM02, DM10, DM14 (Qualitätslabels maskiert)
+Historischer Test
+DM07, DM08, DM11, DM15 – nicht eingelesen/ausgewertet im QA-Pfad
+Loggermerkmale
+F_rad63, F_ax64, Ist_D150, Ist_s151, Ist_h152, RWG55
+Modell
+Bayesian-HMM volle Kovarianz, M2, zwei NIG-Qualitätsköpfe
+Hypothese / Parameter
+K=2; P0; C=0,2; Priorvarianz 0,38526108747593474; 10 Epochen; 8 lokale VI-Schritte
+Kernmodule
+10 Python-Module; byte-identisch zu V5, Hash-Checks beim Start
+
+Wissenschaftlicher Status: Diese Konfiguration ist robustheitsorientiert aus mehrfach verwendeten acht Entwicklungslabels ausgewählt. Es liegt keine neue unabhängige Bestätigung vor. Dies ist kein behauptetes globales Optimum.
+3. Input-Schema und Phasenprüfung
+Ein neuer Logger wird nur als vollständige Rohsequenz akzeptiert. Die Header-Reihenfolge ist exakt: time, F_rad63, F_ax64, Ist_D150, Ist_s151, Ist_h152, RWG55, phase804, LaserOK, MessEin. Nachträgliche Qualitätsmessungen und weitere Spalten sind ausgeschlossen. CSV-Werte müssen endlich, Zeilen vollständig und Zeitstempel streng aufsteigend sein.
+Phase 6 vor F2 → zusammenhängende aktive Phase 1/2 bei LaserOK=MessEin=1 → inaktive Phase 6 als Nachlauf. Die ersten und letzten drei Messpunkte dienen als minimale strukturelle Vor-/Nachlaufprüfung. Nach F2 wird spätestens innerhalb von fünf 0,1-s-Übergangszeitschritten ein stabiler inaktiver Phase-6-Zustand verlangt.
+Realer Sonderfall DM06: In der anfänglichen Phase 6 sind LaserOK und MessEin beide 1. Deshalb prüft der Vorlauf nur phase804=6, der Nachlauf jedoch zusätzlich LaserOK=MessEin=0. Die ursprüngliche strengere Vorlaufidee wurde nach Realdata-Regressionstest ausdrücklich verworfen.
+4. Datengestützte Grenzwerte (nur Entwicklungsringe)
+Aus den 12 erlaubt verwendeten F2-Zeitreihen wird die vorläufige Sicherheitsdomäne ohne U-Labels und ohne die vier historisch gesperrten Außenringe abgeleitet. Das Minimum der Ringlängen beträgt 148 F2-Punkte. Eine konservative Vorstufe setzt N_min=ceil(0,75·148)=111 und die Mindestdauer auf 11,025 s. Die Zeitachse muss Δt=0,1 s mit Toleranz ±0,002 s einhalten.
+Für jeden Rohkanal j gilt das Policy-Intervall [min_train(j) − 0,25·(max_train(j)−min_train(j)), max_train(j) + 0,25·(max_train(j)−min_train(j))]. Das ist ein Entwicklungsbereich mit Sicherheitsspanne, keine physikalische Definition zulässiger Walzprozesse.
+Kanal
+Einheit laut Kanalaudit
+Train-Min
+Train-Max
+Zulässig Min
+Zulässig Max
+F_rad63
+percent_machine_signal
+-0.7
+80.4
+-20.975
+100.675
+F_ax64
+percent_machine_signal
+0.4
+90.6
+-22.15
+113.15
+Ist_D150
+m
+0.32782
+0.92029
+0.1797
+1.06841
+Ist_s151
+m
+0.03018
+0.08096
+0.01748
+0.09366
+Ist_h152
+m
+0.0394
+0.08204
+0.02874
+0.0927
+RWG55
+m_per_s
+0.0
+0.0476
+-0.0119
+0.0595
+
+Darüber hinaus müssen D, Wandstärke und Höhe positiv sein und während F2 eine minimale Dynamik aufweisen (Flatline-Test, Schwelle aus 2 % des kleinsten beobachteten F2-Signalhubs). Die Schwellen sollen Ausreißer und offensichtliche Einheitendreher aussortieren; neue gültige Ringe außerhalb der bisherigen Entwicklungsspanne können dabei vorsorglich blockiert werden.
+5. Prozessende und Abschlussbestätigung nicht verwechseln
+Das inaktive Phase-6-Ende belegt die Beendigung des beobachteten F2-Fensters; es beweist NICHT, dass ein brauchbarer Ring hergestellt wurde. Darum verlangt die neue Vorhersageschnittstelle ein separates JSON-End-of-Ring-Protokoll mit Ring-ID, CSV-SHA256, bestätigtem Ringabschluss, Art und Referenz des Abschlussbelegs, dokumentierender Quelle, F2-Messpunktzahl und F2-Endzeit.
+Die Software prüft die technische Bindung des Nachweises an die identische CSV. Sie kann NICHT den Wahrheitsgehalt einer manuell erfassten Erklärung oder die Echtheit eines Maschinenereignisses ohne unabhängige Authentisierung prüfen. Das beiliegende Template ist absichtlich als „nicht bestätigt“ gesetzt und darf nicht automatisch ausgefüllt werden.
+
+6. Synthetische Negativ- und Positivtests
+Die Test-Suite `test_input_safety_v51.py` hat 18 voneinander getrennte Prüffälle bestanden; sie öffnet keinerlei Prozess-Pickle und trainiert kein Modell. Nachstehend eine verdichtete Matrix.
+Prüfklasse
+Nachweis
+Historische Ring-IDs
+dm04, DM-0004, DM04_COPY, DM13, DM15 und weitere Aliasformen werden vor Modellzugriff zurückgewiesen.
+Gültiger Gesamtlauf
+Vorlauf, zusammenhängendes F2, korrektes 0,1-s-Raster und Phase-6-Nachlauf werden akzeptiert.
+Unvollständiger Prozess
+Fehlender Vorlauf, fehlender Nachlauf und sechs F2-Messpunkte werden abgelehnt.
+Zeit und Phasen
+20-s-Zeitlücke, doppelte Zeitmarke und unterbrochenes F2-Fenster werden erkannt.
+Prozessdaten-only
+Erweiterte Spalten mit Qualitätswerten werden nicht akzeptiert.
+Sensoren / Einheiten
+Millimeter statt Meter bei Ist_D150, massiver RWG55-Ausreißer, Geometriesensor-Flatline und NaN werden abgelehnt.
+Abschlussbeleg
+Korrekte externe Zuordnung wird akzeptiert; falsche CSV-SHA oder F2-Anzahl abgelehnt.
+Konfiguration
+Die ursprünglichen 10 SHA-gesicherten Kernmodule und die Zielkonfiguration werden geladen.
+
+7. Kompatibilität mit allen zwölf Originalprozessen
+Der Originalpickledatensatz wurde nur nach Abgleich seines bekannten SHA256-Wertes für eine rein technische F2-Prüfung geöffnet. Der Vergleich basiert auf Loggerkanälen der acht L- und vier U-Entwicklungsringe, ohne Qualitätslabels der U-Ringe oder die früheren äußeren Test-Ringe zu verwenden.
+Ring
+Rohzeilen
+F2-Zeilen
+Vergleich
+DM01
+219
+148
+bitgenau PASS
+DM02
+490
+419
+bitgenau PASS
+DM04
+898
+829
+bitgenau PASS
+DM05
+765
+694
+bitgenau PASS
+DM06
+1119
+1085
+bitgenau PASS
+DM09
+226
+155
+bitgenau PASS
+DM10
+451
+381
+bitgenau PASS
+DM12
+1364
+1293
+bitgenau PASS
+DM14
+495
+424
+bitgenau PASS
+DM16
+1122
+1051
+bitgenau PASS
+DM17
+734
+663
+bitgenau PASS
+DM18
+369
+298
+bitgenau PASS
+
+12/12 bestanden. Ein separates, bereits bestehendes V5-QA-Modell wurde im kontrollierten Entwicklungs-Replay mit DM04 verwendet, um die numerische Unverändertheit der Prognoserechnung zu prüfen. Es wurde kein neues Modell trainiert, keine Qualitätsmetrik ermittelt und kein unabhängiger Test geöffnet.
+8. Dateiversionierung und Reproduzierbarkeit
+Neue Hauptdateien: `input_safety_v51.py` (prozessbezogene Gates), `main_bayesian_ssr_v51.py` (neuer Einstiegspunkt), `DEVELOPMENT_INPUT_POLICY_V51.json` (aus dem L/U-Entwicklungsfenster abgeleitete Grenzen), `test_input_safety_v51.py` und `test_development_logger_equivalence_v51.py`. Der V5-Originalwrapper wird nicht überschrieben; das ZIP entpackt in einen eigenen Ordner `final_candidate_v51`.
+Für künftig mit V5.1 neu erzeugte, vertrauenswürdige Modellartefakte speichert das Manifest zusätzlich das Safety-Policy-Hash. Eine reguläre V5.1-Prognose lädt alte V5-Modellpickles nicht mehr stillschweigend. Nicht Bestandteil dieser Version sind transaktionale Persistenz, vollständige Konfigurationsschema-Prüfung, signierte Artefakte und ein versionsgefrorenes Python-Environment; diese Punkte bleiben V5.2 vorbehalten.
+9. Ausführung auf dem Windows-Projektstand
+.\.venv\Scripts\python.exe .\final_candidate_v51\test_input_safety_v51.py
+.\.venv\Scripts\python.exe .\final_candidate_v51\test_development_logger_equivalence_v51.py --data input\DM_16_aktive_Ringe.pkl
+.\.venv\Scripts\python.exe .\final_candidate_v51\main_bayesian_ssr_v51.py prepare-policy --data input\DM_16_aktive_Ringe.pkl --out results\v51\POLICY_REGENERATED_01.json
+Zum Zeitpunkt dieser Veröffentlichung wird ausdrücklich KEIN endgültiger Trainingslauf empfohlen. Die normalen Befehle für neue Ringprognosen sind in der README dokumentiert, benötigen aber später ein neues V5.1-Trainingsartefakt und einen unabhängig belegten End-of-Ring-Datensatz.
+10. Bedeutung für Kapitel 4 und 5
+Kapitel 4: Die Datengrundlage und der Prozessfensterzuschnitt können jetzt mit einem überprüfbaren Eingangsgate dokumentiert werden. Die 12/12-Kompatibilität und die 18 synthetischen Prüfungen sind Software- und Datenqualitätssicherungsbefunde, keine neuen RMSE-Resultate. Die K-/C-/Prior-Modellwahl bleibt durch die bisherige explorative CV-Forschung belegt.
+Kapitel 5: Die Risiken einer unvollständigen oder falsch skalierten Ringsequenz, die Abhängigkeit von vorhandenen Prozessregimen und die Trennung zwischen End-of-Run-Prognose und tatsächlicher Prozessoptimierung bilden methodische Grenzen. Eine gültige Prognoseeingabe bedeutet nicht verlässlich kalibrierte Unsicherheit oder eine nachgewiesene Regelungsverbesserung.
+11. Offene Punkte und nächster freizugebender Schritt
+Reihenfolge
+Geplante Freigabeprüfung
+V5.2
+Konfiguration vollständig gegen die Codepfade validieren; atomare Erzeugung/Manifest-Transaktion; Python-/NumPy-/SciPy-/sklearn-/Numba-Versionen und Modell-SHA-Versionierung.
+V5.3
+HMM-/VI-Stabilität und lokal gekoppelte Qualitätsrückkopplung (u. a. steps=0 vs 8) als strikt entwicklungsbasierte Ablationen.
+V5.4
+Konfiguration endgültig signieren, dann bewusstes offizielles Entwicklungstraining und fachlich dokumentierte Prognose-Ausführung auf wirklich neuen Prozessdaten.
+
+Quellen-/Prüfstatus: Originalkernmodule und originaler V5-Konfigurationshash wurden im Rahmen dieses Softwareaudits geprüft. Die 12 DM-Prozesslogger wurden im F2- und Rohfenster verglichen. Die ursprünglichen wissenschaftlichen Papers sowie die Herleitungen A–D wurden hier nicht erneut seitenweise mit den Original-PDFs abgeglichen; Belegstatus aus früheren Master-Handovers bleibt bestehen.

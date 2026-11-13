@@ -1,0 +1,20 @@
+{
+  "status": "V59_EXPLORATORY_READONLY_FROZEN_CORE",
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "54b3b616a58027e7ae1803c23197c7cab1c823119392e73d8b229a3a7a60557d",
+      "bytes": 5494
+    },
+    {
+      "file": "V59_30E_RESEARCH_SUMMARY.json",
+      "sha256": "3442a05cbb1335fcdcedf1440c1f6804a0dcefc239838db4d8ba9fc347df8e5b",
+      "bytes": 33784
+    },
+    {
+      "file": "reduced_markov_logits_v59.py",
+      "sha256": "ed2de4bc67631701071ef9a84570a1682fe863cb6617a63f2e2f55cdfdcd570d",
+      "bytes": 18712
+    }
+  ]
+}

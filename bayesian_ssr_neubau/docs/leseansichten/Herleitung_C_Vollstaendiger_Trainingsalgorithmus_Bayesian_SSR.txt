@@ -1,0 +1,667 @@
+Herleitung C – Vollständiger Trainingsalgorithmus unseres Bayesian-SSR-HMM
+Mathematische Modellentwicklung · Arbeitsstand C.1 · Fortsetzung der Herleitungen A und B · 29. Oktober 2026
+In Herleitung A haben wir das probabilistische Modell konstruiert. In Herleitung B haben wir gezeigt, wie sich die unbekannten Zustandsfolgen und Modellparameter durch strukturierte Variational Inference approximieren lassen.
+Jetzt folgt der nächste Schritt: Wir entwickeln daraus einen tatsächlich ausführbaren Trainingsalgorithmus.
+Dazu müssen wir nicht nur erklären, welche Gleichungen mathematisch gelten, sondern auch, wie sie sich in einer konkreten Implementierung aufeinander beziehen:
+Welche Parameter werden initialisiert?
+Welche Größen werden für jeden Ring berechnet?
+Welche Updates erfolgen analytisch, welche numerisch?
+Wie werden gelabelte und ungelabelte Ringe berücksichtigt?
+Wann gilt ein Trainingsdurchlauf als abgeschlossen?
+Wie überprüfen wir, ob unsere Implementierung mathematisch korrekt arbeitet?
+Besonders wichtig bleibt unsere festgelegte B1-Architektur. Die gesamte verborgene Zustandsfolge beeinflusst die Qualitätsregression. Wir ersetzen sie nicht durch eine feste Zustandsfolge oder durch bloße Punktschätzungen der Zustandsaufenthalte.
+C.1 Unser Ausgangspunkt: Die mathematischen Ergebnisse aus A und B
+Wir erinnern uns zunächst an die Struktur unserer Modellparameter:
+Θ=π,A,Φ,Ψ.
+Die einzelnen Parametergruppen besitzen folgende Bedeutung:
+π: Anfangswahrscheinlichkeiten der verborgenen Zustände
+A: Übergangswahrscheinlichkeiten des HMM
+Φ: Zustandsabhängige Mittelwerte und Varianzen der Loggermerkmale
+Ψ: Regressionskoeffizienten und Fehlervarianzen der drei Qualitätsgrößen
+Für Ring i verwenden wir weiterhin seine vollständige Prozesssequenz:
+Xi=xi1,…,xiTi⊤.
+Die verborgene Zustandsfolge lautet:
+Zi=Zi1,…,ZiTi.
+Aus dieser Folge berechnen wir die relativen Zustandsaufenthalte:
+hikZi=1Tit=1Ti1Zit=k.
+Daraus ergibt sich für die drei Qualitätsgrößen unsere festgelegte B1-Likelihood:
+yi∣Zi,B,Σy∼N3BhiZi,Σy.
+Gleichung (C.1): B1-Endqualitätslikelihood.
+Hier ist B∈R3×K unsere Bayesian-Regressionskoeffizientenmatrix. Die Kovarianzmatrix Σy ist diagonal.
+C.1.1 Was haben wir in Herleitung B zusätzlich erreicht?
+Wir haben eine Variationsverteilung definiert:
+qΘ,Z=qΘi=1NqϕiZi.
+Gleichung (C.2): Globale und lokale Faktorisierung.
+Dabei ist qΘ die gemeinsame Approximation der globalen Parameterposterioren, und qϕiZi die ringspezifische strukturierte Zustandsverteilung.
+Für letztere verwenden wir:
+qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1.
+Gleichung (C.3): Markov-strukturierte lokale Variationsverteilung.
+Die zeitlichen Abhängigkeiten zwischen den Zuständen bleiben somit innerhalb der Variationsverteilung erhalten.
+Außerdem können wir bereits vier wichtige Größen berechnen:
+γitk=qZit=k,
+ξitj,k=qZi,t−1=j,Zit=k,
+mi=Eqhi,  Hi=Eqhihi⊤.
+Die ersten beiden Größen benötigen wir für die HMM-Parameter. Die letzten beiden beschreiben die erwarteten Zustandsaufenthalte und deren zweite Momente.
+Das Entscheidende aus Herleitung B: Wir haben eine Rekursion entwickelt, die Hi berechnen kann, ohne sämtliche möglichen Zustandsfolgen einzeln aufzuzählen.
+Jetzt können wir damit die tatsächliche Optimierung formulieren.
+C.2 Was bedeutet „Training“ in unserem Bayesian-Modell?
+Hier müssen wir einen wichtigen Unterschied zum Training eines gewöhnlichen neuronalen Netzes verstehen.
+Bei einem klassischen neuronalen Netz werden häufig die Modellparameter θ unmittelbar optimiert:
+θ*=argminθLθ.
+Am Ende erhalten wir einen Parametersatz θ*.
+Bei unserem Bayesian-Modell möchten wir hingegen eine Näherung der gesamten Posteriorverteilung über die unbekannten Größen lernen.
+Wir suchen also:
+q*Θ,Z=argmaxq∈QLq.
+Gleichung (C.4): Bayesian-Trainingsziel mittels Variational Inference.
+Dabei ist Q unsere gewählte Variationsfamilie, und Lq die Evidence Lower Bound (ELBO).
+C.2.1 Warum maximieren wir die ELBO?
+Aus Herleitung B kennen wir die Beziehung:
+logpD=Lq+DKLqΘ,Z∥pΘ,Z∣D.
+Die Modellevidenz logpD bleibt bei festem Modell unverändert.
+Wenn wir deshalb die ELBO maximieren, verringern wir die KL-Divergenz zwischen unserer approximierenden Verteilung und dem tatsächlichen Posterior.
+Wir erhalten damit keine Garantie auf den global optimalen Posterior. Die Lösung ist auf unsere Variationsfamilie beschränkt, und die Optimierung kann lokale Optima besitzen.
+Dennoch haben wir ein präzises mathematisches Trainingsziel.
+C.2.2 Welche Parameter werden beim Training verändert?
+Wir müssen unterscheiden zwischen den ursprünglichen Modellparametern und den Parametern unserer approximierenden Verteilungen.
+Die ursprünglichen Modellparameter sind beispielsweise:
+π, A, μk, Σx,k, B, Σy.
+Diese werden nicht einfach auf einzelne feste Werte gesetzt.
+Stattdessen aktualisieren wir beispielsweise die Parameter von
+qπ, qA, qμkj,vkj, qβr,σy,r2.
+Daneben optimieren wir die Variationsparameter ϕi, mit denen die ringspezifischen Zustandsverteilungen beschrieben werden.
+Wir erhalten also zwei unterschiedliche Optimierungsaufgaben:
+Globale Optimierung: Wie verändern sich die Posteriorverteilungen der gemeinsamen Modellparameter?
+Lokale Optimierung: Welche Zustandsfolgen sind für einen bestimmten Ring unter Berücksichtigung seiner Loggerdaten und gegebenenfalls seiner Qualitätsmessungen wahrscheinlich?
+Diese beiden Aufgaben beeinflussen sich gegenseitig.
+C.3 Die vollständige ELBO als Trainingszielfunktion
+Aus Herleitung B haben wir bereits die allgemeine ELBO erhalten. Für die Implementierung möchten wir sie nun in klar berechenbare Einzelbestandteile aufteilen.
+Wir definieren zunächst die Menge aller Trainingsringe:
+I=IL∪IU.
+Für einen Ring i führen wir vier Größen ein:
+Ti=EqlogpZi∣π,A,
+Ei=EqlogpXi∣Zi,Φ,
+Qi=Eqlogpyi∣Zi,Ψ,
+Hi=−EqϕilogqϕiZi.
+Dabei bezeichnet Ti den Beitrag der Zustandsdynamik, Ei den Beitrag der Prozessemissionen, Qi den Qualitätsbeitrag und Hi die Entropie der Zustandsverteilung.
+Die Unterscheidung zwischen Hi und der zuvor definierten Matrix Hi ist wichtig: Hi ist ein Skalar, Hi das zweite Moment der Aufenthaltsanteile.
+Damit lautet unsere gesamte ELBO:
+Lq=−DKLqΘ∥pΘ+i∈I​Ti+Ei+Hi+i∈IL​Qi.
+Gleichung (C.5): Vollständige gemeinsame ELBO des B1-Modells.
+Das ist die wichtigste übergeordnete Gleichung unseres Trainingsalgorithmus.
+C.3.1 Was bedeutet jeder Term praktisch?
+Globale Prior-Regularisierung: −DKLqΘ∥pΘ verhindert, dass sich die globalen Variationsverteilungen ohne entsprechende Dateninformation beliebig weit von ihren Priors entfernen.
+Zustandsdynamik Ti: Bewertet die Anfangszustände und die Zustandsübergänge des Rings anhand der globalen HMM-Verteilungen.
+Emissionen Ei: Bewertet, wie plausibel die beobachteten Loggerwerte unter den verschiedenen verborgenen Zuständen sind.
+B1-Qualitätslikelihood Qi: Vergleicht die drei gemessenen Qualitätsgrößen mit der Regression auf den unsicheren Aufenthaltsanteilen der vollständigen Zustandsfolge.
+Zustandsentropie Hi: Berücksichtigt, dass mehrere Zustandsfolgen plausibel sein können, anstatt die Zustandswahrscheinlichkeiten ohne ausreichenden Grund auf einzelne Zustände zu konzentrieren.
+C.3.2 Was passiert mit ungelabelten Ringen?
+Hier bleibt unsere ursprüngliche Semi-Supervised-Entscheidung vollständig erhalten.
+Für einen gelabelten Ring gilt:
+LiL=Ti+Ei+Hi+Qi.
+Gleichung (C.6): Lokaler ELBO-Beitrag eines gelabelten Rings.
+Für einen ungelabelten Ring gilt:
+LiU=Ti+Ei+Hi.
+Gleichung (C.7): Lokaler ELBO-Beitrag eines ungelabelten Rings.
+Es entsteht kein Pseudo-Label und kein künstlicher Qualitätsverlust.
+Ungelabelte Ringsequenzen tragen zur Schätzung der gemeinsamen Prozess- und Zustandsstruktur bei. Die Qualitätsregression erhält ihre direkte Information weiterhin aus den gelabelten Ringen.
+Das entspricht der grundlegenden Unterscheidung der Likelihood-Beiträge in Shao et al. (2022). Die dortige zeitpunktbezogene Qualitätsregression ersetzen wir durch unsere B1-Sequenzkopplung.
+Erstes Ergebnis der Herleitung C: Unser gemeinsames Trainingsziel lässt sich vollständig in getrennt berechenbare Beiträge überführen. Wir wissen damit genau, welche Teile alle Ringe nutzen und welcher zusätzliche Faktor ausschließlich bei gelabelten Ringen vorkommt.
+C.4 Wie berechnen wir die einzelnen ELBO-Terme?
+Wir wissen jetzt, welche Terme unsere Zielfunktion enthält. Nun müssen wir sie in einer Form ausdrücken, die später tatsächlich mit NumPy oder PyTorch berechnet werden kann.
+C.4.1 Der Term der Zustandsdynamik
+Aus Herleitung A kennen wir:
+pZi∣π,A=πZi1t=2TiAZi,t−1,Zit.
+Durch Logarithmieren wird aus dem Produkt eine Summe.
+Wenn wir anschließend den Erwartungswert unter unserer Variationsverteilung bilden, erhalten wir:
+Ti=k=1Kγi1k Eqlogπk+t=2Tij=1Kk=1Kξitj,k EqlogAjk.
+Gleichung (C.8): Erwarteter HMM-Zustandsdynamikterm.
+Hier verwenden wir zwei Größen aus Herleitung B: γi1k für die Anfangszustandswahrscheinlichkeit und ξitj,k für die Wahrscheinlichkeit eines Übergangs.
+Die Erwartungswerte der logarithmierten Modellparameter können wir aus den Dirichlet-Verteilungen bestimmen.
+Wenn
+qπ=Dirαπ,
+gilt:
+Eqlogπk=ψαkπ−ψl=1Kαlπ.
+Gleichung (C.9): Erwarteter Logarithmus der Anfangswahrscheinlichkeit.
+Analog gilt für die Übergangsmatrix:
+EqlogAjk=ψαjkA−ψl=1KαjlA.
+Gleichung (C.10): Erwartete logarithmische Übergangswahrscheinlichkeit.
+Die Digammafunktion ψ ist dabei eine mathematische Spezialfunktion, die in den üblichen wissenschaftlichen Python-Bibliotheken verfügbar ist.
+Diese Updates und Erwartungswerte gehören zum klassischen Variational Bayesian HMM und werden bei Beal (2003) ausführlich hergeleitet.
+Implementierungsbedeutung: Wir benötigen dafür keine expliziten Samples aus der Übergangsmatrix. Es genügt, die aktuellen Dirichlet-Parameter zu kennen. Daraus berechnen wir die erwarteten Log-Wahrscheinlichkeiten und verwenden diese gemeinsam mit den Zustandsstatistiken.
+C.4.2 Der Term der Prozessemissionen
+Wir haben für jedes Prozessmerkmal eine zustandsspezifische Gaußverteilung festgelegt.
+Für den Zustand k und das Merkmal j lautet sie:
+xitj∣Zit=k,μkj,vkj∼Nμkj,vkj.
+Die globalen Variationsfaktoren dieser Parameter verwenden eine Normal-Invers-Gamma-Struktur.
+Wir schreiben ihre aktuellen Parameter als:
+qvkj=InvGammaakjx,bkjx,
+qμkj∣vkj=Nmkjx,vkjκkjx.
+Für die Implementierung benötigen wir die erwartete logarithmische Gauß-Dichte:
+ℓitkjx=EqlogNxitj∣μkj,vkj.
+Unter unserer Normal-Invers-Gamma-Parametrisierung ergibt sich:
+ℓitkjx=−12log2π+12ψakjx−logbkjx−12akjxbkjxxitj−mkjx2+1κkjx.
+Gleichung (C.11): Erwartete logarithmische Gauß-Emission.
+Die Bestandteile haben unterschiedliche Bedeutungen.
+Der Ausdruck xitj−mkjx2 beschreibt die quadratische Abweichung der tatsächlichen Prozessmessung vom geschätzten Zustandmittelwert.
+Der Faktor akjx/bkjx ist die erwartete Präzision dieser Verteilung.
+Der Zusatzterm 1/κkjx berücksichtigt, dass auch der Mittelwert μkj unsicher ist.
+Genau dieser letzte Term würde bei einer gewöhnlichen Auswertung mit einem festen geschätzten Mittelwert fehlen.
+Da wir eine diagonale Kovarianz gewählt haben, addieren wir die Beiträge aller d Prozessmerkmale:
+ℓitkx=j=1dℓitkjx.
+Damit folgt für den gesamten Emissionsterm:
+Ei=t=1Tik=1Kγitk ℓitkx.
+Gleichung (C.12): Erwarteter Prozessemissionsterm.
+Damit ist auch der Prozessemissionsterm vollständig berechenbar.
+Die Formel ist die auf unsere diagonalen Gauß-Emissionen angepasste konjugierte Erwartungswertberechnung; P112 verwendet die entsprechende allgemeinere multivariate Emissionsstruktur.
+C.4.3 Der B1-Qualitätsbeitrag
+Dieser Term ist die wichtigste eigene Erweiterung unserer Methode.
+Aus Herleitung B kennen wir die beiden Aufenthaltsmomente:
+mi=Eqhi,  Hi=Eqhihi⊤.
+Für jede Qualitätsgröße r definieren wir die bereits hergeleiteten Parametererwartungen:
+ur=Eqλr,  vr=Eqlogλr,
+gr=Eqλrβr,
+Gr=Eqλrβrβr⊤.
+Dabei gilt λr=1/σy,r2.
+Der gesamte Qualitätsterm eines gelabelten Rings lautet:
+Qi=r=13−12log2π+12vr−12yir2ur−2yirgr⊤mi+trGrHi.
+Gleichung (C.13): Erwarteter B1-Qualitätsbeitrag.
+Diese Gleichung ist unmittelbar aus unserer Herleitung B übernommen.
+Besonders wichtig ist der letzte Ausdruck:
+trGrHi.
+Er enthält den zweiten Moment der Zustandsaufenthalte. Dadurch wird die Unsicherheit der verborgenen Zustandsfolge innerhalb des Qualitätsbeitrags berücksichtigt.
+Würden wir ausschließlich den erwarteten Aufenthaltsvektor mi verwenden, wäre diese Information nicht vollständig enthalten.
+Implementierungsbedeutung: Wir brauchen für die Berechnung von Qi nur die aktuellen globalen Parametermomente und die zwei ringspezifischen Aufenthaltsmomente. Wir benötigen nicht die vollständige Menge aller KTi möglichen Zustandsfolgen.
+Das ist eine wesentliche Voraussetzung dafür, dass unsere B1-Architektur überhaupt als implementierbares Verfahren infrage kommt.
+C.4.4 Der Entropieterm
+Unsere lokale Markov-Variationsverteilung besitzt die Form:
+qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1.
+Aus der Entropie-Kettenregel erhalten wir:
+Hi=−k=1Kρiklogρik−t=2Tij=1Kγi,t−1jk=1KQitj,klogQitj,k.
+Gleichung (C.14): Entropie einer Markov-strukturierten Variationsverteilung.
+Dieser Term berücksichtigt die Unsicherheit der Anfangszustände und Übergänge innerhalb unserer lokalen Variationsverteilung. Wie die anderen Terme können wir ihn mit Tensoroperationen auswerten.
+C.4.5 Der globale Prior-Term
+Den letzten Bestandteil bildet:
+−DKLqΘ∥pΘ.
+Weil wir die globalen Parameter in unabhängige Variationsfaktoren zerlegt haben, lässt sich die globale KL-Divergenz in entsprechende Einzelterme aufteilen:
+DKLglobal=DKLπ+DKLA+k,j​DKLx,kj+r=13DKLy,r.
+Gleichung (C.15): Zerlegung der globalen KL-Divergenz.
+Dabei entstehen KL-Divergenzen zwischen Dirichlet-Verteilungen und zwischen Normal-Invers-Gamma-Verteilungen.
+Für einen vollständig implementierten Trainingsalgorithmus müssen wir diese Terme entweder durch geschlossene Formeln oder durch eine äquivalente, numerisch stabile Erwartungswertberechnung auswerten.
+Wir werden ihre genaue Berechnung im folgenden technischen Abschnitt festlegen.
+Zweites Ergebnis: Die vollständige ELBO ist jetzt bis auf die verfügbaren Parameter der globalen und lokalen Variationsverteilungen konkret auswertbar. Wir benötigen keinen unbekannten exakten Posterior und keine explizite Aufzählung aller Zustandsfolgen.
+C.5 Wie aktualisieren wir die globalen Parameterverteilungen?
+Nun kommen wir zur eigentlichen Optimierung.
+Wir beginnen mit den globalen Parametern, weil für diese unter unseren gewählten Priorfamilien weitgehend analytische Updates möglich sind.
+Die Grundidee ist einfach: Wir kombinieren die vorherige Priorinformation mit den erwarteten Statistiken aus allen Trainingsringen.
+C.5.1 Anfangszustände und Übergangsmatrix
+Für die Anfangsverteilung gilt:
+αkπ,neu=α0,kπ+i∈I​γi1k.
+Gleichung (C.16): Dirichlet-Update der Anfangsverteilung.
+Der neue Dirichlet-Parameter besteht somit aus dem Priorparameter und der erwarteten Anzahl der Ringe, die im Zustand k beginnen.
+Für die Übergangsmatrix gilt:
+αjkA,neu=α0,jkA+i∈I​t=2Tiξitj,k.
+Gleichung (C.17): Dirichlet-Update der Übergänge.
+Hier ergänzen wir den Prior durch die erwartete Anzahl der Übergänge von Zustand j nach Zustand k.
+Beide Updates sind direkte Erweiterungen der klassischen Bayesian-HMM-Updates auf mehrere eigenständige Ringsequenzen.
+C.5.2 Die Gauß-Emissionsparameter
+Für unsere späteren Python-Updates möchten wir auch die zustandsspezifischen Mittelwerte und Varianzen vollständig formulieren.
+Wir betrachten dazu Zustand k und Prozessmerkmal j.
+Aus den lokalen Zustandswahrscheinlichkeiten bilden wir drei gewichtete Statistiken:
+Nk=i∈I​t=1Tiγitk,
+Skj1=i∈I​t=1Tiγitkxitj,
+Skj2=i∈I​t=1Tiγitkxitj2.
+Hier beschreibt Nk die erwartete Anzahl der Messzeitpunkte im Zustand k. Die beiden S-Größen enthalten die gewichteten Messwerte beziehungsweise ihre Quadrate.
+Unsere Normal-Invers-Gamma-Posteriorparameter ergeben sich daraus wie folgt.
+Zunächst die neue Mittelwertpräzision:
+κkjx,neu=κ0,jx+Nk.
+Gleichung (C.18): Aktualisierte Emissionsmittelwertpräzision.
+Danach der neue Mittelwertparameter:
+mkjx,neu=κ0,jxm0,jx+Skj1κkjx,neu.
+Gleichung (C.19): Aktualisierter Emissionsmittelwert.
+Der Formparameter der Invers-Gamma-Verteilung lautet:
+akjx,neu=a0,jx+Nk2.
+Gleichung (C.20): Aktualisierter Emissions-Formparameter.
+Schließlich erhalten wir für den Skalenparameter:
+bkjx,neu=b0,jx+12Skj2+κ0,jxm0,jx2−κkjx,neumkjx,neu2.
+Gleichung (C.21): Aktualisierter Emissions-Skalenparameter.
+Die drei gewichteten Statistiken sind damit ausreichend, um den globalen Emissionsfaktor zu aktualisieren.
+Was passiert bei selten besetzten Zuständen? Wenn ein Zustand nur wenige erwartete Beobachtungen besitzt, bleibt sein Posterior stärker durch den Prior beeinflusst.
+Das ist gerade einer der Gründe, weshalb unsere Bayesian-Parametrisierung bei kleinen Datenmengen sinnvoll sein kann.
+Für die Implementierung müssen wir dennoch überwachen, ob Zustände praktisch unbesetzt bleiben. In diesem Fall können die entsprechenden Parameter unsicher und die Zustände schwer interpretierbar sein.
+Drittes Ergebnis: Die globalen HMM-Parameter besitzen vollständig bestimmte, konjugierte Aktualisierungsgleichungen. Wir müssen sie nicht mit einem allgemeinen Gradientenoptimierer trainieren.
+C.5.3 Die globalen Parameter unserer B1-Qualitätsregression
+Jetzt betrachten wir den Teil, der unser Modell speziell auf die drei Ringqualitätsgrößen ausrichtet.
+Für jede Qualitätsgröße r verwenden wir:
+yir∣Zi,βr,σy,r2∼Nβr⊤hiZi,σy,r2.
+Die Regressionsparameter erhalten einen Normal-Invers-Gamma-Prior.
+Aus Herleitung B wissen wir, dass wir dabei nicht die tatsächlichen, unbekannten Aufenthaltsvektoren benötigen, sondern deren Momente:
+mi=Eqhi,  Hi=Eqhihi⊤.
+Zur besseren Lesbarkeit verwenden wir für eine einzelne Qualitätsgröße r die folgenden Priorparameter:
+m0,rβ, V0,rβ, a0,ry, b0,ry.
+Aktualisierung der Koeffizientenkovarianz
+Zunächst gilt:
+Vrβ,neu−1=V0,rβ−1+i∈IL​Hi.
+Gleichung (C.22): Aktualisierte Regressionskoeffizientenkovarianz.
+Wichtig ist hier, dass wir das zweite Moment Hi verwenden und nicht lediglich mimi⊤. Dadurch berücksichtigen wir die Unsicherheit der Zustandsaufenthalte auch bei der Aktualisierung der Regressionskoeffizienten.
+Aktualisierung des Koeffizientenmittelwertes
+Der neue Mittelwert lautet:
+mrβ,neu=Vrβ,neuV0,rβ−1m0,rβ+i∈IL​yirmi.
+Gleichung (C.23): Aktualisierter Regressionskoeffizientenmittelwert.
+Diese Gleichung ist unmittelbar mit einer gewöhnlichen linearen Bayesian Regression vergleichbar. Der Unterschied ist lediglich, dass unsere Eingaben latent und deshalb unsicher sind.
+Aktualisierung der Qualitätsfehlervarianz
+Der neue Formparameter der Invers-Gamma-Verteilung lautet:
+ary,neu=a0,ry+NL2.
+Gleichung (C.24): Aktualisierter Qualitäts-Formparameter.
+Für den Skalenparameter erhalten wir:
+bry,neu=b0,ry+12i∈IL​yir2+Q0,r−Qn,r,
+mit den beiden quadratischen Formen
+Q0,r=m0,rβ⊤V0,rβ−1m0,rβ,
+Qn,r=mrβ,neu⊤Vrβ,neu−1mrβ,neu.
+Gleichung (C.25): Aktualisierter Qualitäts-Skalenparameter, für Word in gleichwertige Teilschritte zerlegt.
+Damit besitzen wir die vollständigen globalen Updates unserer Qualitätsregression.
+Ein entscheidender Unterschied zwischen DL und DU: In den Gleichungen (C.22)–(C.25) wird nur über die gelabelten Ringe summiert. Das ist beabsichtigt.
+Ein ungelabelter Ring liefert keinen tatsächlich gemessenen Qualitätswert yir, mit dem die Regressionskoeffizienten direkt aktualisiert werden könnten.
+Allerdings kann er über die gemeinsamen HMM-Parameter die Zustandsverteilungen beeinflussen, die wiederum in die Aufenthaltsmomente gelabelter Ringe eingehen.
+Damit bleibt der Semi-Supervised-Effekt innerhalb unseres Modells indirekt, aber vollständig gemeinsam probabilistisch.
+Praktische Umsetzung: Wir sollten die neue Matrix Vrβ,neu nicht durch eine unnötige explizite Matrixinverse berechnen. Numerisch günstiger ist es, das zugehörige lineare Gleichungssystem mithilfe einer Cholesky-Zerlegung zu lösen.
+Die Matrix
+V0,rβ−1+i​Hi
+ist bei positiv definitem Prior und korrekt berechneten zweiten Momenten positiv definit. Das bietet eine gute Grundlage für stabile lineare Algebra.
+Viertes Ergebnis: Sämtliche globalen Parametergruppen unseres B1-Modells besitzen nun konkrete Aktualisierungsformeln. Die Hauptschwierigkeit des Trainings liegt nicht mehr in den globalen Parametern, sondern in der lokalen Optimierung der strukturierten Zustandsverteilungen.
+C.6 Wie berechnen wir den globalen KL-Term konkret?
+Für unsere vollständig auswertbare ELBO benötigen wir auch die KL-Divergenz zwischen den globalen Variationsverteilungen und ihren Priorverteilungen.
+Das ist ein Punkt, der bei der Implementierung leicht übersehen wird.
+Wenn wir nur die erwarteten Likelihood-Terme optimieren, trainieren wir nicht die zuvor definierte vollständige Bayesian-ELBO.
+C.6.1 KL-Divergenz der Dirichlet-Verteilungen
+Seien
+qp=Dirα,  pp=Dirα0.
+Wir definieren die Parametersummen:
+S=k​αk,  S0=k​α0,k.
+Dann gilt:
+DKLq∥p=logΓS−k​logΓαk−logΓS0+k​logΓα0,k+k​αk−α0,kψαk−ψS.
+Gleichung (C.26): KL-Divergenz zweier Dirichlet-Verteilungen.
+Die Funktion Γ ist die Gammafunktion. In der Implementierung verwenden wir deren logarithmierte Form, beispielsweise gammaln, weil diese numerisch stabiler ist.
+Diese Formel verwenden wir einmal für die Anfangsverteilung und für jede Zeile der Übergangsmatrix.
+C.6.2 KL-Divergenz der Normal-Invers-Gamma-Faktoren
+Auch für unsere Emissions- und Qualitätsparameter benötigen wir eine entsprechende Berechnung.
+Betrachten wir zwei Normal-Invers-Gamma-Verteilungen:
+qv=InvGammaa,b, qβ∣v=Nm,vV
+und
+pv=InvGammaa0,b0, pβ∣v=Nm0,vV0.
+Hier kann β auch eindimensional sein, wie bei einem einzelnen Emissionsmittelwert.
+Durch die Kettenregel der KL-Divergenz ergibt sich:
+DKLq∥p=DKLIG+12trV0−1V−Kβ+logV0V+abm−m0⊤V0−1m−m0.
+Gleichung (C.27): KL-Divergenz des Normal-Invers-Gamma-Faktors.
+Hier bezeichnet Kβ die Dimension des Koeffizientenvektors und V die Determinante der Matrix.
+Der Invers-Gamma-Anteil lautet bei unserer Shape-Scale-Konvention:
+DKLIG=a0logbb0+logΓa0−logΓa+a−a0ψa+ab0b−1.
+Gleichung (C.28): KL-Divergenz der Invers-Gamma-Verteilungen.
+Damit sind auch die KL-Terme der Emissions- und Regressionsfaktoren analytisch berechenbar.
+In der Implementierung sollten wir diese Funktionen isoliert testen und überprüfen, dass sie bei gleichen Prior- und Variationsparametern den Wert null liefern.
+Warum ist das praktisch wichtig? Wir möchten während des Trainings nicht nur eine Gesamt-ELBO protokollieren, sondern ihre einzelnen Bestandteile.
+Wenn sich beispielsweise der Qualitätsterm verbessert, während die globale KL-Divergenz stark zunimmt, erkennen wir daran, dass die approximierten Parameterposterioren sich zunehmend von den gewählten Priors entfernen.
+Das muss nicht falsch sein; ausreichend informative Daten sollen die Posteriorverteilungen verändern.
+Die getrennte Protokollierung hilft uns jedoch zu erkennen, welcher Bestandteil die Optimierung beeinflusst.
+C.7 Die lokale Optimierung unserer B1-Zustandsverteilungen
+Jetzt kommen wir zur eigentlichen technischen Herausforderung.
+Wir möchten für jeden gelabelten Ring eine strukturierte Markov-Verteilung optimieren, die sowohl die Prozessmessungen als auch die beobachtete Endqualität berücksichtigt.
+Für ungelabelte Ringe ist das Problem einfacher, weil der B1-Qualitätsfaktor nicht vorkommt.
+C.7.1 Die Parameter unserer lokalen Variationsverteilung
+Wir verwenden weiterhin:
+qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1.
+Damit müssen wir für jeden Ring optimieren:
+einen Wahrscheinlichkeitsvektor ρi der Länge K,
+Ti−1 Übergangsmatrizen Qit der Größe K×K.
+Diese Parameter müssen jeweils gültige Wahrscheinlichkeiten bilden.
+Daher legen wir sie nicht als völlig freie reelle Zahlen ab. Stattdessen verwenden wir unbeschränkte sogenannte Logits, die wir mittels Softmax in Wahrscheinlichkeiten umwandeln.
+Für die Anfangsverteilung:
+ρik=expuikl=1Kexpuil.
+Gleichung (C.29): Softmax-Parametrisierung des Anfangszustands.
+Für die Variationsübergänge:
+Qitj,k=expVitjkl=1KexpVitjl.
+Gleichung (C.30): Softmax-Parametrisierung einer Variationsübergangszeile.
+Hier sind uik und Vitjk frei optimierbare reelle Parameter.
+Wegen der Softmax-Transformation bleiben sämtliche Wahrscheinlichkeiten positiv und normiert.
+Wichtig: Diese Qit sind keine zusätzlichen globalen HMM-Übergangsmatrizen. Sie parametrisieren ausschließlich unsere approximierenden Zustandsverteilungen und sind daher ringspezifisch und zeitabhängig.
+C.7.2 Wie berechnen wir daraus die Zielfunktion?
+Für die aktuellen Logits eines Rings führen wir folgende Schritte aus:
+Lokale Logits: ui,Vi festlegen.
+Softmax: normierte ρi,Qit berechnen.
+Zustandsrekursion: γit,ξit berechnen.
+B1-Momentenrekursion: mi,Hi berechnen.
+Lokale ELBO: LiL beziehungsweise LiU auswerten.
+Alle Operationen müssen so implementiert werden, dass die Abhängigkeit der ELBO von den ursprünglichen Logits erhalten bleibt.
+Damit können wir automatische Differentiation verwenden.
+C.7.3 Wie verändert die Qualitätsmessung die Zustandsverteilung?
+Betrachten wir den Qualitätsterm eines gelabelten Rings.
+Aus Herleitung B folgt, dass die vom Aufenthaltsvektor abhängigen Teile bei festem globalem qΘ die Form besitzen:
+Qi=ci+gi⊤mi−12trRHi.
+Gleichung (C.31): Aufenthaltsabhängiger Qualitätsfaktor.
+Dabei sind
+gi=r=13yirgr
+und
+R=r=13Gr.
+Die Größen gr und Gr sind unsere zuvor definierten globalen Parametererwartungen.
+Für die Ableitung nach den Aufenthaltsmomenten gilt deshalb:
+∂Qi∂mi=gi,  ∂Qi∂Hi=−12R.
+Gleichung (C.32): Direkte Ableitungen nach den Aufenthaltsmomenten.
+Das ist mathematisch sehr aufschlussreich.
+Die gemessene Endqualität beeinflusst, welche erwarteten Zustandsaufenthalte das Modell bevorzugt. Gleichzeitig beeinflussen die zweiten Parametermomente, wie die Unsicherheit der Aufenthaltsanteile bewertet wird.
+Diese Information wird durch die Momentenrekursion zurück auf die lokalen Übergangswahrscheinlichkeiten übertragen.
+Wir erhalten somit tatsächlich eine Rückwirkung der Qualitätsmessungen auf die approximierten verborgenen Zustandsfolgen.
+Das ist mehr als ein HMM, dessen Zustandsmerkmale erst nach dem Training separat für eine Regression verwendet werden.
+C.7.4 Die numerische Aktualisierung
+Wir maximieren die lokale ELBO bezüglich der Logits:
+ϕi*≈argmaxϕiLiϕi;qΘ.
+Gleichung (C.33): Numerische lokale B1-Aktualisierung.
+Als ersten Optimierungsalgorithmus würde ich Adam untersuchen.
+Bei jeder Iteration berechnen wir die lokale ELBO und ihre Gradienten bezüglich der Logits. Anschließend verändern wir die Logits so, dass die ELBO nach Möglichkeit zunimmt.
+Daraus entsteht ein iteratives Verfahren.
+Allerdings ist wichtig: Adam garantiert nicht, dass jede einzelne Aktualisierung die ELBO erhöht. Deshalb müssen wir die Optimierung überwachen und bei Bedarf die Lernrate reduzieren oder einen Schritt zurücknehmen.
+Der lokale Optimierungsprozess endet beispielsweise, wenn sich die ELBO nur noch geringfügig verändert oder die maximale Anzahl zulässiger Iterationen erreicht wurde.
+Die konkreten Grenzwerte legen wir später anhand kleiner synthetischer Testfälle und der tatsächlichen Rechenkosten fest.
+C.7.5 Warum wir ungelabelte Ringe einfacher aktualisieren können
+Für ungelabelte Ringe existiert kein beobachteter Qualitätsfaktor.
+Ihre lokale ELBO besteht deshalb ausschließlich aus Zustandsdynamik, Prozessemissionen und Zustandsentropie.
+Für einen solchen Ring gilt:
+LiU=Ti+Ei+Hi.
+Wenn wir die globalen Variationsfaktoren festhalten, ergibt sich die optimale lokale Zustandsverteilung aus:
+qi*Zi∝expEqlogπZi1+t=2TiEqlogAZi,t−1,Zit+t=1TiEqlogpxit∣Zit,Φ.
+Gleichung (C.34): Optimale lokale ungelabelte HMM-Verteilung bei festem globalem Faktor.
+Dieser Ausdruck besitzt weiterhin die Struktur einer HMM-Kette.
+Daher können wir bei ungelabelten Ringen die klassische angepasste Forward-Backward-Inferenz verwenden.
+Das ist praktisch sehr vorteilhaft.
+Wir benötigen nicht zwingend für jeden ungelabelten Ring eine aufwendige iterative Gradientenoptimierung der lokalen Logits.
+Stattdessen können wir seine optimalen lokalen Zustandsmarginalen bei festgehaltenem globalem qΘ aus den erwarteten HMM-Potenzialen berechnen.
+Diese Marginalen lassen sich bei Bedarf wieder in die normalisierte Markov-Form ρi,Qit überführen.
+Bei gelabelten Ringen müssen wir weiterhin den globalen Qualitätsterm berücksichtigen und unsere numerische B1-Optimierung durchführen.
+Unsere konkrete Trainingsentscheidung:
+Gelabelter Ring – Strukturierte Markov-VI mit numerischer Optimierung: Qualitätslikelihood koppelt die gesamte Zustandsfolge
+Ungelabelter Ring – Angepasste Forward-Backward-Inferenz: Nur lokale Zustands-, Übergangs- und Emissionsfaktoren
+Damit nutzen wir die einfachere Lösung überall dort, wo sie mathematisch zulässig ist.
+Für gelabelte Ringe würde ich zunächst ebenfalls eine gewöhnliche Forward-Backward-Berechnung zur Initialisierung verwenden. Anschließend korrigieren wir die lokale Zustandsverteilung unter Berücksichtigung der tatsächlich gemessenen Qualität.
+Das gibt uns einen nachvollziehbaren und numerisch vernünftigen Startpunkt.
+Fünftes Ergebnis: Unser vollständiger Trainingsalgorithmus benötigt nicht für alle Ringe dieselbe aufwendige lokale Optimierung. Der zusätzliche B1-Aufwand entsteht vor allem bei den gelabelten Ringsequenzen.
+C.8 Der Faktor C: Wie können wir ungelabelte Daten gezielt gewichten?
+Wir hatten vereinbart, zunächst das ungewichtete direkte Semi-Supervised-Modell zu verwenden.
+Später möchten wir innerhalb derselben Modellarchitektur untersuchen, welchen Einfluss die ungelabelten Ringe besitzen.
+Dafür eignet sich der von dir angesprochene Gewichtungsfaktor C.
+Shao, Ge und Song (2021) entwickeln eine gewichtete Variational-Inference-Formulierung, mit der sich der Einfluss ungelabelter Beobachtungen kontrollieren lässt.
+Für unser Ringwalzmodell müssen wir diese Idee auf komplette Prozesssequenzen übertragen.
+C.8.1 Die ursprüngliche, ungewichtete Likelihood
+Unser bisheriges Modell verwendet:
+pDL,DU∣Θ=pDL∣Θ pDU∣Θ.
+Durch Logarithmieren folgt:
+logpDL,DU∣Θ=logpDL∣Θ+logpDU∣Θ.
+Hier werden die gelabelten und ungelabelten Daten entsprechend ihrer gewöhnlichen Likelihood berücksichtigt.
+Das ist unsere Hauptvariante mit C=1.
+C.8.2 Erweiterung durch einen Gewichtungsfaktor
+Für die spätere Evaluation können wir ein verallgemeinertes Lernziel definieren:
+logpDL∣Θ+ClogpDU∣Θ.
+Gleichung (C.35): Gewichtete ungelabelte Log-Likelihood.
+Dabei untersuchen wir zunächst:
+0≤C≤1.
+Die Werte besitzen folgende Interpretation:
+0: Ungelabelte Daten werden nicht berücksichtigt
+0<C<1: Abgeschwächter Einfluss ungelabelter Daten
+1: Ursprüngliche gemeinsame Likelihood
+Die gewichtete Variante ist ein generalisiertes Bayesian-Lernziel. Für C≠1 handelt es sich nicht mehr um den unveränderten Posterior unseres ursprünglichen generativen Modells.
+Das müssen wir später wissenschaftlich kenntlich machen.
+C.8.3 Eine wichtige mathematische Feinheit
+Wir dürfen nicht einfach nur die HMM-Likelihood-Terme mit C multiplizieren und die lokale Zustandsentropie unverändert lassen.
+Denn unser gewünschtes Gewicht bezieht sich auf die marginale ungelabelte Likelihood.
+Für einen ungelabelten Ring gilt:
+pXi∣Θ=Zi​pXi,Zi∣Θ.
+Eine Variationsschranke hierfür lautet:
+logpXi∣Θ≥EqilogpXi,Zi∣Θ+Hqi.
+Wenn wir diesen gesamten Beitrag mit C≥0 gewichten, müssen wir auch die Entropie entsprechend berücksichtigen.
+Deshalb definieren wir unsere gewichtete ELBO als:
+LC=−DKLqΘ∥pΘ+i∈IL​Ti+Ei+Qi+Hi+Cj∈IU​Tj+Ej+Hj.
+Gleichung (C.36): Gewichtete ELBO einschließlich ungelabelter Entropie.
+Damit erhält jede ungelabelte Ringsequenz einen insgesamt gewichteten Variationsbeitrag.
+C.8.4 Was verändert sich dadurch beim Training?
+Bei den globalen Updates werden die erwarteten Statistiken der ungelabelten Ringe ebenfalls mit C gewichtet.
+Für die Anfangszustände ergibt sich beispielsweise:
+αkπ=α0,kπ+i∈IL​γi1k+Cj∈IU​γj1k.
+Gleichung (C.37): Gewichtetes Dirichlet-Update der Anfangsverteilung.
+Für die Übergangsmatrix gilt analog:
+αabA=α0,abA+i∈IL​t=2Tiξita,b+Cj∈IU​t=2Tjξjta,b.
+Gleichung (C.38): Gewichtetes Dirichlet-Update der Übergangsmatrix.
+Auch bei den Emissionsupdates werden die entsprechenden γ-gewichteten Statistiken ungelabelter Ringe zusätzlich mit C multipliziert.
+Die unmittelbaren globalen Qualitätsupdates bleiben dagegen ausschließlich von den gelabelten Ringen abhängig.
+C.8.5 Verändert C auch die lokale Zustandsinferenz?
+Für einen ungelabelten Ring wird sein gesamter lokaler ELBO-Beitrag mit C multipliziert.
+Solange C>0 gilt und die globalen Variationsfaktoren festgehalten werden, ändert diese gemeinsame Skalierung nicht die optimale lokale Zustandsverteilung:
+argmaxqiC LiU=argmaxqiLiU.
+Deshalb können wir für ungelabelte Ringe auch bei 0<C≤1 weiterhin die gewöhnliche angepasste Forward-Backward-Inferenz verwenden.
+Der Faktor C verändert hauptsächlich, wie stark ihre Statistiken in die globalen Parameterupdates eingehen.
+Bei C=0 benötigen wir für die ungelabelten Ringe überhaupt keine lokalen Updates mehr, weil sie nicht zum Training beitragen.
+Warum ist das besonders interessant für unsere Bachelorarbeit? Damit können wir innerhalb derselben Bayesian-HMM-Architektur einen kontrollierten Versuch durchführen.
+Wir verändern lediglich die Stärke der ungelabelten Trainingsinformation. Die Modellstruktur, Priors und Qualitätsregression bleiben gleich.
+Dadurch können wir beispielsweise untersuchen, ob eine große Menge ungelabelter Ringe die Prozessstruktur sinnvoll verbessert oder ob ihre ungewichtete Berücksichtigung zu einem ungünstigen Verhältnis zwischen Prozessmodellierung und Qualitätsvorhersage führt.
+Eine weitere Besonderheit: Unsere Ringe können unterschiedlich lange Sequenzen besitzen. Lange Ringe tragen entsprechend mehr zeitpunktbezogene Emissions- und Übergangsterme bei.
+Eine zusätzliche Normierung dieser Beiträge wäre möglich, würde aber wiederum ein verändertes Lernziel darstellen. Das sollten wir erst untersuchen, wenn wir die tatsächlichen Sequenzlängen kennen.
+Sechstes Ergebnis: Wir können den Faktor C mathematisch konsistent in unsere Variationsoptimierung integrieren. Die ursprüngliche ungewichtete Methode bleibt unser Hauptpfad; die Gewichtung wird eine gezielte Experimentvariante.
+C.9 Der vollständige Trainingsalgorithmus – Schritt für Schritt
+Wir haben jetzt alle wesentlichen Bausteine, um unser Trainingsverfahren zusammenzusetzen.
+Dabei müssen wir eine klare Reihenfolge einhalten. Die globalen Updates benötigen Statistiken aus den lokalen Zustandsverteilungen. Umgekehrt benötigen die lokalen Zustandsupdates die aktuellen globalen Parameterverteilungen.
+Wir wählen deshalb ein alternierendes Variational-Inference-Verfahren.
+Das Prinzip ist mit Variational Bayesian Expectation-Maximization (VBEM) verwandt. Unsere spezielle B1-Erweiterung erfordert jedoch eine zusätzliche numerische lokale Optimierung für gelabelte Ringe.
+C.9.1 Schritt 1 – Trainingsdaten vorbereiten
+Wir übernehmen unsere bereits getroffenen Entscheidungen:
+DLtrain={Xi,yi}i=1NL,
+DUtrain={Xj}j=1NU.
+Alle Ringe besitzen ihre eigene, gegebenenfalls unterschiedliche Sequenzlänge.
+Der gelabelte Datensatz wird ringweise in Training, Validierung und Test aufgeteilt.
+Die zulässigen ungelabelten Ringsequenzen verwenden wir beim B1-Training vollständig. Sequenzen der zurückgehaltenen Validierungs- und Testringe dürfen dabei nicht versehentlich als ungelabelte Trainingsdaten wieder auftauchen.
+Die Skalierung und datengetriebene Vorverarbeitung werden ausschließlich mit den jeweils zugelassenen Trainingsdaten angepasst.
+C.9.2 Schritt 2 – Modellstruktur und Hyperparameter festlegen
+Wir müssen vor dem eigentlichen Training beispielsweise folgende Einstellungen definieren:
+K: Anzahl verborgener HMM-Zustände
+d: Anzahl verwendeter Prozessmerkmale
+Prior-Hyperparameter: Stärke und Form der Bayesian-Priors
+C: Gewichtung ungelabelter Daten, zunächst C=1
+Lokale Lernrate: Schrittweite der numerischen B1-Zustandsoptimierung
+Maximale lokale Iterationen: Begrenzung der Optimierung pro Ring
+Maximale globale Iterationen: Begrenzung der gesamten VI
+Konvergenztoleranz: Kriterium für ausreichend geringe Veränderung der ELBO
+Wir legen die tatsächlichen numerischen Werte noch nicht willkürlich fest.
+Dafür benötigen wir die Eigenschaften der realen Ringdaten und erste synthetische Funktionstests.
+C.9.3 Schritt 3 – Globale Variationsfaktoren initialisieren
+Wir initialisieren:
+q0π, q0A, q0Φ, q0Ψ.
+Eine rein symmetrische Initialisierung ist möglich, kann aber dazu führen, dass mehrere Zustände anfangs praktisch gleich modelliert werden.
+Deshalb würde ich verschiedene Initialisierungen prüfen.
+Für die Emissionsmittelwerte könnten beispielsweise Clusterzentren aus den zugelassenen Trainingsprozessdaten als Ausgangspunkt dienen.
+Dabei bleiben die Parameter selbstverständlich Bayesian-Zufallsvariablen. Die Initialisierung setzt lediglich die Startwerte ihrer Variationsverteilungen.
+Wir müssen diese Startwerte anschließend mit den gewählten Priors und ihren Hyperparametern in Einklang bringen.
+C.9.4 Schritt 4 – Ringspezifische Zustandsverteilungen initialisieren
+Für jeden Ring berechnen wir zunächst eine HMM-basierte Zustandsverteilung aus den aktuellen globalen Parametern.
+Dazu eignen sich die erwarteten Log-Übergangs- und Emissionspotenziale.
+Die initialen Zustandsverteilungen können wir durch angepasste Forward-Backward-Berechnungen erhalten.
+Für gelabelte Ringe dient das als Startwert für unsere zusätzliche B1-Optimierung.
+Bei ungelabelten Ringen kann diese Berechnung bereits das optimale lokale Update bei festgehaltenen globalen Variationsfaktoren liefern.
+C.9.5 Schritt 5 – Lokale Variationsverteilungen aktualisieren
+Nun unterscheiden wir zwei Fälle.
+Gelabelter Ring: Wir optimieren ρi,Qit unter Berücksichtigung seiner Prozesssequenz, Qualitätsmessungen und der strukturierten Aufenthaltsmomente.
+Ungelabelter Ring: Wir berechnen die lokalen Zustandsstatistiken durch angepasste Forward-Backward-Inferenz.
+Nach den lokalen Updates erhalten wir:
+γitk, ξitj,k, mi, Hi.
+Für ungelabelte Ringe benötigen wir mi,Hi im aktuellen Hauptmodell nicht zwingend für die globalen Updates, da für sie kein Qualitätsterm existiert.
+Es genügt dort zunächst, γ und ξ zu berechnen.
+C.9.6 Schritt 6 – Globale Variationsfaktoren aktualisieren
+Aus den aktuellen lokalen Zustandsstatistiken bilden wir die globalen hinreichenden Statistiken.
+Anschließend verwenden wir die hergeleiteten konjugierten Updates:
+qneuπ, qneuA, qneuΦ, qneuΨ.
+Bei einer späteren C-Gewichtung berücksichtigen wir die erwarteten Statistiken der ungelabelten Ringe entsprechend ihrer Gewichtung.
+Die Qualitätsparameter werden aus den gemessenen Qualitätswerten und den Aufenthaltsmomenten der gelabelten Ringe aktualisiert.
+C.9.7 Schritt 7 – ELBO berechnen
+Nach einem globalen Trainingsdurchlauf berechnen wir die gesamte ELBO:
+Ls=Lqs.
+Hier bezeichnet s die globale Trainingsiteration.
+Wir protokollieren die ELBO nicht nur als Gesamtwert, sondern auch ihre Einzelterme.
+Damit können wir später nachvollziehen, ob beispielsweise eine veränderte Zustandsanzahl die Prozesslikelihood verbessert, aber gleichzeitig zu höherer Modellkomplexität führt.
+C.9.8 Schritt 8 – Konvergenz überprüfen
+Als ein mögliches Kriterium verwenden wir die relative Änderung der ELBO:
+δs=Ls−Ls−1max1,Ls−1.
+Gleichung (C.39): Relative ELBO-Änderung.
+Liegt diese Änderung über mehrere Iterationen unter einer festgelegten Toleranz, kann dies ein Abbruchkriterium sein.
+Allerdings reicht die ELBO-Änderung allein nicht aus.
+Eine Optimierung kann beispielsweise sehr langsam fortschreiten oder in einem ungünstigen lokalen Optimum verbleiben.
+Daher sollten wir auch die Entwicklung der Parameter, den Gradientenverlauf der lokalen Optimierung und die erreichten Validierungsergebnisse beobachten.
+C.10 Unser Trainingsalgorithmus als implementierungsnahes Schema
+Die gesamte Reihenfolge können wir nun folgendermaßen darstellen:
+Initialisierung: Daten, Modellstruktur, Priors und globale Variationsfaktoren festlegen.
+Lokale Inferenz: Gelabelte Ringe mit strukturierter B1-Optimierung samt Qualitätsterm; ungelabelte Ringe mit angepasster Forward-Backward-Inferenz.
+Erwartete Statistiken: γ, ξ, m und H bestimmen.
+Konjugierte globale Updates: qπ, qA, qΦ und qΨ aktualisieren.
+ELBO und Konvergenz: Prüfen, protokollieren und bis zum Abbruchkriterium wiederholen.
+Ergebnis: Approximierter Posterior q*Θ,Z.
+C.10.1 Algorithmus in Python-naher Schreibweise
+Der folgende Pseudocode fasst unsere mathematische Trainingslogik zusammen. Er ist bewusst kein vorgetäuschtes, bereits ausführbares Komplettprogramm.
+# Bayesian SSR-HMM mit B1-Qualitätskopplung# Pseudocode: Funktionen werden in der Implementierung ausgearbeitet.initialize_model_and_priors()q_global = initialize_global_variational_factors()q_local = initialize_local_hmm_distributions(    D_L_train, D_U_train, q_global)for epoch in range(max_global_iterations):    # 1. Lokale Inferenz für gelabelte Ringe    for ring in D_L_train:        q_local[ring] = optimize_B1_markov_variational(            X=ring.sequence,            y=ring.quality,            q_global=q_global,            q_initial=q_local[ring]        )        # Intern:        # gamma, xi = markov_marginals(q_local[ring])        # m, H = occupation_moments(q_local[ring])        # objective = transition + emission + quality + entropy        # optimize local logits using gradients    # 2. Lokale Inferenz für ungelabelte Ringe    if C > 0:        for ring in D_U_train:            q_local[ring] = variational_forward_backward(                X=ring.sequence,                q_global=q_global            )    # 3. Hinreichende Statistiken sammeln    statistics = collect_expected_statistics(        q_local,        D_L_train,        D_U_train,        unlabeled_weight=C    )    # 4. Analytische globale Updates    q_global = conjugate_global_updates(        statistics,        prior_hyperparameters    )    # 5. ELBO berechnen und protokollieren    elbo = compute_full_elbo(        q_global,        q_local,        D_L_train,        D_U_train,        C    )    log_training_diagnostics(elbo)    # 6. Konvergenz prüfen    if convergence_reached():        breaksave_variational_posterior(q_global)
+Für die tatsächliche Implementierung müssen wir insbesondere die lokale Markov-Optimierung, die Momentenrekursion, die analytischen KL-Terme und die Behandlung unterschiedlicher Sequenzlängen konkret programmieren.
+Das Schema gibt uns dafür bereits eine eindeutige Reihenfolge vor.
+C.11 Numerische Prüfung unserer mathematischen Bausteine
+Dieser Schritt ist für die spätere Bachelorarbeit besonders wichtig.
+Wir sollten keinesfalls nur darauf vertrauen, dass unser Python-Programm ohne Fehlermeldung trainiert.
+Stattdessen müssen wir einzelne mathematische Berechnungen unabhängig überprüfen.
+In der vorausgehenden Herleitung wurden für zentrale Momentenrechnungen und den erwarteten Qualitätsterm kleine synthetische Zustandsmodelle als Prüfbeispiele beschrieben. Die nachfolgenden Zahlen werden als bisher dokumentierte Prüfresultate übernommen; die unabhängig reproduzierbare Testimplementierung und ihre Eingabekonfiguration gehören noch in das Implementierungspaket.
+C.11.1 Prüfung der Aufenthaltsmomente
+In der bisherigen Herleitung wurde ein künstliches Markov-Modell mit
+K=3,  T=5
+betrachtet.
+Für fünf Zeitpunkte und drei mögliche Zustände existieren:
+35=243
+verschiedene Zustandsfolgen.
+Bei einer so kleinen Anzahl können wir sämtliche Zustandsfolgen vollständig aufzählen und ihre Wahrscheinlichkeiten direkt berechnen.
+Dadurch besitzen wir einen unabhängigen Referenzwert für unsere Momentenrekursion.
+Mit einer beispielhaften Anfangsverteilung und zeitabhängigen Variationsübergangsmatrizen wurde folgender Mittelwert angegeben:
+m=0,3704300,3989760,230594.
+Die Ergebnisse der rekursiven Momentenberechnung und der vollständigen Enumeration stimmten nach dieser Dokumentation überein.
+Die größte absolute Abweichung des ersten Moments betrug ungefähr:
+3,33⋅10−16.
+Für das zweite Moment betrug sie:
+1,39⋅10−16.
+Diese Unterschiede liegen im Bereich numerischer Gleitkommarundungen.
+Damit ist ein konkreter, dokumentierter positiver Funktionstest unserer in Herleitung B entwickelten Momentenrekursion beschrieben. Für eine eigenständig reproduzierbare Bestätigung fehlen in diesem Dokument noch die vollständigen ursprünglichen Testmatrizen.
+C.11.2 Prüfung des erwarteten Qualitätsterms
+Anschließend wurde für dasselbe synthetische Markov-Modell ein fester Regressionskoeffizientenvektor gewählt:
+β=0,41,2−0,15,  y=0,7.
+Wir können den erwarteten quadratischen Fehler auf zwei Wegen berechnen.
+Weg 1: Vollständige Aufzählung aller Zustandsfolgen und direkte gewichtete Mittelung ihrer quadratischen Fehler.
+Weg 2: Verwendung der ersten und zweiten Aufenthaltsmomente:
+Eqy−β⊤h2=y2−2yβ⊤m+β⊤Hβ.
+Beide Wege lieferten laut bisheriger Prüfnotiz:
+Eqy−β⊤h2=0,125545092.
+Damit wurde die Momentenform des Qualitätsterms für diesen synthetischen Fall numerisch abgeglichen.
+C.11.3 Prüfung der automatischen Differentiation
+Ein weiteres kritisches Problem ist die Frage, ob wir durch die Momentenrekursion hindurch differenzieren können.
+Dazu wurde in der bisherigen Herleitung ein kleiner Test mit PyTorch beschrieben.
+Die zu prüfende Funktion war wiederum der erwartete quadratische Qualitätsfehler, diesmal für eine kurze Markov-Kette mit K=3 und T=4.
+Ein Gradient hinsichtlich eines lokalen Anfangs-Logits wurde auf zwei Wegen bestimmt:
+Durch automatische Differentiation.
+Durch numerische Vorwärtsdifferenzen mit einer kleinen Veränderung des Logits.
+Die dokumentierte absolute Abweichung betrug ungefähr:
+5,16⋅10−9.
+Damit stimmen die beiden Gradientenberechnungen für den beschriebenen Testfall gut überein.
+Wichtig: Diese Prüfungen bestätigen, soweit reproduzierbar, einzelne mathematische und numerische Bausteine. Sie beweisen noch nicht, dass unser vollständiger Bayesian-SSR-HMM-Trainingsalgorithmus zuverlässig konvergiert oder auf den realen Ringwalzdaten gut funktioniert.
+Genau deshalb benötigen wir weitere Tests.
+C.12 Welche Prüfungen müssen wir vor dem Einsatz mit Ringwalzdaten durchführen?
+Aus der bisherigen Herleitung können wir bereits eine konkrete Teststrategie entwickeln.
+Normierung der Anfangsverteilung: k​ρik=1
+Normierung der Übergangsmatrizen: k​Qitj,k=1
+Normierung der Zustandsmarginalen: k​γitk=1
+Erwartete Aufenthaltsanteile: k​mik=1
+Zweites Aufenthaltsmoment: Hi ist symmetrisch und positiv semidefinit
+Aufenthaltskovarianz: Hi−mimi⊤ ist positiv semidefinit
+Dirichlet-KL: Nichtnegativ; null bei gleichen Verteilungen
+Normal-Invers-Gamma-KL: Nichtnegativ; null bei gleichen Verteilungen
+Globale Updates: Bei festem qZ sollen die konjugierten Updates die ELBO nicht verschlechtern, bis auf numerische Fehler
+Lokale B1-Updates: Optimierung soll den jeweiligen lokalen ELBO-Beitrag verbessern
+C=0: Ungelabelte Daten dürfen keine Trainingswirkung besitzen
+C=1: Gewöhnliche ungewichtete Semi-Supervised-ELBO
+Zusätzlich sollten wir bei kleinen synthetischen Modellen eine vollständige ELBO-Berechnung durch Enumeration als Referenz aufbauen.
+Damit können wir prüfen, ob die Summe aller einzelnen Terme tatsächlich mit der direkt ausgewerteten Variationszielfunktion übereinstimmt.
+Auch die analytischen globalen Updates sollten wir anhand unabhängiger numerischer Optimierungen testen.
+Solche Tests liefern später eine wesentlich belastbarere Grundlage als lediglich eine erfolgreich gestartete Trainingsschleife.
+C.13 Numerische Stabilität und Rechenaufwand
+Die mathematische Herleitung ist nur dann für unsere Bachelorarbeit geeignet, wenn wir sie mit vertretbarem Aufwand umsetzen können.
+Daher müssen wir frühzeitig prüfen, welche Komponenten numerisch empfindlich oder aufwendig sind.
+C.13.1 Unterschiedlich lange Ringsequenzen
+Wir haben festgelegt, dass jeder Ring seine ursprüngliche zeitliche Struktur behalten soll.
+Unser Modell kann grundsätzlich mit unterschiedlichen Sequenzlängen arbeiten, weil jede lokale Zustandsverteilung separat definiert wird.
+Allerdings besitzt ein langer Ring mehr Zeitpunkte und dadurch mehr lokale Variationsparameter sowie mehr Emissions- und Übergangsterme.
+Für die Implementierung bedeutet das, dass wir variable Sequenzlängen ausdrücklich unterstützen müssen.
+Wir könnten einzelne Ringe nacheinander verarbeiten oder für effizientere Batchoperationen gepaddete Sequenzen mit Masken verwenden.
+Wichtig ist, dass künstlich hinzugefügte Padding-Werte nicht als echte Prozessmessungen in die Likelihood gelangen.
+C.13.2 Der Aufwand der Momentenrekursion
+Unsere in Herleitung B entwickelte allgemeine Rekursion für die zweiten Aufenthaltsmomente verarbeitet für jede mögliche Zustandskombination Matrizen der Größe K×K.
+Eine direkte Implementierung besitzt die Größenordnung
+OTiK4
+pro Ring für diese Momentenberechnung.
+Bei kleinen Zustandszahlen dürfte dies oft handhabbar sein. Bei sehr langen Sequenzen oder vielen Zuständen kann der Aufwand jedoch erheblich werden.
+Die tatsächliche Laufzeit hängt zusätzlich von der verwendeten Implementierung und davon ab, wie automatische Differentiation die Zwischenergebnisse speichert.
+Hier müssen wir vor der endgültigen Freigabe reale Laufzeitmessungen durchführen.
+Eine interessante spätere Optimierung wäre die Verwendung stärker vektorisierter Tensoroperationen oder spezieller dynamischer Rekursionen für additive HMM-Statistiken.
+C.13.3 Die wichtigsten numerischen Schutzmaßnahmen
+Für die spätere Implementierung würde ich folgende technische Regeln festhalten:
+Wahrscheinlichkeiten und Log-Likelihoods möglichst im Log-Raum beziehungsweise mit stabilen Log-Sum-Exp-Operationen berechnen.
+softmax und log_softmax für die lokalen Wahrscheinlichkeiten verwenden.
+Positiv definite beziehungsweise positive globale Variationsparameter ausdrücklich sicherstellen.
+Für lineare Gleichungssysteme und Log-Determinanten geeignete Cholesky-Verfahren einsetzen.
+ELBO-Komponenten getrennt protokollieren.
+Nicht endliche Zahlenwerte sofort als Fehler behandeln und nicht unbemerkt durch Ersatzwerte überdecken.
+Mehrere reproduzierbare Initialisierungen untersuchen.
+Eine zusätzliche Schwierigkeit kann aus der Größe unserer Trainingsdaten entstehen.
+Falls wir sehr viele ungelabelte Ringe besitzen, könnten deren gesamte Prozesslikelihood-Beiträge die globale Optimierung stark beeinflussen.
+Dafür ist unter anderem unser späteres C-Experiment relevant.
+Die eigentlichen Prior-Hyperparameter und die Trainingskonfiguration müssen wir dennoch anhand der verfügbaren Daten und durch kontrollierte Versuche auswählen.
+C.14 Was ist mit Herleitung C jetzt erreicht?
+Wir können den Stand unserer Modellentwicklung inzwischen deutlich präziser beurteilen.
+14.1 Mathematisch hergeleitete Bestandteile
+Vollständige Modellverteilung – Herleitung A: Festgelegt
+Strukturierte Variationsfamilie – Herleitung B: Festgelegt
+Erste und zweite Aufenthaltsmomente – Rekursion und kurze numerische Tests: Hergeleitet und teilweise geprüft
+B1-Qualitätsbeitrag – Analytische Erwartungswertformel: Hergeleitet
+Globale Dirichlet-Updates – Anfangszustände und Übergänge: Hergeleitet
+Globale Emissionsupdates – Normal-Invers-Gamma: Hergeleitet
+Globale Qualitätsupdates – Bayesian Regression auf Aufenthaltsmomenten: Hergeleitet
+Gesamte ELBO – Alle Einzelterme konkretisiert: Analytisch auswertbar
+Lokale ungelabelte Inferenz – Angepasstes Forward-Backward: Mathematisch begründet
+Lokale gelabelte B1-Inferenz – Gradientenoptimierung strukturierter Markov-Verteilungen: Formuliert, noch nicht als Gesamtverfahren getestet
+Gewichtung C – Gewichtete ELBO einschließlich lokaler Entropie: Hergeleitet
+Trainingsablauf – Alternierende lokale und globale VI-Updates: Algorithmisch spezifiziert
+14.2 Was bleibt vor der endgültigen Implementierung offen?
+Wir sollten vier Punkte ausdrücklich als offene Prüfaufgaben festhalten.
+1. Konvergenz der lokalen B1-Optimierung
+Unsere Markov-beschränkte Variationsfamilie kann den uneingeschränkten optimalen Zustandsposterior möglicherweise nicht exakt darstellen. Wir müssen untersuchen, wie gut und wie stabil die numerische Optimierung innerhalb dieser Familie funktioniert.
+2. Laufzeit und Speicherbedarf
+Die differenzierbare Berechnung der zweiten Aufenthaltsmomente kann für lange Sequenzen aufwendig werden. Ihre tatsächliche Effizienz ist noch nicht anhand realer Ringwalzdaten geprüft.
+3. Aussagekraft der Aufenthaltsrepräsentation
+Unsere derzeitige B1-Regressionskopplung verwendet relative Zustandsaufenthalte. Sie berücksichtigt dadurch die gesamte Zustandsfolge, aber nicht ausdrücklich sämtliche Informationen über ihre zeitliche Reihenfolge oder die absoluten Phasendauern.
+Das bleibt eine wichtige mögliche spätere Erweiterung, beispielsweise durch Übergangshäufigkeiten oder weitere additive Sequenzstatistiken.
+4. Validierung des gesamten VI-Algorithmus
+Die bislang geprüften synthetischen Teilberechnungen sind noch kein vollständiger Implementierungstest. Insbesondere müssen die komplette ELBO, die globalen Updates, die lokale Optimierung und der Gesamttrainingsablauf zusammen überprüft werden.
+15. Quellenkontrolle und Abgrenzung unserer eigenen Herleitung
+Auch für Herleitung C müssen wir die wissenschaftlichen Grundlagen sauber von unseren eigenen Anpassungen unterscheiden.
+Beal (2003): Übernommen werden Variational Bayesian HMM, ELBO, Dirichlet-Updates und Forward-Backward im VBEM-Verfahren. Eigene Entwicklung bleibt der B1-Qualitätsfaktor über die gesamte Zustandsfolge.
+Shao et al. (2022), P112: Übernommen werden direkte Bayesian SSR, Nutzung fehlender Qualitätsmessungen, konjugierte globale VI. Eigene Entwicklung bleiben ringweise Endqualität und numerische Optimierung unserer Markov-Variationsfamilie.
+Shao, Ge & Song (2021), P111: Übernommen werden gewichtete Variational Inference und die Idee des Faktors C. Eigene Entwicklung bleibt die Anwendung auf vollständige HMM-Ringsequenzen und deren lokalen ELBO-Beitrag.
+Chen et al. (2010): Übernommen wird die Idee der asynchronen Endqualitätsvorhersage aus Batchsequenzen. Eigene Entwicklung bleibt die Qualitätskopplung über die gesamten latenten Aufenthaltsanteile.
+Unsere Herleitungen A–C: Die Kombination zu einem gemeinsamen Bayesian-SSR-Ringwalzmodell, einschließlich Momentenrekursion, B1-ELBO, lokaler Optimierung und konkreten globalen Regressionsupdates, ist eine eigene Modellkonstruktion.
+Die Originalarbeiten belegen nicht exakt unsere gesamte Modellkombination. Die neuen Formeln sind deshalb als eigene mathematische Ableitungen zu kennzeichnen und müssen vor einer endgültigen wissenschaftlichen Darstellung anhand unabhängiger Tests geprüft werden.
+Die relevanten Grundlagen der vorhandenen Originalquellen wurden für diese Herleitung abgeglichen. Nicht vollständig geprüft sind sämtliche separaten Supplements und mögliche vorhandene Implementierungen genau dieser B1-Architektur.
+Gesamtergebnis unserer Herleitungen A, B und C
+Herleitung A – Was ist unser Modell? Gemeinsame generative Bayesian-Verteilung für Ringsequenzen, latente Zustände, Priors und drei Endqualitätsgrößen.
+Herleitung B – Wie approximieren wir den Posterior? Strukturierte Markov-Variationsverteilung, Zustands- und Aufenthaltsmomente, erwarteter B1-Qualitätsterm.
+Herleitung C – Wie trainieren wir das Modell? Vollständige ELBO, analytische globale Updates, numerische lokale B1-Optimierung, Konvergenz und Training mit DL+DU.
+Herleitung D – Wie erfolgt die spätere Qualitätsvorhersage? Posterior Predictive, drei Zielgrößen, Parameter- und Zustandsunsicherheit und prädiktive Intervalle.
+Unsere wichtigste Schlussfolgerung
+Wir haben nun einen konkret spezifizierten Bayesian-SSR-Trainingsalgorithmus, der auf unseren bisherigen Modellentscheidungen aufbaut.
+Sein wesentlicher Vorteil liegt darin, dass wir die gesamte latente Zustandsfolge in die ringweise Endqualitätsregression einbringen und trotzdem eine berechenbare ELBO erhalten.
+Wir behalten die gewünschten Eigenschaften bei: Ein Ring entspricht einer vollständigen Sequenz, das Prozessmodell ist ein Standard-HMM mit diagonalen Gauß-Emissionen, alle globalen Parameter sind Bayesian-Zufallsvariablen, und ungelabelte Daten werden ohne Pseudo-Labels genutzt.
+Die wichtigste verbleibende Einschränkung: Ein mathematisch formulierter und in Teilberechnungen überprüfter Algorithmus ist noch kein vollständig validiertes Trainingsverfahren. Die lokale B1-Optimierung und ihre Skalierbarkeit müssen im Gesamtmodell noch experimentell nachgewiesen werden.
+Genau diese Unterscheidung sollten wir sowohl in der Projektarbeit als auch in der späteren Bachelorarbeit beibehalten.
+Als nächstes folgt sinnvollerweise Herleitung D – Posterior Predictive und Qualitätsvorhersage. Dort werden wir untersuchen, wie aus unserem gelernten globalen Bayesian-Posterior und der unbekannten Zustandsfolge eines neuen Rings tatsächlich drei Qualitätsvorhersagen mit prädiktiven Unsicherheiten entstehen.
+Damit wäre die mathematische Entwicklung vom Rohdatenmodell bis zur fertigen Vorhersage zunächst vollständig beschrieben und wir könnten danach unser endgültiges implementierungsnahes Blockschaltbild nochmals systematisch überprüfen.

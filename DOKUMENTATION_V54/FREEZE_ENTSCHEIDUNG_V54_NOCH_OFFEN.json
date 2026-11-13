@@ -1,0 +1,25 @@
+{
+  "schema": "BAYESIAN_BACHELOR_FREEZE_DECISION_PREP_V1",
+  "created": "2026-11-12",
+  "decision": "UNDECIDED",
+  "approval_by_user": null,
+  "approval_date": null,
+  "code_release": "DM-V52-CONFIG-AND-ARTIFACT-2026-11-12-v1",
+  "model_artifact_sha256_reported_from_windows": "56c3605ba3e0157125ecb7b2adaaddcb160a15c16edf22f2e28e5b232f2ae3c4",
+  "source_dataset_sha256": "bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5",
+  "registered_config_sha256": "88f9da6aa51be71db7968a8222cb36e5e4838b8a8431988bd7c54c09bace51ab",
+  "model_status": "PROVISIONAL_USER_APPROVAL_PENDING",
+  "permitted_scientific_claim": "technically checked reproducible development prototype; exploratory development CV",
+  "prohibited_claims": [
+    "independently validated",
+    "converged optimum",
+    "proven process improvement",
+    "calibrated predictive interval",
+    "real-new-ring positive E2E test passed"
+  ],
+  "pending_checks": [
+    "verify Windows archive ZIP and hashes",
+    "acknowledge convergence limitation",
+    "external new-ring validation"
+  ]
+}

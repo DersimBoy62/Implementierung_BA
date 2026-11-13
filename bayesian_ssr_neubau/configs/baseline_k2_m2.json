@@ -1,0 +1,12 @@
+{
+  "K": 2,
+  "C": 0.2,
+  "variant": "M2",
+  "physical_var": 0.38526108747593474,
+  "seed": 20261111,
+  "local_maxiter": 8,
+  "train_epochs": 30,
+  "process_window": "F2",
+  "include_unlabeled_preprocessing": true,
+  "monotonic_atol": 0.000001
+}

@@ -1,0 +1,57 @@
+{
+  "status": "fresh 30-epoch training complete; no quality scoring",
+  "dataset_sha256": "bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5",
+  "model_sha256": "99c8c76b596a510a8c91b80abc89e518f3d4ae1db82f001fc868c280252743f6",
+  "config": {
+    "K": 2,
+    "C": 0.2,
+    "variant": "M2",
+    "physical_var": 0.38526108747593474,
+    "seed": 20261111,
+    "local_maxiter": 8,
+    "train_epochs": 30,
+    "process_window": "F2",
+    "include_unlabeled_preprocessing": true,
+    "monotonic_atol": 1e-06
+  },
+  "n_epochs": 30,
+  "n_block_updates": 450,
+  "first_epoch_J": -26739.321580315365,
+  "last_epoch_J": -22028.914444073278,
+  "min_block_delta": -7.275957614183426e-12,
+  "monotonic_atol": 1e-06,
+  "n_violations": 0,
+  "final_weighted_N": [
+    4440.04594662583,
+    1902.3540533741118
+  ],
+  "final_transition_mean": [
+    [
+      0.9959568232439597,
+      0.004043176756040338
+    ],
+    [
+      0.00567407094538654,
+      0.9943259290546135
+    ]
+  ],
+  "epoch11_total_increase": 1322.4460356566851,
+  "epoch11_process_increase": 1146.3054166174006,
+  "epoch11_process_components": {
+    "emission_NW": 1143.344255249518,
+    "transition_Dirichlet": 2.9611613678917763,
+    "initial_Dirichlet": 3.552713678800501e-15
+  },
+  "n_local_optimizers": 240,
+  "n_local_accepted": 191,
+  "optimizer_max_final_grad_inf": 0.00020958636300265115,
+  "optimizer_non_success": 6,
+  "post_training_reference": {
+    "path": "results/v60_math_m2/V60_INDUCED_PRIOR_M2_30E_01.json",
+    "sha256": "d56bf8176ec021bacc6845b83d47137942eb103554fa98209c290059dfad3c26",
+    "use": "read-only historical training-curve comparison after new fit; never input to training",
+    "max_abs_curve_difference": 2.641354512888938e-07,
+    "final_difference": -1.8379068933427334e-08
+  },
+  "limitation": "Train objective and numerical parity are not independent quality/generalization evidence"
+}

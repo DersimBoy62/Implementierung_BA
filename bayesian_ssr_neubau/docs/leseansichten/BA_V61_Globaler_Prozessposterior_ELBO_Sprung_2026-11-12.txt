@@ -1,0 +1,56 @@
+V6.1 – Mathematikaudit des globalen Prozess-Updates
+Bayesian Bachelor · Forschungsstand 12.11.2026 · Exploratorische Entwicklungsdaten, kein final freigegebenes Modell
+1. Ausgangslage und Ziel
+Der V6.0-Lauf des Nutzers bestätigt die exakt priorerhaltende M2-Reduktion: 30 Epochen, keine relevanten ELBO-Blockverletzungen und eine maximale ELBO-Abweichung von 3,41 × 10⁻⁸ gegenüber V5.9. Als nächster mathematischer Prüfpunkt wurde der große Anstieg der gewichteten ELBO in Epoche 11 gewählt. Ziel ist keine weitere Parametersuche, sondern die exakte Aufschlüsselung des globalen Normal-Wishart-/Dirichlet-Posterior-Updates.
+2. Reproduzierte Trainingsrechnung
+Der neue V6.1-Zweig übernimmt den mathematischen V6.0-Trainingsablauf (Seed 20261111; K=2; C=0,2; 8 gelabelte + 4 ungelabelte Entwicklungsringe; 30 Epochen) und ergänzt nur die Diagnostik. Die zehn V5.2-Mathematikdateien und die Versionen V5.8–V6.0 werden per SHA-256 kontrolliert. Der getrennte lokale Originaldatenlauf reproduzierte die V6.0-ELBO über 30 Epochen mit einer maximalen Absolutabweichung von 8,95 × 10⁻⁸.
+3. Mathematische Zerlegung
+Bei festgehaltenen lokalen Markov-Faktoren q(z) und Qualitäts-Posteriors wird der Gewinn nach dem Prozess-Posterior-Update in drei additive Gruppen zerlegt:
+ΔL_Prozess = Δ[L_x + C·U_x − KL_NW] + Δ[L_A + C·U_A − KL_A] + Δ[L_π + C·U_π − KL_π].
+Die Entropien und beide Qualitätsbeiträge müssen sich während dieses isolierten Prozessschritts exakt aufheben. Der Code testet diese Identität sowie die posterioren gewichteten hinreichenden Statistiken N_k, N_ij und N_π unabhängig gegen die geschlossenen konjugierten Updates.
+4. Zentrales Ergebnis: Epoche 11
+ELBO-Gewinn innerhalb Prozess-Updates
+Epoche 10
+Epoche 11
+Epoche 12
+Emission + Normal-Wishart-KL
+22,6601
+1.143,3443
+259,3501
+Übergangs-Dirichlet
+0,3797
+2,9612
+2,7151
+Anfangszustands-Dirichlet
+≈ 0
+≈ 0
+≈ 0
+Gesamtes Prozess-Update
+23,0398
+1.146,3054
+262,0652
+In Epoche 11 resultieren damit 99,74 % des globalen Prozess-Update-Gewinns aus dem gemeinsamen Emissions-/Normal-Wishart-Anteil. Innerhalb dieses Blocks steigen die erwarteten gewichteten Emissionsloglikelihoods um rund 1.181,60 Punkte; der Normal-Wishart-KL-Term wächst gleichzeitig um rund 38,26 Punkte. Der Übergangsteil liefert nur 2,96 Punkte. Die zusätzlich im selben Epochenübergang gemessene lokale Verbesserung beträgt 176,13 Punkte; die Qualitätskopf-Updates rund 0,006 Punkte.
+
+Abbildung 1: Gemessene Gewinne der getrennten globalen Prozess-Update-Gruppen, Epochen 8–15.
+5. Parameter- und Zustandsdiagnostik
+Kenngröße
+Epoche 10
+Epoche 11
+Gewichtete Zustandsbesetzung k=1
+4.542,055
+4.456,056
+Gewichtete Zustandsbesetzung k=2
+1.800,345
+1.886,344
+Frobenius-Norm Änderung der Emissionsmittelwerte
+0,02846
+0,15960
+Trace prädiktive Kovarianz Zustand 1
+1,89429
+1,83346
+Trace prädiktive Kovarianz Zustand 2
+7,45162
+7,59757
+Der Emissionsblock und die erwarteten Zustandszuweisungen verändern sich um Epoche 11 sichtbar. Die prädiktiven Emissionskovarianzen bleiben positiv definit; ein singulärer Kollaps ist anhand der geprüften Eigenwerte nicht zu erkennen. Das beweist jedoch keine physikalisch sinnvolle Zustandsinterpretation. Die posterioren Übergangswahrscheinlichkeiten weisen eine starke Persistenz auf (in Epoche 11 Selbstübergang ca. 0,9964 bzw. 0,9954), die anschließend als gesonderte Modellannahme geprüft werden sollte.
+6. Wissenschaftliche Einordnung und nächste Schritte
+Der auffällige Anstieg stammt primär aus dem globalen Emissions-/Normal-Wishart-Term. Das ist jetzt für diesen Trainingslauf numerisch nachgewiesen. Die gekoppelten lokalen und globalen Updates lassen sich aus dem isolierten Blockgewinn nicht auf eine einzige kausale Ursache reduzieren. Die Analyse liefert keine Aussage über bessere Qualitätsvorhersagen, Generalisierung oder global optimale Variationsparameter. Nächster Code-Audit: starke HMM-Persistenz und fast ringkonstante Zustandsbelegungen beurteilen; Emissionsresiduen und bedingte zeitliche Unabhängigkeit prüfen. Danach folgen kontrollierte HMM-, Bayes- und SSL-Ablationen.

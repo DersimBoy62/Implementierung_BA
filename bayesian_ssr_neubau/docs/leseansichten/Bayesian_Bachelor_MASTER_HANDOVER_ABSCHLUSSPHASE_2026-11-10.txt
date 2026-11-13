@@ -1,0 +1,975 @@
+BAYESIAN BACHELOR · VERBINDLICHE FORSCHUNGS- UND CODEÜBERGABE
+MASTER-HANDOVERABSCHLUSSPHASE
+Fortsetzung des Forschungsstands vom 08.11.2026
+Dokumentationsstand: 10. November 2026 · Erfasste neue Arbeit: 08.–09.11.2026
+Vollständige technische Übergabe: mathematischer Modellkern, End-to-End-Implementierung, generative E24-Abschlussstudie, reale SFA-Prozessläufe, synthetische und signalbasierte Ersatzlabels, Kontroll- und Evaluationsstudien, Windows-Abnahmen, Quellenstand sowie Schreib- und Prüfauftrag für Kapitel 3–5.
+Einschätzung
+Verbindlicher Sachstand
+Algorithmus
+Direktes Bayesian-HMM + ringweite Bayesian-Regression + strukturierte VI; ohne Pseudo-Labeling.
+Reale Prozessdaten
+16 nutzbare SFA-Ringe; K3/d4/E20 auf Vollsequenzen unter Windows erfolgreich gespeichert.
+Qualität mit SFA
+Keinerlei verifizierte Endqualitätsmessungen. Sechs getrennte Ersatzlabel-Modellarme K3/E20 mit 96 Messpunkten pro Ring ausgeführt.
+Generative SSR
+Vier-Seed-Studie E24: C0 0,914454 vs. C1 0,766442 NRMSE, 4/4 positive Seed-Differenzen – ausschließlich vollständig synthetisch.
+Bachelorarbeit
+Kapitel 3.7 Word aktualisiert; Kapitel 4 erste 16-seitige Entwurfsfassung vor der finalen SFA-Ersatzlabel-E20-Studie; Kapitel 5 geplant.
+Wichtige offene Prüfung
+Unabhängige Windows-Abnahme der sechs Ersatzlabel-Ergebnisdateien wurde angefordert, aber noch nicht als PASS zurückgemeldet.
+
+Zentraler Wahrheitsgrundsatz: Prozessmodellierung auf realen X, Ersatzregression auf realen X mit künstlichen Y und vollständig generierte (X,Z,Y)-SSR-Simulation sind drei verschiedene Nachweise. Nie verwechseln.
+Diese Übergabe dokumentiert abgeschlossene und berichtete Arbeiten. Sie ersetzt weder Originaldaten, konkrete Checkpoints, die Herleitungen A–D noch die jeweils verbindlichen Originalquellen.
+
+0. Sofortnavigation – was der nächste Chat zwingend wissen muss
+Priorität
+Entscheidung / Fundstelle
+Sofort
+Vorheriges Master-Handover 08.11.2026 bleibt die geschichtliche Basis. Dieses Dokument aktualisiert ausdrücklich den damaligen „Label-Dosis noch offen“-Status.
+Modellcode
+Im Benutzerprojekt: final_ssr/b1_core.py (Kern) + final_ssr/abschluss_train.py (reguläres Training).
+Fertiger Prozesscheckpoint
+ergebnisse_final_ssr/abschluss_sfa_k03_e20_20261109/modell_best.pt; Prozess-ONLY, nicht Qualitätscheckpoint.
+Ersatzlabelcheckpoint
+ergebnisse_NUR_ERSATZLABEL_EVALUATION/forschung_Ersatzlabels_SFA_E20_20261109/modelle/proxy/C1_JOINT/NUR_FORSCHUNG_KEIN_REALES_QUALITAETSMODELL.pt
+Experimentcode
+experimente_ersatzlabel_evaluation/sfa_ersatzlabel_studie.py; separate sechsarmige Forschungsstudie.
+Aktuell
+Kein neues Tuning nötig. Zuerst unabhängigen Ergebnis-Audit unter Windows, dann Abbildungsbericht, Kapitel 3–5.
+VERBOT
+raw.zip nicht verwenden; keine falschen Messwerte in qualitaetsmessungen.csv; TEST nicht öffnen; niemals originale Dateien überschreiben.
+
+0.1 Evidenzkürzel – obligatorisch bei jeder Ergebnisbehauptung
+Kürzel
+Bedeutung
+[W]
+Vom Nutzer als Windows-Terminalausgabe in der Unterhaltung bestätigt; nicht automatisch als Original-CSV hochgeladen.
+[L]
+Auf isolierter lokaler/containerbasierter Arbeitskopie ausgeführt und/oder originale Ergebnisdateien aus erstellt geliefertem ZIP geprüft.
+[D]
+In gesichteter Arbeitsfassung, Quellendokument, README oder Archiv protokolliert; kein neuer unabhängiger Messbeleg.
+[O]
+Noch offen, nicht ausgeführt oder im aktuellen Chat nicht unabhängig nachvollziehbar.
+[A]
+Mathematische Ableitung/Annahme/Interpretation; nicht als empirisch nachgewiesene Tatsache verkaufen.
+
+Ein belegter Windows-Abnahmelauf [W] belegt ausschließlich dessen konkret geprüfte Teilfunktionen. Eine bestandene Systemabnahme bedeutet nicht, dass drei tatsächliche geometrische Qualitätsgrößen erlernt wurden.
+1. Verbindung zur letzten Master-Übergabe vom 08.11.2026
+Maßgeblicher Vorgänger: Bayesian_Bachelor_MASTER_HANDOVER_FORSCHUNGSSTAND_2026-11-08.docx (26 Seiten). Vorgänger davor: ULTIMATIVE_Masteruebergabe_2026-11-05.docx und MASTER_HANDOVER_NACHTRAG_2026-11-06(1).docx. Die alte Fassung schloss mit einem vorbereiteten, aber noch nicht ausgeführten synthetischen Label-Dosis-Versuch. Diese Schranke ist inzwischen überwunden. Die folgenden Arbeiten wurden danach erledigt: Label-Dosis, längere globale VI, Qualitätsfeedback, lokale VI-Reserve, E13-2-vs-3, E24, produktiver Abschlusscode, Windows-SFA-Prozesstraining, technische Zufallslabel-Demo und vollständige SFA-Ersatzlabel-Studie.
+Die ältere Forschungsarchitektur wird NICHT nachträglich als „von Beginn an fertig“ dargestellt. Korrigierte Ergebnisse gelten zeitlich erst ab dem nachgewiesenen jeweiligen Experiment. Ursprüngliche Proxy-Ablationen, gescheiterte Vergleichsvarianten und negative Kontrollen bleiben Teil der wissenschaftlichen Entwicklung.
+1.1 Chronologische Übersicht seit dem letzten Handover
+Datum / Block
+Was konkret geschah
+Status
+08.11., nach Handover
+Label-Dosis L6/12/24/48 (C0/C1, U48), trueZ-Oracle, 3 Epochen.
+[W]
+08.11.
+Paare mit 12 globalen Epochen und L6/L48; historische E3-Identität kontrolliert.
+[W]
+08.11.
+JOINT gegen OFF bei E12; 2 lokale VI-Schritte; Kontrolltrajectorien und Gradientenreserve.
+[W]
+08.–09.11.
+E13-Vergleich 2 versus 3 lokale Gradientenschritte; später globale Fortsetzung E12–E24.
+[W]
+09.11.
+final_ssr-Hauptversion isoliert gebaut; mathematische, synthetische und SFA-Datentests.
+[L], [W] Kernabnahme
+09.11.
+SFA K3/E20 Vollsequenzen unter Windows, Checkpoints, Auswertungsbilder.
+[W]
+09.11.
+Neue L-Logger-raw.zip untersucht, anschließend auf ausdrücklichen Wunsch ausgeschlossen.
+[D]
+09.11.
+Betreuerschätzung 0–12 mm / Mittel ca. 5 mm; reine Zufallslabel-Softwaredemo E3.
+[L], [W]
+09.11.
+Sechs SFA-Ersatzlabel-Varianten ×20 Epochen, 96 Zeitpunkte, Vorhersagen + Intervalle.
+[L], [W] Training
+09.11.
+Kapitel 3.7 überarbeitet, Kapitel 4 Vorentwurf, Begleitdossier und Diagrammpakete.
+[D]
+10.11.
+Dieses vollständige ergänzende Master-Handover zur Abschlussphase.
+[D]
+
+2. Unveränderte Aufgabenstellung, echter Datenbestand und Datenpolitik
+2.1 Forschungsfrage und Qualität
+Ziel ist eine direkte, generative, vollständig Bayesian formulierte Semi-Supervised Regression zur ringweiten Endqualität beim Ringwalzen. Pro Ring existiert eine Prozesssequenz X_i mit d Merkmalen und einer theoretisch vorgesehenen dreidimensionalen Qualitätsgröße y_i = (Unrundheit innen, Unrundheit außen, Höhenschlag). Im echten SFA-Bestand fehlen nach wie vor unabhängig gemessene Werte dieser drei Größen. „Vollständig Bayesian“ bezeichnet den Modellierungs- und Variationsansatz; die implementierte Inferenz ist eine strukturierte Näherung, kein exaktes vollständiges MCMC-Posterior.
+2.2 Fester ringweiser SFA-Split
+Teilmenge
+Ringkennungen
+Zweck
+TRAIN (12)
+SFA01, SFA03, SFA12, SFA13, SFA14, SFA15, SFA17, SFA18, SFA19, SFA21, SFA22, SFA23
+Prozess-/Qualitätsparameter, ausschließlich erlaubte Skalierungsfits
+VAL (2)
+SFA02, SFA10
+Modellwahl / definierte Ersatzreferenzen nur im isolierten Forschungszweig
+TEST (2)
+SFA11, SFA20
+Gesamte Entwicklung gesperrt; nicht auswerten oder für Checkpointwahl verwenden
+Ausschluss
+SFA16
+55 extreme −4,823592990974126×10^25-Werte in 50 Kanälen; nicht stillschweigend wieder aufnehmen
+
+Original: 17 SFA-Dateien mit 115 Loggerkanälen je Ring; nach Ausschluss 16 Ringe. Vier festgelegte Eingangskanäle: F_rad63 (Radialkraft), F_ax64 (Axialkraft), Ist_D150 (Ist-Durchmesser), Ist_h152 (Ist-Höhe). Änderungen des Originalsplit JSON und des Roh-Pickles sind verboten. Alle SFA-Zeitreihen sind Ring-Beobachtungseinheiten; die mehreren Hundert Zeitpunkte sind keine unabhängig gelabelten Ringbeispiele.
+2.3 Verspätetes raw.zip und Herkunft von Qualitätsangaben
+Am 09.11.2026 wurde eine neue raw.zip mit 18 L-Logger-CSV und 115 Spalten geprüft, aber ohne eindeutige SFA-ID-Zuordnung und ohne nachgewiesene Unrundheit- oder Höhenschlaglabels. Der Nutzer ordnete anschließend ausdrücklich an: „ignorier die daten, die sind viel zu spät eingetroffen“. Konsequenz: raw.zip bleibt für finale Implementierung, E24 und die gesamte SFA-Ersatzlabelstudie vollständig ausgeschlossen. Auch ein Vergleich oder automatischer Merge ist nicht freigegeben.
+Mündliche Betreuerinformation: Unrundheit und Höhenschlag erfahrungsgemäß bzw. vorläufig zwischen 0 und 12 mm, Mittel ungefähr 5 mm; Betreuer gestattete für die vorläufige Softwarefertigstellung Zufallszahlen. Dies ist eine Modell-/Testvorgabe, kein Messdatensatz und keine Legitimation, Zufallszahlen später als reale physikalische Labels auszugeben. Drei Zielplätze im Code bleiben gleich, obwohl die Ausgaben im Ersatzlabelversuch keine echten geometrischen Messgrößen tragen.
+3. Der fachlich finale Modellpfad – kein neues Modell erfinden
+3.1 Generativer Modellkern
+Globales Bayesian-HMM mit π ~ Dirichlet(απ), Zeilen A[k,:] ~ Dirichlet(αA[k,:]), und diagonalen Gaußemissionen für X_it | Z_it=k. Für Emissionsmittel/-varianz werden konjugate Normal-Invers-Gamma-Faktoren genutzt. Die Markov-Zustandsfolge Z_i hat K diskrete Zustände; im abgeschlossenen SFA-Kandidaten K=3, d=4.
+Ringweite Kopplung: h_ik(Z_i) = (1/T_i) Σ_t 1[Z_it = k]; y_i | Z_i, B, Σy ~ N_3(B h_i(Z_i), Σy). Die drei Qualitätskomponenten besitzen bedingt auf h getrennte konjugate NIG-Updates. Unbedingt die ersten BEIDEN Aufenthaltsmomente verwenden: m_i = E_q[h_i] und H_i = E_q[h_i h_iᵀ] = m_i m_iᵀ + Cov_q(h_i). Nur m_i einzusetzen unterschlägt Zustandsunsicherheit im quadratischen Qualitätsterm. Dies ist eine eigene ringweite Adaption der Literatur, nicht die unveränderte P112-Modellstruktur.
+3.2 Variational Inference und kontrollierte Lernziele
+Approximation q(Θ,Z) = q(Θ)·∏_i q_i(Z_i) mit pro Ring Markov-strukturiertem lokalem q_i. Lokale ungelabelte Zustandsfaktoren per Forward-Backward unter erwarteten Log-Parametern; gelabelte Faktoren bei feedback=JOINT per zwei numerischen Gradient-/Backtracking-Schritten auf die gemeinsame X+Y-Lokal-ELBO angepasst. feedback=OFF unterdrückt diesen gelabelten Y→q(Z)-Einfluss, behält aber die globale Qualitätsregression. Für feste lokale Zustandsmomente erfolgen konjugate globale Parameterupdates.
+Gewichteter Zielfunktionsblock: ELBO_C = Σ_{i∈D_L} ELBO_i(X_i,y_i) + C·Σ_{j∈D_U} ELBO_j(X_j) − KL_global. C=1 nutzt alle vorgesehenen ungelabelten TRAIN-Sequenzen, C=0 schaltet deren Beiträge aus. C≠1 ist ein angepasstes Gewichtungsziel. Bei C=0 muss die vorgeschaltete Standardisierung und Initialisierung ebenfalls von D_U unabhängig sein, sonst ist der Vergleich inkonsistent; die Abschlussfassung erzwingt daher die Initialisierung/Skalen nur aus D_L, sofern echte/experimentelle TRAIN-Labels vorhanden sind.
+3.3 Vorhersage, Unsicherheit und Grenzen
+Bei einem neuen Ring wird X ohne Kenntnis seines y verarbeitet; der globale Variationsposterior bleibt im modularen Vorhersageschritt fest. Daraus folgen Zustandsaufenthaltsmomente, prädiktive Zielmittelwerte, Kovarianzen und approximierte Intervalle. Die Normal-Invers-Gamma-Regressionsparameter liefern bedingte Student-t-Komponenten; nach Marginalisierung der latenten Aufenthaltsverteilung entsteht im Allgemeinen eine Mischung, nicht eine einzelne Student-t-Dichte. Die im Ersatzlabelzweig ausgegebenen 90%-Intervalle sind NORMALAPPROXIMATIONEN aus Mittelwert ± 1,64485×Standardabweichung; keine per Simulation kalibrierten exakten Mischungsquantile.
+Ringweites h(Z) verliert zeitliche Reihenfolge sowie konkrete Signalstärken. A.4.4-Experimente mit Fenstern, amplitudengewichteten Zustandsmerkmalen und quadratischen Momenten zeigten bei begrenzter Labelinformation keinen überzeugend robusten Zusatznutzen. Darum blieb im Hauptpfad bewusst nur die einfache einteilige h(Z)-Kopplung. Das HMM selbst modelliert weiterhin den zeitlichen Prozessverlauf.
+3.4 Final gewählte und NICHT gewählte Varianten
+Modellentscheid
+Eingefrorene Wahl
+Wissenschaftliche Einordnung
+HMM K/d
+K=3, vier bekannte Kanäle
+Guter technischer Referenzkandidat; kein durch echte Qualität optimales K
+D_U
+C=1 im Hauptpfad; C=0 als kontrollierte Ablation
+Nicht ElBO(C0) direkt gegen ElBO(C1) vergleichen
+Feedback
+JOINT bei vorhandenen TRAIN-Labels
+Zwei lokale Steps; ohne Labels gibt es keinen Qualitätsfeedback-Schritt
+Qualitätsgesetz
+Ein ringweiter Aufenthaltsvektor, 3 bedingt NIG-kompatible Ausgänge
+Einfache interpretierbare Hauptvariante
+Epochen
+E20 SFA-Prozess und Ersatzlabelvergleich; E24 generativer Kontrollversuch
+24 Epochen sind kein globales Konvergenzzertifikat
+Nicht übernommen
+Fenster-4, Long-4, F15/F27 Signalmomente, Power-Label-Gewicht, nichtlineares NN-HMM
+Archivierte explorative Nebenwege, nicht Teil der Kernabnahme
+Labelverfahren
+Kein Pseudo-Labeling des SSL-Trainings
+Zufalls- und Signalproxies sind externe künstliche Prüf-Y, keine selbst vorhergesagten Pseudo-Labels
+
+4. Neu seit dem Handover: generative Label-Dosis mit wahrem Zustands-Oracle [W]
+Vollständig generierter HMM-Datensatz mit bekannten Z und bekanntem dreidimensionalen Qualitätsgesetz; nicht reale SFA-Daten. L=6/12/24/48 gelabelte Sequenzen, U=48 ungelabelte, vier feste Seeds, OFF-Feedback und drei globale Epochen. Beide C-Arme nutzen dieselben VAL- und TRAIN-Referenzen pro Seed; die Normalisierung stammt aus den sechs initialen TRAIN-Labels. Oracle-NIG nutzt echte synthetische Z im TRAIN und VAL, muss B aber selbst anhand der jeweiligen L-Labels schätzen.
+L
+C0 NRMSE
+C1 NRMSE
+Oracle-NIG true Z
+Rauschgesetz-Referenz
+6
+1,10306
+1,10247
+0,66779
+0,16016
+12
+0,97096
+0,94406
+0,39306
+0,16016
+24
+0,82436
+0,80902
+0,23379
+0,16016
+48
+0,69291
+0,71824
+0,17389
+0,16016
+
+Befund: Oracle-Fehler sinkt mit mehr Labels stark; der Abstand zwischen gelernten VI-HMM-Zuständen und trueZ-Oracle bleibt bei nur drei Epochen groß. Bei L48/C1 noch kein Vorteil über C0 – frühe Unteroptimierung ist eine mögliche, später geprüfte Erklärung. Rauschfehler sind konkrete Simulationskennwerte, keine absolute mathematische Untergrenze jeder zufälligen VAL-Stichprobe. Der Label-Dosis-Erfolg ersetzt nicht die noch fehlenden echten Qualitätsmessungen.
+5. Globale VI-Dauer: E3 → E6 → E12 bei L6 und L48 [W]
+Kontrolliert: dieselben vier Seeds, schwach trennbare synthetische Zustände, zustandsabhängiges generatives Qualitätsgesetz, U48 für C1, Feedback OFF, unabhängig exakt reproduzierter E3-Stand. Keine nachträgliche VAL-Epochenauswahl. Die Erhöhung der globalen Epochen änderte die Rangfolge deutlich.
+Gelabelte Ringe
+Epoche
+C0 NRMSE
+C1 NRMSE
+C0−C1
+L6
+E3
+1,10306
+1,10247
++0,00059
+L6
+E6
+1,07546
+1,02125
++0,05421
+L6
+E12
+0,98130
+0,89086
++0,09044
+L48
+E3
+0,69291
+0,71824
+−0,02533
+L48
+E6
+0,57861
+0,59474
+−0,01613
+L48
+E12
+0,49569
+0,44296
++0,05273
+
+Bei L6 verbessert sich die synthetische mittlere Zustandsgenauigkeit in E12 von ungefähr 0,727 (C0) auf 0,838 (C1). Bei L48 etwa 0,838 zu 0,877. Drei von vier Seeds profitieren zu E12, während insbesondere 20263126 noch ein negatives C1-Beispiel bleibt. Daher anschließend Rückkopplung und längere Trainingsdauer getrennt untersucht.
+6. JOINT versus OFF bei E12 – y→q(Z) funktioniert [W]
+Bei L=6 und 48, C=0 oder 1, denselben vier Seeds, E12 und zwei lokalen Backtracking-Schritten wurden die historischen OFF-Arme nur gelesen und 16 neue JOINT-Arme trainiert. Vollständige Epochenprotokolle als 192 JOINT-Einträge archiviert; lokale Qualitätslikelihood ist tatsächlich aktiv. JOINT wird nicht fälschlich mit einem veränderten globalen Qualitätsgesetz verwechselt.
+L
+C
+OFF E12
+JOINT E12
+Δ OFF−JOINT
+Seed-Befund
+6
+0
+0,98130
+0,94578
++0,03552
+4/4 JOINT besser
+6
+1
+0,89086
+0,88567
++0,00519
+4/4 JOINT besser
+48
+0
+0,49569
+0,47167
++0,02401
+4/4 JOINT besser
+48
+1
+0,44296
+0,42437
++0,01858
+4/4 JOINT besser
+
+StateAcc-Änderungen z. B. L6/C0 0,727→0,747; L6/C1 0,838→0,840; L48/C0 0,838→0,852; L48/C1 0,877→0,885. Bei vier Seeds und auf künstlichen Generatorgesetzen sind das positive kontrollierte Befunde, aber keine universellen oder signifikanzstatistischen Nachweise.
+7. JOINT-VI-Trajektorien, lokale Reserve und E13-2vs3-Kontrolle
+7.1 Vollständiger E12-Trajektorienaudit [W]
+Ein lesender Audit der 192 JOINT-Epochenprotokolle reproduzierte die berichteten E12-Stände und prüfte Epochendifferenzen. In je 44 globalen Epochenübergängen pro L/C-Bedingung keine negative berichtete globale ELBO-Änderung in der historischen E12-JOINT-Studie. Dieses Resultat bedeutet nicht, dass die lokalen Variationsparameter oder das globale Modell konvergiert sind. Zwei lokale Schritte pro Epoche können eine verbleibende Gradientenreserve besitzen.
+JOINT E12
+Summierter lokaler ELBO-Gewinn (Mittel)
+L6/C0
+0,00853063
+L6/C1
+0,010931
+L48/C0
+0,0512369
+L48/C1
+0,0551176
+
+7.2 Gezielte lokale dritte Gradientenprobe [W]
+Probe an zwei Seeds (20261108, 20263126), jeweils zwei gelabelten TRAIN-Ringen bei L6/C1/U48/JOINT nach reproduziertem globalem E12-Posterior. Nach den zwei üblichen Schritten wurde probeweise ein weiterer kleiner Schritt ε=0,005 gemessen. Der Posterior war bereits NACH der E12-Globalaktualisierung; diese Probe ist damit nicht identisch mit dem innerhalb der E12-Epoche verwendeten lokalen q(Z).
+Seed / Ringposition
+Lokaler Zuwachs nach 2 Schritten
+Zusätzlicher 3. Schritt
+Anteil
+20261108 / Ring 0
+0,00671069
++0,000373671
+5,57 %
+20261108 / Ring 5
+0,00283564
++0,000137323
+4,84 %
+20263126 / Ring 0
+0,00368190
++0,000131962
+3,58 %
+20263126 / Ring 5
+0,00766985
++0,000248952
+3,25 %
+
+7.3 E13 mit 2 versus 3 lokalen Optimierungsschritten [W]
+Nach exaktem E12-Replay wurden zwei Seeds nur um E13 fortgesetzt; beide Arme verwenden identische E12-Parameter, dieselbe Trainingsbasis und lediglich zwei versus drei lokale Schritte. Zwei unabhängige E13-Referenzwerte des Zweischritt-Arms wurden später im E24-Audit exakt reproduziert.
+Seed
+E13 RMSE 2 Schritte
+E13 RMSE 3 Schritte
+Zusatznutzen 3 Schritte
+Summierter 3.-Schritt-Lokalgewinn
+20261108
+0,465844
+0,465640
+0,000204423
+0,006319216
+20263126
+1,102383
+1,101739
+0,000643801
+0,003646106
+
+Fazit: Dritter Schritt verbessert in diesen beiden Fällen die lokale ELBO, den VAL-NRMSE aber nur minimal. Globaler Trainingsfortschritt über mehrere Epochen hatte die erheblich größere Wirkung. Darum blieben aus Rechenaufwandsgründen zwei lokale Schritte im Abschlussmodell. Kein allgemeiner Beleg für optimale Schrittzahl.
+8. Wichtige E24-Abschlussstudie – exakt gepaarte generative JOINT-VI [W]
+Vier feste Seeds 20261108, 20262117, 20263126, 20264135. Schwache Zustandsunterscheidbarkeit, zustandsabhängiges bekanntes synthetisches Qualitätsgesetz; 6 gelabelte Sequenzen, bei C1 zusätzlich 48 ungelabelte, JOINT, zwei lokale Steps, K3. Exakte Replay-Sperre E12 für alle Arme; zwei unabhängige C1-E13-Kontrollen exakt (Δ=0). Feste Epochen E12/E13/E16/E20/E24 ohne nachträgliche Best-Epoch-VAL-Selektion.
+Epoche
+C0 NRMSE
+C1 NRMSE
+C0−C1
+Gewinn-Seeds
+StateAcc C0/C1
+12
+0,945783
+0,885668
++0,060115
+3/4
+0,747 / 0,840
+13
+0,935739
+0,873598
++0,062142
+3/4
+0,755 / 0,850
+16
+0,925889
+0,838410
++0,087479
+3/4
+0,761 / 0,877
+20
+0,920981
+0,782546
++0,138435
+4/4
+0,766 / 0,901
+24
+0,914454
+0,766442
++0,148012
+4/4
+0,766 / 0,907
+
+E24 relativer Fehlerunterschied: (0,914454−0,766442)/0,914454 = 16,19 %. Das gilt ausschließlich im vorliegenden generativen vier-Seed-Szenario; die echten SFA-Qualitätslabels fehlen. Nicht als Verbesserung echter Ringunrundheit bezeichnen. Die Verläufe zeigen einen zunehmenden C1-Effekt während längerer globaler VI. Keine vollständige Konvergenz nach E24 nachgewiesen.
+
+Archivgrafik – synthetischer Qualitäts-NRMSE über E12–E24; E24-Werte wurden aus Nutzer-Terminalausgaben rekonstruiert.
+8.1 E24-Einzelseeds – zwingend gemeinsam berichten
+Seed
+C0 E24
+C1 E24
+C0−C1
+Zustandsgenauigkeit C0/C1
+90%-Coverage C0/C1
+20261108
+0,460827
+0,433044
++0,027783
+0,870 / 0,891
+1,000 / 1,000
+20262117
+1,048007
+0,965527
++0,082480
+0,880 / 0,929
+0,910 / 0,931
+20263126
+0,923148
+0,810978
++0,112170
+0,837 / 0,915
+0,889 / 0,917
+20264135
+1,225836
+0,856219
++0,369617
+0,478 / 0,893
+0,840 / 0,979
+
+Seed 20263126: Nach E12 war C1 schlechter, bei E24 nun besser. Seed 20264135 zeigt besonders großen C1-Nutzen, aber schwache C0-Zustandsrekonstruktion. Der Mittelwertgewinn ist somit heterogen. Bei C1-Seed 20263126 beträgt der berichtete letzte globale ELBO-Epochenzuwachs noch +3,08756; für 20264135 +0,141484. Der C0-Seed 20261108 zeigt eine minimale E24-ELBO-Änderung −4,02×10^−6, wohl numerisch klein; nicht kategorisch „überall streng monoton“ schreiben.
+Intervallabdeckungen in den generativen Studien schwanken erheblich. Bei 90%-Niveau treten 100% und knapp 84% auf. Ohne Intervallbreiten und größere wiederholte Samples keine Kalibrierung behaupten. Die generativen E24-Originaldateien summary.csv/per_seed_paired.csv/all_epochs.csv liegen im Windows-Run, wurden hier aber nur anhand der vom Nutzer bestätigten Terminalwerte nachgebildet. Für eine endgültige Abbildung Original-CSV prüfen.
+9. Die neue isolierte Abschlussimplementierung final_ssr – was „final“ bedeutet
+9.1 Dateibaum und Rollen
+Datei innerhalb final_ssr
+Funktion / Status
+b1_core.py
+Unveränderter Bayesian-HMM-/NIG-/VI-Kern; geprüfter SHA256 c07a3aaee706a7654bb98cf173b856a01ca14dbbd0427e7875dd3a3af04ad2c8.
+abschluss_train.py
+Verbindlicher produktiver CLI-Trainingslauf; ringweises Einlesen, Splits, Skalierung, C, Checkpoints, Logging, Schutz gegen künstliche Labels.
+run_b1.py
+Kopierte Hilfsfunktionen für Datenimport, Konfiguration und Initialisierung.
+abschluss_abnahme.py
+Lesende Daten-/Split-/Kernel-/HMM-Momentenprüfung; führt laut Windows-Log kein Training aus und verändert keine Dateien.
+abschluss_prozessdiagnose.py
+Erstellt Real-X-Diagramme, train/VAL-Verläufe, HMM-Zustandskurven und Übergänge aus gespeichertem Checkpoint.
+abschluss_qualitaetsauswertung.py
+Qualitätsbewertung nur mit gültig gekennzeichneten echten Referenzlabels; produktiven Pfad nicht mit Proxy-CSV umgehen.
+test_joint_synthetisch.py, test_b1_mathematik.py
+Mathematische und generative Softwaretests; keine reale Qualitätsvalidierung.
+konfiguration_final.json, requirements-final.txt
+Festgelegte und dokumentierte Referenzkonfiguration / benötigte Pakete.
+echte_qualitaetsmessungen_NUR_VORLAGE.csv
+Leere Vorlage nur für unabhängige echte Labormessungen. Mit künstlichen Werten NICHT befüllen.
+
+Hauptarchiv: Bayesian_Bachelor_ABSCHLUSSMODELL_und_Kapitel3-5_2026-11-09.zip. Seine 33 Einträge enthalten die finale Codeunterstruktur, Diagramme, Quellen-/Abnahmestatus und Word-Unterlagen. Dieses Archiv ist ein VERSIONSKANDIDAT, der funktional abgenommen wurde; es ist nicht der eine numerisch gelernte Regressionscheckpoint. Das eigentliche Objekt ist aufgeteilt in Code, prior/posterior und Nachweisdateien.
+9.2 Windows-Abnahme des produktiven Kerns [W]
+Nutzerterminal: „PASS: Ursprünglicher Bayesian-HMM-Kern unverändert | SHA256: c07a...“; „PASS: 16 nutzbare Ringe; 12/2/2 TRAIN/VAL/TEST, SFA16 ausgeschlossen“; „PASS: d=4, endliche Messwerte, zeitkonsistente Kernkanäle, nur TRAIN-Skalierung“; „TRAIN-Qualitaetslabels: 0 VAL-Qualitaetslabels: 0“; „PASS: HMM-Momente PSD, normalized und schnelle unlabeled Inferenz identisch“; „PASS: Keine Test-Auswertung, kein Training, keine Dateiaenderung“. Dies belegt das bestandene Eingangs-/Leckage-/Kernaudit, nicht einen Trainingserfolg mit realen y.
+python .\final_ssr\abschluss_abnahme.py
+9.3 Schutzmechanismen und spätere reale Labelintegration
+Mit 0 echten Labels trainiert der produktive Hauptlauf NUR das Prozess-HMM. Das globale Qualitätsteil wird nicht auf Daten geschätzt und seine Prior-basierte Ausgabe ist keine gelernte Qualitätsprognose. Künstliche Proxy- und Zufallslabels sind in final_ssr absichtlich blockiert und werden ausschließlich isoliert unter experimente_ersatzlabel_evaluation verwendet. Nie --confirm-real-labels setzen, um Prüflabels als reale Messungen einzuschleusen. Für künftige echte Y sind Herkunft, Ring-ID, mm, Messmethode, Vollständigkeit und Leakage zu prüfen; vor echter Qualitätsbewertung ist ein echtes Training mit den zugehörigen Labeldateien notwendig.
+Aufgrund eines lokal identifizierten Integrationsfehlers wurde die Liste gelabelter TRAIN-Ringe bei der Initialisierung vorgezogen; danach hat ein synthetischer echter-Label-Schnittstellentest TRAIN/VAL und TEST-Sperre bestätigt. C0-Posterior bleibt bei Änderung von D_U exakt gleich, wenn Skalierung und Initialisierung nur D_L benutzen. Original b1_core.py blieb unverändert.
+10. Vollständiger realer SFA-Prozesslauf K3/E20 [W]
+Befehl und Ergebnisordner:
+python .\final_ssr\abschluss_train.py --run-name abschluss_sfa_k03_e20_20261109 --states 3 --epochs 20 --unlabeled-weight 1 --local-steps 2
+ergebnisse_final_ssr\abschluss_sfa_k03_e20_20261109\
+Benutzerausgabe listet sechs vorhandene Dateien: metadaten.json (2302 B), modell_best.pt (10063 B), modell_letzte_epoche.pt (10297 B), skalierung.json (665 B), split_snapshot.json (281 B), trainingsverlauf.csv (1210 B). Die letzte Epoche lautet: 20; TRAIN-ELBO −21139,85194594443; VAL-Forward-Score −2,066563594431228; leere Qualitäts-RMSE; bester_bisher=True. Der Checkpoint modell_best.pt ist damit der gespeicherte BEST-PROZESSPOSTERIOR, kein mit Y gelernter Qualitätsposterior.
+TRAIN/VAL
+E1
+E10
+E20
+TRAIN-ELBO
+−27.832,99
+−21.783,52
+−21.139,85
+VAL-Prozessscore / Messpunkt
+−2,645670
+−2,19870
+−2,066564
+Echte Qualitätsmetriken
+—
+—
+—
+
+Die Prozesskennzahlen verbessern sich im durchgeführten E20-Versuch. Ein höherer Forward-Validierungsscore ist ein im Code definierter erwarteter Log-Normierungsterm pro Messpunkt; nicht die exakte prädiktive Prozessloglikelihood. ELBO und VAL-Score unterstützen eine numerische Trainingsdiagnose, aber beweisen weder vollständige Konvergenz noch realen Qualitätsnutzen. Das vorhandene Run-Verzeichnis war bei einem Wiederholungsversuch bereits belegt: FileExistsError wird aus Überschreibschutz korrekt ausgelöst; anschließend wurden bereits vollständig vorhandene Dateien geprüft – nicht neu trainiert.
+10.1 Vier echte Prozessdiagramme liegen vor [W]
+PNG
+Befund / Interpretationsgrenze
+abb_elbo.png
+TRAIN-ELBO E1–20 verbessert sich und flacht ab.
+abb_val_prozess_score.png
+VAL-Forward-Score verbessert sich; keine Endqualität.
+abb_sfa_signale_und_hmm_zustaende.png
+Vier SFA01-Eingangssignale und intern inferierte Zustandswahrscheinlichkeiten; keine unabhängigen Phasenlabels.
+abb_uebergangsmatrix.png
+Hohe Selbstübergänge, kleinere Off-Diagonalen; numerisch annotierte lokale Reproduktion im Kapitel-4-Paket prüfen.
+
+SFA01: Zustand 0 erscheint am Anfang und gegen Ende, Zustand 2 über längeren Mittelabschnitt, Zustand 1 danach. HMM-Zustände sind KEINE nachgewiesenen SPS-Betriebsphasen. Die aus lokal reproduziertem Checkpoint zitierte Übergangsdiagonale liegt ungefähr bei 0,9950/0,9945/0,9966. Exakte numerische Matrix vor Bachelor-Finalisierung mit dem Windows-Best-Checkpoint abgleichen. Dass identische Zustände Anfang/Ende auftreten, begründet die bekannte Informationsgrenze eines reinen Occupancy-Vektors.
+11. Betreuervorgabe und erster Zufallslabel-E3-Durchlauftest [W]
+Betreuer: Wertebereich angenähert 0–12 mm, Mittel ~5 mm für Unrundheit und Höhenschlag; künstliche Werte bis zum Dateneingang erlaubt. Isolierter Demo-Scriptpfad experimente_label_demo/run_synthetische_qualitaet.py, Archiv Bayesian_Bachelor_Synthetische_Qualitaet_Durchlauftest_2026-11-09.zip. Auf Windows bestätigt: 6 künstlich gelabelte TRAIN, 6 ungelabelte TRAIN, 2 künstliche VAL-Referenzen, TEST unangetastet; max. 96 gleichmäßig verteilte Zeitpunkte pro Ring; TRAIN-Mittel genau [5,5,5] in der künstlichen Skala.
+Epoche
+TRAIN-ELBO
+VAL-Prozessscore
+Demo-RMSE der Zufallsreferenzen
+1
+−3709,9051
+−2,84439
+1,2431
+2
+−3369,6002
+−2,70567
+1,2381
+3
+−3323,8262
+−2,66686
+1,2398
+
+Dieses Ergebnis belegt End-to-End-Funktion von Training, drei Zielgrößen, Variationsposterior, Vorhersage und Sperre der TEST-Ringe. Es ist weder ein positiver Zusammenhang zwischen X und y noch eine gelernte echte geometrische Ringqualität. Nach dem E3-Test folgte die deutlich umfangreichere sechsarmige E20-Ersatzlabelstudie.
+12. Vollständige SFA-Ersatzlabelstudie E20 – jetzt auf Windows bestätigt [W]
+12.1 Versuchsdesign – reale X mit zwei klar verschiedenen künstlichen Y-Klassen
+Experiment: experimente_ersatzlabel_evaluation/sfa_ersatzlabel_studie.py, Hauptpaket Bayesian_Bachelor_SFA_Ersatzlabels_GESAMTPAKET_2026-11-09.zip. Es enthält 51 Archiveinträge, sechs vorab lokal gespeicherte Modellvarianten, CSV-Auswertungen und acht Diagramme. Nutzer führte denselben Trainingsbefehl auf Windows erfolgreich aus; ausgegebener Run endet mit „PASS: TRAIN/VAL, alle drei Ersatzziele, prädiktive Unsicherheit; TEST gesperrt.“
+python .\experimente_ersatzlabel_evaluation\sfa_ersatzlabel_studie.py --run-name forschung_Ersatzlabels_SFA_E20_20261109 --epochs 20 --max-timepoints 96
+ergebnisse_NUR_ERSATZLABEL_EVALUATION\forschung_Ersatzlabels_SFA_E20_20261109\
+TRAIN (12) = exakt sechs künstlich gelabelte Ringe SFA03, SFA13, SFA14, SFA19, SFA22, SFA23 plus sechs weitere ungelabelte Ringe. VAL mit zwei künstlichen Referenzwerten SFA02, SFA10; für deren Vorhersage wird y nicht als Modellinput verwendet. TEST SFA11/SFA20 bleibt gesperrt. Alle Trainingsarme verwenden K3, d4, E20, seed=20261031, zwei lokale Optimierungsschritte, festen Sequenz-Subsample max 96. Die künstlichen Proxy-/Zufallswerte werden nur für TRAIN/VAL erzeugt; Vorhersagen und Unsicherheit werden vollständig protokolliert.
+12.2 Klasse A: SFA-signalbasierte Proxy-Zielgrößen
+Die Ersatzlabelquelle „proxy“ ist eine kontrolliert definierte mathematische Funktion der ORIGINALEN vollständigen SFA-Sequenzen: u1=RMS_t(F_rad63), u2=Q0,95(Ist_D150)−Q0,05(Ist_D150), u3=std_t(Ist_h152, ddof=0). Diese Größen wurden schon in älteren Proxy-Versuchen verwendet. Sie sind ausdrücklich KEINE Messwerte für Unrundheit innen/außen oder Höhenschlag. Ihre Transformationsparameter wurden nur mit sechs gelabelten TRAIN-Ringen geschätzt. Code: y_proxy = clip[0,12]{5 + 1,8·tanh((u−μ_TRAIN6)/σ_TRAIN6) − Offset_TRAIN6}. Der Offset erzwingt je Komponente TRAIN-Mittel 5 in künstlichen Pseudoeinheiten. Obwohl drei Modellplätze die Namen der Qualitätsziele tragen, entsprechen die Proxy-Spalten NICHT diesen physikalischen Größen.
+12.3 Klasse B: Unabhängige Zufallslabels als Negativkontrolle
+Die „random“-Referenzen wurden separat mit NumPy-Zufallszahlgenerator seed=20261109 generiert: anfänglich 12·Beta(2,5;3,5) pro Ziel und Ring, danach gemeinsame Verschiebung zur TRAIN-Mitte 5 sowie Clipping auf [0,12]. TRAIN6-Mittel je künstlicher Komponente exakt 5. Die auf VAL gesetzten künstlichen Werte werden nicht für das Fitting der Transformation verwendet. Es besteht absichtlich kein systematisch eingespeistes X→y-Gesetz; daher wäre eine hohe gemessene Vorhersagegüte kein Beweis für echte Ringqualität.
+12.4 Fairness: nur D_L für Vorverarbeitung/Initialisierung
+Sowohl bei C0 als auch C1 stammen X-Skalierung und HMM-Initialisierung ausschließlich aus sechs gelabelten TRAIN-Ringen. Dies wurde vor dem erneuten systematischen C0/C1-Vergleich überprüft; der C0-Posterior muss gegenüber Änderungen an den sechs ungenutzten U-Ringen invariant bleiben. Dadurch wird verhindert, dass C0 heimlich D_U über die Vorverarbeitung nutzt. Labels sind im Forschungszweig zwar künstlich, dienen aber als wohldefinierte D_L-Maske. Bei 0 Labels läuft die finale produktive Prozesspipeline anders und benötigt alle zwölf TRAIN-X.
+12.5 Wichtige Einschränkung der Sequenzzeitauflösung
+Das Skript benutzt für die teils mehrere Hundert Zeitpunkte langen Originalsequenzen ein Raster aus maximal 96 gleichmäßig über die ursprüngliche Ringdauer verteilten Indizes. Dadurch entsteht eine zeitlich ausgedünnte Folge, deren HMM-Übergangsannahmen nicht dieselbe Zeitskala wie die 0,1-s-Vollsequenzen haben. Es ist eine SOFTWARE-/SURROGAT-Auswertung und keine gleichwertige reale Prozessmodellprüfung. Die Proxy-Ziele selbst werden vor diesem Subsampling aus den Originalvollsequenzen bestimmt. Ein Lauf mit --max-timepoints 0 würde vollständige Zeitfolgen verwenden, ist wesentlich rechenintensiver und wurde für die sechsarmige E20-Studie nicht als [W] nachgewiesen.
+13. Die sechs E20-Modelle – tatsächliche Ergebnisse [W][L]
+Vier ARM-Kombinationen für Proxies: C0_OFF, C1_OFF, C0_JOINT, C1_JOINT; zwei ARM-Kombinationen für Zufallslabels: C0_JOINT, C1_JOINT. Alle sechs wurden in 20 Epochen trainiert und nach festen Epochen 1,3,6,12,20 untersucht – ohne rückblickende Optimierung des VAL-Fehlers. Lokal im gelieferten ZIP durch CSV gezählt: 120 Epochenzeilen, 720 Zeilen TRAIN/VAL-Vorhersagen, 30 Gesamtvergleichszeilen; sechs .pt-Modellcheckpoints, acht PNG-Diagramme. Nutzerausgabe bestätigt alle sechs 20-Epochen-Arme auf Windows.
+Labelart
+Arm
+E20 VAL-RMSE
+TRAIN-Mittelwert-Baseline
+Coverage 90%
+Ø Breite
+SFA-Proxy
+C0_OFF
+1,283432
+1,292465
+83,3 %
+3,7916
+SFA-Proxy
+C1_OFF
+1,279186
+1,292465
+100 %
+3,7985
+SFA-Proxy
+C0_JOINT
+1,283398
+1,292465
+83,3 %
+3,7915
+SFA-Proxy
+C1_JOINT
+1,279129
+1,292465
+100 %
+3,7984
+Zufall
+C0_JOINT
+1,245927
+1,227625
+100 %
+7,4310
+Zufall
+C1_JOINT
+1,256133
+1,227625
+100 %
+7,4456
+
+Auswertungsskala: künstlich normierte bzw. frei definierte Pseudoeinheiten, NICHT Millimeter tatsächlicher Unrundheit. Die Prozentverbesserung C1-JOINT gegen Proxy-Baseline beträgt etwa 1,0 %, gegenüber C0-JOINT nur etwa 0,33 %. Der Unterschied JOINT versus OFF bei C1 beträgt lediglich ungefähr 0,000057 RMSE, praktisch sehr klein. Bei unabhängigen Zufallswerten ist die Mittelwert-Baseline besser als beide C-Arme. n_VAL=2 Ringe und drei Proxy-/Zufallsziele → sechs deskriptive Einzelwerte pro Modell; keine belastbare Signifikanz- oder Kalibrierungsbewertung.
+13.1 Feste Epochen: alle sechs Arme – sichtbarer Verlauf
+Arm
+E1 RMSE
+E3 RMSE
+E6 RMSE
+E12 RMSE
+E20 RMSE
+proxy C0_OFF
+1,2886
+1,2876
+1,2862
+1,2845
+1,2834
+proxy C1_OFF
+1,2882
+1,2871
+1,2840
+1,2817
+1,2792
+proxy C0_JOINT
+1,2886
+1,2876
+1,2861
+1,2844
+1,2834
+proxy C1_JOINT
+1,2883
+1,2870
+1,2839
+1,2817
+1,2791
+random C0_JOINT
+1,2430
+1,2393
+1,2416
+1,2447
+1,2459
+random C1_JOINT
+1,2431
+1,2398
+1,2450
+1,2495
+1,2561
+
+VAL-Prozessscore des Proxy-C1-JOINT-Arms steigt E1 −2,8444 → E3 −2,6669 → E6 −2,5999 → E12 −2,5060 → E20 −2,4668. Proxy-C0-JOINT: −2,9300 → −2,7804 → −2,7345 → −2,6983 → −2,6535. Gleichzeitig sinkt Ersatzlabel-RMSE nur schwach. Hierin liegt eine zentrale kritische Interpretation: Verbesserung der Prozessmodellierung ist nicht gleichbedeutend mit einer großen Verbesserung der Ersatzqualitätsvorhersage. Die C0- und C1-Train-ELBO sind aufgrund ungleicher Zielfunktionen zahlenmäßig NICHT direkt gegeneinander zu vergleichen.
+
+Archivgrafik – VAL-RMSE auf künstlichen SFA-Proxy-Zielen über feste Epochen; die Unterschiede zwischen den Armen sind klein.
+13.2 Prädiktive Unsicherheit
+Alle Arme liefern prädiktive Standardabweichungen, normalapproximierte zentrale 90%-Intervalle und sechs VAL-Abdeckungsindikatoren. Bei Proxy C0-JOINT liegen 5/6 Werte im Intervall, bei Proxy C1-JOINT 6/6. Bei Zufallslabels ebenfalls 6/6, aber mit deutlich größeren mittleren Intervallbreiten (~7,44 gegenüber ~3,80). Sehr breite Intervalle können hohe Coverage erzielen, ohne informativer zu sein. Die Auswertung erlaubt KEINE Kalibrierungsbehauptung. Die drei Zielwerte liegen in einer künstlichen Skala; keine reale mm-Kalibrierung möglich.
+
+Archivgrafik – Beispielhafte drei Zielausgänge und normalapproximierte Unsicherheit auf zwei VAL-SFA-Ringen, ausschließlich künstliche Prozess-Proxies.
+14. Modelle und Artefakte – was ist der „fertige Code“?
+14.1 Drei klar getrennte Ebenen
+Ebene
+Datei / Ort
+Was tatsächlich darin steckt
+Algorithmus / Modellfamilie
+final_ssr/b1_core.py
+Mathematischer Kern mit Parametern, Priors, VI, HMM und Qualitätstermen; noch keine konkreten gelernten Qualitätswerte.
+Produktives Trainingsprogramm
+final_ssr/abschluss_train.py
+SFA-Datenvorbereitung, echte Labelschutzprüfung, ringweiser Split, Train/VAL, Checkpoints.
+Realer Prozesscheckpoint
+ergebnisse_final_ssr/abschluss_sfa_k03_e20_20261109/modell_best.pt
+Mit ALLEN 12 TRAIN-X (0 echte Y) trainierter HMM-Prozessposterior; Qualitätsregressor nicht datenbasiert erlernt.
+Experimentlauf mit Ersatzlabels
+experimente_ersatzlabel_evaluation/sfa_ersatzlabel_studie.py
+Sechs isolierte E20-Experimente mit drei künstlichen Zielgrößen.
+Vollständiger Ersatzlabel-Checkpoint
+ergebnisse_NUR_ERSATZLABEL_EVALUATION/forschung_Ersatzlabels_SFA_E20_20261109/modelle/proxy/C1_JOINT/NUR_FORSCHUNG_KEIN_REALES_QUALITAETSMODELL.pt
+Gelerntes q/p und Skalen für drei SIGNALBASIERTE Proxy-Ausgänge, ohne reale geometrische Bedeutung.
+Ersatzlabel-Audit
+experimente_ersatzlabel_evaluation/abnahme_ersatzlabel_studie.py
+Prüft gespeicherte CSV/Checkpoint/Leakage/Hash und soll ohne neues Training auf Windows ausgeführt werden.
+
+Der zuletzt genannte Proxy-C1-JOINT-Checkpoint ist der beste der vier auf zwei VAL-Ringen berichteten SFA-Proxy-Arme, jedoch weder nach echter Qualität optimiert noch als finales Produktionsmodell mit beliebigem neuem Ring-Eingabekommando verpackt. Ein eigenständiger generischer predict_proxy_checkpoint.py-CLI-Einstiegspunkt ist noch nicht nachgewiesen. Die Study-Skripte können TRAIN/VAL vorhersagen; bei Bedarf kann ein read-only Inferenz-CLI als Nacharbeit erstellt werden, ohne Kern- oder Checkpointänderung.
+14.2 Ergebnisstruktur der E20-Studie
+ergebnisse_NUR_ERSATZLABEL_EVALUATION\forschung_Ersatzlabels_SFA_E20_20261109\
+  UNBEDINGT_STATUS_LESEN.json
+  proxy_REFERENZEN_NUR_KUENSTLICH.csv
+  random_REFERENZEN_NUR_KUENSTLICH.csv
+  VERGLEICH_ALLE_ARME.csv
+  ALLE_METRIKEN_JE_ZIEL.csv
+  ALLE_VORHERSAGEN_TRAIN_VAL_NUR_ERSATZ.csv
+  ALLE_TRAJEKTORIEN.csv
+  modelle\proxy\{C0_OFF,C1_OFF,C0_JOINT,C1_JOINT}\...pt
+  modelle\random\{C0_JOINT,C1_JOINT}\...pt
+  abbildungen\ (8 PNGs)
+Die ZIP enthält zusätzlich den Ordner BEISPIELERGEBNISSE_LOKAL_GETESTET_NUR_ERSATZLABELS/ mit lokal geprüften Ergebnisdateien; dieser ist eine gesonderte lokale Reproduktion und muss vom späteren Windows-Run-Verzeichnis unterschieden werden. Wenn Original-CSV für Kapitel 4 angefordert werden, vorzugsweise die bereits auf Windows erstellte Studie beistellen und SHA256/Seeds vergleichen.
+15. Windows-Kommandos – dokumentiert, nicht wahllos neu starten
+15.1 Bereits bestätigte Windows-Befehle [W]
+python .\final_ssr\abschluss_abnahme.py
+python .\final_ssr\abschluss_train.py --run-name abschluss_sfa_k03_e20_20261109 --states 3 --epochs 20 --unlabeled-weight 1 --local-steps 2
+python .\experimente_label_demo\run_synthetische_qualitaet.py --run-name demo_SFA_Zufallsqualitaet_20261109 --epochs 3 --states 3 --C 1 --max-timepoints 96
+python .\experimente_ersatzlabel_evaluation\sfa_ersatzlabel_studie.py --run-name forschung_Ersatzlabels_SFA_E20_20261109 --epochs 20 --max-timepoints 96
+Die vorhandenen Run-Namen sind bereits belegt; erneuter Aufruf mit identischem Namen führt wegen Überschreibschutz zu FileExistsError. Keine alten Runs löschen. Es ist fachlich und zeitlich nicht erforderlich, die sechs ×20 Epochen erneut durchzurechnen.
+15.2 Noch sinnvoll: unabhängiger lesender Windows-Audit [O]
+python .\experimente_ersatzlabel_evaluation\abnahme_ersatzlabel_studie.py --run-name forschung_Ersatzlabels_SFA_E20_20261109
+Dieser einzelne Befehl wurde dem Nutzer als nächster Schritt gegeben, aber im verfügbaren Gespräch wurde noch keine Terminalausgabe dafür zurückgeschickt. Es ist unzulässig zu behaupten, der UNABHÄNGIGE WINDOWS-ERGEBNIS-AUDIT sei bereits bestanden. Training selbst [W] und lokale CSV-Kontrolle [L] sind davon zu unterscheiden.
+15.3 Bereits ausgeführte Prozessdiagnose
+python .\final_ssr\abschluss_prozessdiagnose.py --run-name abschluss_sfa_k03_e20_20261109 --ring-id SFA01 --checkpoint best
+Vier übermittelte und gesichtete PNGs: abb_elbo.png, abb_val_prozess_score.png, abb_sfa_signale_und_hmm_zustaende.png, abb_uebergangsmatrix.png. Die exakte Unterordnerbenennung kann im Windows-Verzeichnis prozessdiagnose_SFA01_best lauten. Nutzer hat die Bilder in den Chat hochgeladen.
+16. Bachelorarbeit Kapitel 3 – Anpassungsauftrag auf Basis final_ssr
+Sieben Unterkapitel 3.1–3.7 existieren in Word. Die ursprünglichen Formeln/Gleichungsnummern 3.7–3.46 beibehalten, soweit sie noch dem Code entsprechen. Nicht automatisch alle Formeln umschreiben. Vor Bearbeitung konkrete finale Datei, echte Codefunktion und zugeordnete Originalquelle prüfen. Immer in .docx in Originalvorlage, Quellen am Schluss jedes Sinnabschnitts „(vgl. Autor, Jahr, S. ...)“, mit nachweislich kontrollierten Originalseiten. Terminologie: Datenaufteilung statt Datenpartitionierung, „Granularität“ vermeiden.
+Unterkapitel
+Unverzichtbare konkrete Änderung
+Code-/Quellenpfad
+3.1 Datenbasis
+16 gültige SFA, SFA16-Ausschluss, 0 echte Y, ausdrücklich getrennte künstliche Ersatzlabelstudie.
+SFA-Datenaudit; Mowbray 2022; Borchani 2015
+3.2 Aufbereitung
+Vier Kanäle, Originalzeitreihen vs. 96 Subsample, TRAIN-only Skalen, D_L-only Skalen bei C0/C1, fester Split.
+abschluss_train.py; sfa_ersatzlabel_studie.py; Kaufman 2011
+3.3 Architektur
+K3/d4, Dirichlet+NIG, diagonale Gaußemissionen, keine Erweiterung mit F15/F27 im finalen Pfad.
+b1_core.py; Rabiner, Beal, P112
+3.4 Qualitätskopplung
+Ein h(Z), m/H, eigene ringweite Adaption, keine SFA-Realqualität gelernt.
+Herleitungen A/B; b1_core.py
+3.5 VI / Training
+C-Gewichtung korrekt einschließlich Entropie/Statistiken, OFF/JOINT, zwei lokale Schritte, globaler Rückkopplungseffekt, E20/E24 korrekt getrennt.
+Herleitung C; Beal; Shao 2021/2022
+3.6 Predictive
+Modulare VI-Vorhersage, Normalapprox-90%-Intervalle nur Ersatzlabelzweig, keine voll integrierten exakten Quantile.
+Herleitung D; predictive_from_mom; Gelman/Gabry
+3.7 Evaluation
+Explizit drei Versuchsarten, sechsarmige SFA-E20-Studie, L6/U6, C0/C1, OFF/JOINT, TRAIN-Mittelbaseline, nVAL2, E24 generativ.
+Aktualisierte DOCX 09.11.; study+audit; Kaufman/Gelman
+
+Erstellte aktualisierte 3.7-Datei: Bachelorarbeit_Kapitel_3_7_Abschlussmodell_Ueberarbeitet_2026-11-09.docx (vier Seiten). Ihre Methodik basiert auf der Abschluss-Pipeline und war zeitlich vor dem vollständigen sechsarmigen SFA-E20-Ersatzlabelversuch. Deshalb auch 3.7 nach den letzten Studien nochmals punktuell ergänzen; die Word-Datei nicht als endgültig fehlerfrei deklarieren.
+17. Kapitel 4 – erster Entwurf existiert, aber NICHT letzter Stand
+Am 09.11. wurde Bachelorarbeit_Kapitel_4_Experimentelle_Untersuchung_und_Ergebnisse_2026-11-09.docx als 16-seitige erste Fassung erstellt und visuell geprüft, mit 4.1–4.9, 12 Tabellen und 11 Abbildungen. Dazu: Kapitel4_Abbildungen_und_Ergebnisdaten_2026-11-09.zip (PNGs und rekonstruierte Ergebnis-CSV); Kapitel4_Quellenstatus_und_Pruefpunkte_2026-11-09.md. Diese Fassung entstand VOR dem vollständigen SFA-Ersatzlabel-E20-Windows-Lauf und muss um dessen sechsarmigen Vergleich, Vorhersageplots, Unsicherheit und die Negativkontrolle ergänzt werden. Nicht stillschweigend als bereits aktualisiert bezeichnen.
+Abschnitt
+Verbindlicher Ergebnisblock
+4.1
+SFA-Split, echte X, vollständig generative (X,Z,Y), Ersatzlabel-X+fake Y – explizit drei Datentypen
+4.2
+Exakte Enumeration m/H, PSD, C0-Leakage, Checkpoint-Replay, Windows-Abnahmen
+4.3
+Reales SFA K3/E20 und vier Originaldiagramme; keine Qualitätsmetriken
+4.4
+Generative Positiv-/Nullkontrollen; nur synthetische true-Z-Accuracy
+4.5
+U-Dosis und C-Gesamtgewicht aus generativen Ablationen
+4.6
+Label-Dosis L6–48 und trueZ-Oracle mit E3-Kontrollen
+4.7
+JOINT/OFF, lokale Step-Proben, globale E12–24; Mittel und vier Einzel-Seeds
+4.8
+Synthetische und SFA-Proxy-Unsicherheiten streng getrennt; Coverage mit Breite
+4.9 bzw. eigener Abschnitt
+NEU: komplette SFA-Ersatzlabelstudie L6/U6/E20, 6 Arme + Zufallskontrolle + Baselines; danach Kapitelabschluss nach Bedarf neu nummerieren
+
+Vor Abgabe die originalen Windows-E24-CSV-Dateien direkt prüfen und numerisch annotierte HMM-Übergangsmatrix aus dem tatsächlichen Windows-Checkpoint reproduzieren. Neue SFA-Ersatzlabel-CSV ist innerhalb der Windows-Ergebnisstruktur und lokal im ZIP vorhanden. Bei alten Kapitel-4-Grafiken E24-Daten klar als aus Terminal rekonstruiert kennzeichnen.
+18. Kapitel 5 – vorgesehene kritische Bewertung
+5.1 Mathematische Zuverlässigkeit und Grenzen der strukturierten VI; 5.2 realer Prozess: Stabilität, Zustände/kein Ground Truth; 5.3 generativer Nutzen von U und Trainingsdauer (inklusive heterogener Seeds, fehlender Konvergenz); 5.4 direkter Y→qZ-Feedbackeffekt und lokale Optimierungsreserve; 5.5 Labelknappheit, Oracle-Gap und Grenzen der Occupancy-Repräsentation; 5.6 SFA-Zufallslabels vs. X-Proxies mit schwachen Gewinnen und möglicher tautologischer Ableitung von X; 5.7 prädiktive Unsicherheit / kleine n und nicht kalibrierte Intervalle; 5.8 externe Validität und echte y-Messungen; 5.9 Schlussfolgerungen und Ausblick. Nicht nur Kapitel-4-Tabellen in Prosa wiederholen, sondern Forschungsfragen beantworten und Einschränkungen benennen.
+19. Abbildungsregister – was jetzt vorliegt / noch nötig ist
+Abb.-Block
+Datei / Argument
+Status
+Real SFA TRAIN
+abb_elbo.png; ELBO −27.833→−21.140
+[W] Bild erhalten
+Real SFA VAL
+abb_val_prozess_score.png; Forward −2,646→−2,067
+[W] Bild erhalten
+Real SFA Zustände
+abb_sfa_signale_und_hmm_zustaende.png
+[W] Bild erhalten
+Real SFA Übergänge
+abb_uebergangsmatrix.png; numerisch annotierte lokale Variante
+[W] Original; [O] lokale Matrix mit Windows-Posterior abgleichen
+Synthetik C0/C1
+Abb_4_8_NRMSE_E12_bis_E24.png; E24-Daten aus Terminal
+[D] Diagramm rekonstruiert
+Synthetik Seed
+Abb_4_10_Seedvergleich_E24.png; Vier-Seed-Heterogenität
+[D] Diagramm rekonstruiert
+SFA Proxy E20
+proxy_val_ersatzlabel_rmse.png; 4 Arme, feste Epochen
+[L] PNG im gelieferten ZIP; Windows-Run ebenfalls erstellt
+SFA Proxy Prozess
+proxy_val_prozessscore.png; C0/C1 und OFF/JOINT
+[L] PNG im gelieferten ZIP
+SFA Proxy Predictive
+proxy_val_dreiziel_vorhersagen_unsicherheit.png; VAL n2
+[L] PNG im gelieferten ZIP
+SFA Random-Kontrolle
+random_val_ersatzlabel_rmse.png + Unsicherheitsplot
+[L] PNG im ZIP
+Uncertainty
+Vergleich Coverage 90% und Intervallbreite in EINER interpretierbaren Ansicht
+[O] redaktionelle Zusammenführung
+Synopsis
+Ebenendiagramm „echtes X / künstliches Y / generative XZY“
+[O] optional für Betreuer/BA
+
+Wissenschaftliche Darstellung: Figurecaptions nennen tatsächliche Datengrundlage („reale Prozesssignale“, „signalbasierte Proxy-Referenzen“ oder „vollständig generiert“), Trainingseinstellungen, Seed/Anzahl VAL-Ringe und den Bereich des Diagramms. Keine falsche mm-Achse für Proxy-Werte. Diagramm ELBO(C0) neben ELBO(C1) höchstens getrennt, mit Hinweis auf unterschiedliche ELBO-Ziele.
+20. Quellenlage, Methodenbelege und genaue Zitationsregeln
+Die im vorherigen Master-Handover geführte wissenschaftliche Quellenmatrix gilt fort. Für die NEUEN Python-Ergebnisse stammen die Zahlen primär aus selbst erstellten Code-/CSV-/Windows-Laufprotokollen. Für Literaturausführungen gilt die Originalquelle und deren gesicherte gedruckte Seitenzahl; Seiten aus altem Entwurf dürfen nicht ohne erneute Original-PDF-Prüfung als neu verifiziert ausgegeben werden. Diese Übergabe ist kein neu seitenweise geprüfter Quellenkommentar.
+Quelle / Vorarbeit
+Rolle
+Prüfstatus Stand dieses Handover
+Rabiner (1989)
+HMM, Forward/Backward und Markov-Übergänge
+Original-PDF in kuratiertem Quellenbestand; Seiten bei neuer Textstelle erneut lesen
+Beal (2003)
+Konjugate Bayesian-Modelle, HMM, VI, strukturierte Approximation
+Original-PDF im Bestand; in älteren Kapiteln geprüft, jetzt nicht vollständig neu extrahiert
+Shao, Ge & Song (2021) [P111]
+Weighted VI und ungelabelte Beiträge
+Original-PDF im Bestand; eigene C-Gewichtung klar als Adaption markieren
+Shao et al. (2022) [P112]
+Direkte Bayesian Semi-Supervised HMM-Regression
+Original-PDF im Bestand; nicht mit eigener ringweiter Endqualitätskopplung gleichsetzen
+Mowbray et al. (2022)
+Qualitätsvorhersage aus Batch-/Ringsequenzen, Unsicherheit
+Original-PDF im Bestand; relevante Stellen in Vorarbeit geprüft
+Borchani et al. (2015)
+Multi-Output und getrennte Bewertungsgrößen
+Original-PDF vorhanden, exakte Seiten je Aussage kontrollieren
+Kaufman et al. (2011)
+Datenleckage, faire Auswahl, Split
+Original-PDF im Bestand; methodisch zentrale Quelle
+Gelman et al. (2020); Gabry et al. (2019)
+Bayesian Workflow, Diagnostik, Posterior Predictive, Visualisierung
+Original-PDFs im Bestand; Aussagen zur Kalibrierung/Intervalle begrenzen
+Herleitungen A–D
+Eigene Modellfaktorisierung, m/H, VI-Algorithmus, Predictive
+Original-DOCX im kuratierten Quellenordner; Code/Word im Detail vergleichen
+Projektarbeit 20250714_...umay.pdf
+Fachliche Vorarbeit Kap. 4, die eigene ringweite HMM-Regression
+Original-PDF vorhanden; gedruckte/PDF-Seitenzählung abgleichen
+SFA-Prozess-/Ersatzlabel-E20
+Eigene neue Primärergebnisse
+CSV/Checkpoint + Windows-Lauf; keine externer Literaturbeleg für eigene Messwerte notwendig
+
+Belegstil: (vgl. Autor, Jahr, S. xx–yy), vgl. kleingeschrieben; eigene Herleitungen und eigene Abbildungen als solche ausweisen. Quellen gesammelt am Schluss eines Sinnabschnitts; keine erfundenen Seitenzahlen. Für jeden Abschnitt Quellenstatus dokumentieren: Original vollständig vorhanden und geprüft / nur lokal gefunden und abschnittsweise geprüft / nur Literaturkarte / fehlt. Word-Vorlage und Formeln beibehalten.
+21. Aktuelle Dateiregister – welches ZIP für welche Aufgabe?
+Artefakt
+Zweck / Priorität
+Bayesian_Bachelor_MASTER_HANDOVER_FORSCHUNGSSTAND_2026-11-08.docx
+Vorgänger – frühere Forschung und technische Details; NICHT ersetzen.
+Bayesian_Bachelor_GlobalVI_E24_Konvergenz_2026-11-09.zip
+Code, README, Test zur generativen E12→E24-Kontrolle.
+Bayesian_Bachelor_ABSCHLUSSMODELL_und_Kapitel3-5_2026-11-09.zip
+Hauptcode final_ssr plus Daten-/Modelltests und Forschungsabbildungen.
+Bayesian_Bachelor_Synthetische_Qualitaet_Durchlauftest_2026-11-09.zip
+Isolierte 3-Epochen-Zufallslabel-Softwaredemo.
+Bayesian_Bachelor_SFA_Ersatzlabels_GESAMTPAKET_2026-11-09.zip
+Aktuell wichtigste End-to-End-Studie: 6 Modelle × E20, 120 Logs, 720 Vorhersagen, PNGs.
+Bayesian_Bachelor_Betreuergespraech_Stand_2026-11-09.md
+Kurzversion aller Ergebnisse und korrekter Gesprächsformulierung.
+Bachelorarbeit_Kapitel_3_7_Abschlussmodell_Ueberarbeitet_2026-11-09.docx
+Aktualisierte Word-Methodik; neuere E20-Ersatzresultate noch ergänzen.
+Bachelorarbeit_Kapitel_4_Experimentelle_Untersuchung_und_Ergebnisse_2026-11-09.docx
+16-seitiger Kapitel-4-VORENTWURF; NOCH NICHT um sechsarmige E20-SFA-Studie aktualisiert.
+Kapitel4_Abbildungen_und_Ergebnisdaten_2026-11-09.zip
+11 Kapitel-4-Figuren + rekonstruierte Zahlen; neue Proxy-E20-Figuren gesondert.
+Bayesian_Bachelor_Abschlussdossier_Modell_Kapitel3_4_5_2026-11-09.docx
+Gesonderte methodische Entscheidungs- und Evaluationsmatrix.
+raw.zip
+Vom Nutzer ausdrücklich ausgeschlossen; KEIN Trainingsbestand.
+
+21.1 Forschungsarchive seit dem 08.11. – genauer experimenteller Nachweis
+Archiv / Unterordner
+Welches Experiment dokumentiert es
+Bayesian_Bachelor_LabelDosis_Oracle_Kontrolle_2026-11-08.zip
+Generative Label-Dosis L6/12/24/48, trueZ-NIG, E3, gepaarte C-Arme.
+Bayesian_Bachelor_Konvergenz_Labeldosis_2026-11-08/
+L6/L48, E3/E6/E12, C0/C1, OFF, Vier-Seed-HMM-NRMSE.
+Bayesian_Bachelor_JointFeedback_12Epochen_2026-11-08.zip
+16 JOINT-Fortsetzungen, 192 Epochenprotokolle, OFF-vs-JOINT E12.
+Bayesian_Bachelor_JointVI_Trajektorienaudit_2026-11-08.zip
+Lesender E12-Verlaufs-/Monotonie-/Reproduktionsaudit.
+Bayesian_Bachelor_VI_Gradientenrest_E12_2026-11-08.zip
+Gelabelte lokale Restgradienten, zusätzliche dritte Schrittprobe.
+Bayesian_Bachelor_VI_E13_Zwei_Drei_Schritte_2026-11-08.zip
+Seedgenaues E13-2-vs-3 nach E12-Replay; zwei lokale Stepwerte.
+Bayesian_Bachelor_GlobalVI_E24_Konvergenz_2026-11-09.zip
+Globaler E12–24-Fortsetzungsversuch; vier Seeds, feste Epochen.
+Bayesian_Bachelor_SFA_Ersatzlabels_GESAMTPAKET_2026-11-09.zip
+Sechs SFA-Ersatzlabelarme ×20, drei Ziele, Vorhersagen, acht PNGs, Ergebnisse.
+
+E24-Windows-Kommando (ab Projektwurzel, nur zur Reproduktion, vorhandenen Run nicht überschreiben):
+python .\experimente_global_vi_e24\global_vi_e24.py --run-name forschung_GlobalVI_E24_20261109 --reference-run forschung_JointFeedback_E12_20261108 --e13-reference forschung_BC_E13_2vs3_20261108
+Dazugehöriger Windows-Ergebnisordner: ergebnisse_generativ_global_e24/forschung_GlobalVI_E24_20261109/; erwartete CSV-Dateien all_epochs.csv, per_seed_paired.csv, summary.csv und manifest.json. Historische E12-Referenz: ergebnisse_generativ_jointfeedback/forschung_JointFeedback_E12_20261108/joint_all_epochs.csv; unabhängige E13-Referenz: ergebnisse_generativ_vi_e13/forschung_BC_E13_2vs3_20261108/per_seed.csv. Diese Originaldateien sind wichtig, bevor die E24-Bachelor-Abbildungen endgültig eingefroren werden.
+21.1 Relevante Dateinamen der Originalquellen und Arbeitsfassungen
+Originale u. a.: Bayesian_SSR_Ringwalzen_Entscheidungen_Herleitung_A.docx; Herleitung_B_Strukturierte_Variationsverteilung_Bayesian_SSR.docx; Herleitung_C_Vollstaendiger_Trainingsalgorithmus_Bayesian_SSR.docx; Herleitung_D_Posterior_Predictive_Bayesian_SSR.docx; Bayesian_SSR_B1_Implementierungsleitfaden_V1.docx; Bachelorarbeit_Kapitel_3_Auftakt_und_3_1_Ueberarbeitet.docx; Bachelorarbeit_Kapitel_3_2_Datenaufbereitung_und_Datenpartitionierung.docx; Bachelorarbeit_Kapitel_3_3_Probabilistische_Modellarchitektur_Formeln_ueberarbeitet.docx; Bachelorarbeit_Kapitel_3_4_Kopplung_Prozesszustaende_Endqualitaet.docx; Bachelorarbeit_Kapitel_3_5_Variationsbasierter_Trainingsalgorithmus.docx; Bachelorarbeit_Kapitel_3_6_Qualitaetsvorhersage_und_Unsicherheitsquantifizierung.docx; Bachelorarbeit_Kapitel_3_7_Versuchsplanung_und_Bewertungsmethodik.docx.
+22. Fehlinterpretationen, behobene Risiken und noch offene technische Punkte
+Thema
+Verbindliche Wahrheit / Konsequenz
+raw.zip
+Nicht benutzen. 18 späte L-Logger-Files sind keine zusätzlich verifizierten SFA-Labels.
+Falsche mm-Einheiten
+Proxy-Skala „0–12“ ist künstlich; RMSE ~1,2791 ist KEIN mm-Fehler echter Unrundheit.
+Randomlabels
+Dienen nur der Negativkontrolle; Baseline 1,2276 unter Modellwerten 1,2459/1,2561.
+„SSR-Nutzen“
+Generative E24 C1-Verbesserung 16,2% gilt NICHT für reale SFA; SFA-Proxy-E20 nur kleiner Nutzen ~0,33% gegenüber C0.
+„JOINT hilft“
+Generativ E12 ja, SFA-Proxy-E20 kaum Unterschied zu OFF – beide Aussagen getrennt.
+„Konvergiert“
+Weder E12/24-ELBO-Zunahmen noch E20-SFA-Flachheit garantieren globales VI-Optimum.
+„Coverage kalibriert“
+n=2 VAL-Ringe, normalapproximierte Intervalle, sehr breite Zufallsintervalle; nicht nachgewiesen.
+„TEST bestanden“
+TEST-Zugriff gesperrt, ja. Kein echter unabhängiger TEST-Qualitätsfehler berechnet.
+„Finale Modell-Datei“
+Algorithmus ist b1_core.py; trainierter Prozesscheckpoint vs Proxy-checkpoint müssen unterschieden werden.
+Ersatzlabel-Audit Windows
+Noch kein separates PASS-Log des abnahme_ersatzlabel_studie.py dokumentiert.
+E24-Original CSV
+Noch direkt vom Windows-Projekt nachzureichen, wenn wissenschaftliche Abbildungsdateien eingefroren werden.
+Übergangsmatrix
+Lokale numerische Reproduktion noch mit modell_best.pt auf Windows abgleichen.
+Standalone neue Ringe
+Kein eigenständiger universeller Proxy-Inferenz-CLI für neue Ringe nachgewiesen; bestehende Studie wertet TRAIN/VAL aus.
+Ausdünnung
+96 Punkte pro Ring verändert effektive Markov-Zeitschritte; immer erwähnen.
+C0-/C1-ELBO
+Unterschiedliche Trainingsziele; direkte ELBO-Niveau-Rangfolge methodisch nicht zulässig.
+
+23. Nächster Arbeitsplan – mit minimalem Zeitverlust zur wissenschaftlichen Endfassung
+Schritt 1 – Nachweis sichern, kein erneutes Training
+Im Windows-Projekt nur die vorhandene SFA-Ersatzlabelstudie mit abnahme_ersatzlabel_studie.py LESEND auditieren; Ergebnisdateien mit Run-ID, Konfiguration, SHA/Seeds sichern. Falls Abnahme fehlgeschlagen: engen Fehler lokal reproduzieren, nur im isolierten Versuchsordner patchen, Originalkern und alte Ergebnisse unberührt lassen. Idealerweise zudem Windows-E24-Original-CSV und den endgültigen realen HMM-best-Checkpoint als überprüfbare Basis kopieren. Keine erneute Hyperparametervariantenforschung.
+Schritt 2 – Betreuerfähige Visualisierung
+Fokussierte 5–7 Figuren: (a) SFA K3/E20 ELBO + VAL score getrennt, (b) SFA01-Signale + HMM-Zustände, (c) numerisch annotierte Übergangsmatrix, (d) vier Proxy-Arme über E1–E20 mit Baseline, (e) echte Ersatzwert-Vorhersagen samt Intervallbreite pro VAL-Ring, (f) Proxy vs Zufall und Mittelwert-Baseline, (g) generatives E24-C0/C1 pro Seed und über Epochen. Bei jedem Diagramm Quellenart explizit nennen; kein falsches positives Experiment erzwingen.
+Schritt 3 – Kapitel 3 synchronisieren
+Datei- und Gleichungs-Audit gegen final_ssr/b1_core.py, abschluss_train.py und das sechsarmige sfa_ersatzlabel_studie.py. Für jede verwendete Literaturstelle die Original-PDF-Seite prüfen. Änderungen direkt in Word, ursprüngliche Vorlage und Formelnummern beibehalten.
+Schritt 4 – Kapitel 4 redaktionell aktualisieren
+Den 16-seitigen Vorentwurf um die sechsarmige E20-Studie ergänzen, Tabellen und alle jetzt verfügbaren Proxy-/Random-Vergleichsplots aufnehmen, zusammenfassende Hypothesentabelle mit Negativkontrolle. Original-E24-CSV abgleichen. Fakten/Interpretation trennen.
+Schritt 5 – Kapitel 5 kritisch schreiben
+Forschungsfragen beantworten: technisch vollständige Pipeline ja; generativer SSR-Nutzen unter speziellen Bedingungen ja; SFA-Ersatzlabelnutzen klein; echte geometrische Qualitätsvalidierung nein. Oracle-Gap, Identifizierbarkeit, Occupancy-Verlust, lokale/ globale VI-Näherungen und mögliche Ursachen einbeziehen. Ausblick auf nachzureichende unabhängige Y ausdrücklich als Ausblick.
+24. Kopierfertiger Neustart-Text für den Folgechat
+Wir setzen mein Projekt „Bayesian Bachelor“ fort. Lies zuerst das Word-Dokument
+„Bayesian_Bachelor_MASTER_HANDOVER_ABSCHLUSSPHASE_2026-11-10.docx“
+vollständig sowie den Vorgänger
+„Bayesian_Bachelor_MASTER_HANDOVER_FORSCHUNGSSTAND_2026-11-08.docx“.
+WICHTIG: Direkte Bayesian SSR mit ringweisem HMM, strukturiertem VI,
+kein Pseudo-Labeling. 17 originale SFA-Ringe, SFA16 ausgeschlossen,
+16 Ringe, fester Split 12/2/2, K3/d4.
+Aktuell: final_ssr ist implementiert und das reale SFA-HMM K3/E20
+unter Windows trainiert; ohne echte Qualitätslabels. Separat gibt es
+eine vollständige SFA-Ersatzlabelstudie (6 Arme x E20, 96 Punkte/Ring)
+mit random und X-Proxies, auf Windows ausgeführt, drei Zielausgänge,
+prädiktive Unsicherheit. NICHT als echte Unrundheit behaupten!
+Die generative Studie E24 zeigte 16,2% C1/C0-NRMSE-Unterschied
+auf vollständig künstlichen X/Z/Y, vier Seeds.
+Benutzer verbietet die neue raw.zip. Keine Originaldaten überschreiben,
+TEST gesperrt; künstliche Labels nie in qualitaetsmessungen.csv.
+Als erstes: unabhängigen Windows-Ersatzlabel-Audit prüfen (noch offen),
+danach fertige Ergebnisdiagramme und Kapitel 3/4/5 synchronisieren.
+Word-Vorlage, genaue originale Quellen und Seitenprüfstatus respektieren.
+Einzelne Windows-Befehle nacheinander, kein weiteres Modell-Tuning.
+Anhang A. Exaktes SFA-E20-CSV-Auswertungsschema
+Datei
+Felder / Bedeutung
+ALLE_TRAJEKTORIEN.csv
+120 Zeilen: labelquelle, arm, C, feedback, epoche, train_elbo, val_process_score, local_joint_gain, duration_s.
+ALLE_VORHERSAGEN_TRAIN_VAL_NUR_ERSATZ.csv
+720 Zeilen: Quelle/Arm/Epoche/Gruppe/Ring/Ziel, Referenz, Vorhersage, TRAIN-Baseline, Fehler, Std, 90%-untere/obere Grenze, Coverage, Breite, Herkunft.
+ALLE_METRIKEN_JE_ZIEL.csv
+MAE/MSE/RMSE/R² und Baseline je Ziel und Arm bei festen Checkpoints.
+VERGLEICH_ALLE_ARME.csv
+30 Zeilen: 6 Arme × 5 feste Epochen, 3-Ziel-VAL-RMSE, TRAIN-Baseline, Coverage und Breite.
+*_REFERENZEN_NUR_KUENSTLICH.csv
+Im Demo-Run gespeicherte Signalproxies bzw. Zufallswerte nur für zugelassene TRAIN/VAL-IDs.
+UNBEDINGT_STATUS_LESEN.json
+Konfiguration, Datenherkunft, Seed, Sicherheits- und Warnhinweise.
+modelle/{source}/{arm}/*.pt
+Posterior q, Prior p, Konfiguration, Skalen, Kennzeichen synthetic_labels_only und test_forbidden.
+
+Anhang B. Ergebnis-Hilfstabellen: Zwischenstände generativ / SFA
+Block
+Einzelbeobachtung
+Folgerung
+Proxy SFA E20
+C1_JOINT: E1=1,2883, E3=1,2870, E6=1,2839, E12=1,2817, E20=1,2791
+Langsamer kleiner Ersatzlabelgewinn
+Random SFA E20
+C1_JOINT: E1=1,2431, E3=1,2398, E6=1,2450, E12=1,2495, E20=1,2561
+Längeres Training muss Zufallswerte nicht vorhersagbar machen
+SFA Process-only E20
+VAL-Prozessscore −2,6457 → −2,0666
+HMM-Prozessvalidierung ohne Y
+Generative E12 JOINT L6
+C0=0,94578 vs C1=0,88567, 3/4 Seeds
+Früher positiver synthetischer C1-Mittelwert
+Generative E24 JOINT L6
+C0=0,914454 vs C1=0,766442, 4/4 Seeds
+Nutzen nach längerer globaler VI unter Generatorbedingungen
+Oracle L48 E3
+trueZ-NIG=0,17389 vs Generatorrauschen ~0,16016
+Regressionskopf bei mehr Labels besser identifizierbar
+
+Anhang C. Gesprächsleitfaden – sachlich und vorzeigbar
+Kurzfassung (etwa 45–60 Sekunden): „Ich habe das ringweise Bayesian-HMM mit direkter Semi-Supervised-Qualitätskopplung auf ein vollständiges, reproduzierbares Trainings- und Auswertungsverfahren gebracht. Zuerst habe ich den Originaldatensatz und die Leakage-Regeln abgesichert, danach die VI-Momente und globalen NIG-Updates gegen unabhängige Kontrollen getestet. Es folgten repräsentations- und priorbezogene Ablationen, Mehrseed- und Oracle-Kontrollen sowie längere VI-Konvergenzstudien. Im abschließenden Modell nutze ich einen einfachen ringweiten Zustandsaufenthaltsvektor und zwei lokale VI-Schritte. Das HMM wurde auf den realen SFA-Vollsequenzen über 20 Epochen trainiert. Wegen der weiterhin fehlenden Endqualitätsmessungen habe ich den kompletten Regressionspfad zusätzlich mit ausdrücklich künstlichen Zufalls- und signalbasierten Proxyzielen auf den SFA-Daten demonstriert und sechs Varianten verglichen. Den größeren Nutzen ungelabelter Daten konnte ich in einer getrennten vollständig generativen Kontrollsimulation nach 24 Epochen sehen. Eine reale Aussage zur Unrundheit oder zum Höhenschlag bleibt ohne unabhängige Messwerte offen.“
+Bei Nachfragen: „Warum K3?“ – beherrschbarer, numerisch kontrollierter Abschlusskandidat mit dokumentierter Sensitivität; keine behauptete wahre Zustandszahl. „Warum Proxy?“ – Nachweis der Daten-/Qualitäts-Schnittstelle, nicht Ersatz gemessener Ringqualität. „Warum C1?“ – probabilistischer Prozessbeitrag ungelabelter Trainingsringe; unter generativem bekannten Gesetz verbesserte E24-Qualität. „Warum JOINT?“ – gelabelter y-Term beeinflusst lokale Zustandsverteilung; im SFA-Proxyversuch sehr kleiner Zusatznutzen, in generativen E12-Kontrollen konsistent positiver Mittelwert. „Warum zwei lokale Steps?“ – dritter Step geringe VAL-Gewinne gegenüber zusätzlichem globalem Training. „Was ist gespeichert?“ – Kern + realer HMM-Prozesscheckpoint + getrennte Proxy-Checkpoints.
+Anhang D. Abnahme- und Integritätsprotokoll
+Kontrolle
+Wahrheitsstatus
+Was künftig noch zu tun ist
+SHA b1_core.py: c07a3aa...ad2c8
+[W] PASS 09.11.
+Bei Originalcodeänderungen sofort stoppen; nicht stillschweigend ersetzen.
+SFA 16 Ringe, 12/2/2, SFA16 aus, 4 Kanäle
+[W] PASS
+Vor neuem realen Datensatz erneut prüfen.
+C0-D_U-Unabhängigkeit bei fairer Skalierung
+[L] PASS laut Abschlussabnahme
+Beizubehalten bei jeder Änderung am Preprocessing.
+SFA Prozess 20 Epochen, beide Checkpoints
+[W] bestätigt
+Finales Run-Verzeichnis sichern und nicht überschreiben.
+Drei-Ziel-Demo E3 Zufall, TEST gesperrt
+[W] PASS
+Nur als technischen Funktionstest zitieren.
+Ersatzlabels SFA 6 Arme x E20
+[W] PASS des Trainings; [L] CSV/Counts
+Lesendes abnahme_ersatzlabel_studie.py noch einmal lokal/Windows belegen.
+E24 historische E12/E13-Reproduktion
+[W] PASS
+Original-CSV aus Windows-Run nachreichen, wenn möglich.
+Kapitel 4 inklusive Ersatzlabel-E20
+[O] noch nicht
+Vorab 16-seitigen Entwurf auf E20-Studie aktualisieren.
+Exakte physikalische Qualitätsmessung
+[O] nicht geliefert
+Keine echte Regression als validiert ausgeben.
+Generischer Proxy-Prädiktions-CLI
+[O] noch nicht nachgewiesen
+Nur falls erforderlich, lesenden CLI nachträglich schreiben.
+
+Anhang E. Abschlussfazit und Übergabegrenze
+Die mathematische Hauptimplementierung ist als Code-Version technisch abgeschlossen und auf Windows sowohl ohne echte Qualitätslabels (SFA-Prozessmodell, vollständige Zeitreihen) als auch im getrennten künstlichen Qualitätszweig (SFA-Ersatzlabels, 96 Zeitpunkte, sechs E20-Arme) erfolgreich ausgeführt worden. Damit ist die vorläufige Software- und Methodenfunktionalität wesentlich besser abgesichert als am 08.11.2026. Dies ist nicht gleichzusetzen mit einer empirisch validierten Endqualitätsprognose für reale Walzringe.
+Der wissenschaftliche Abschluss besteht jetzt hauptsächlich aus: unabhängiger Abnahme der gespeicherten Ersatzlabelstudie, visueller Ergebnispräsentation, chronologischer Dokumentation der Tuning-/Ablationsschritte und präziser Anpassung der Word-Kapitel 3–5 an den tatsächlich eingefrorenen Code. Neue generative Trainingsfamilien sind aktuell nicht erforderlich. Jede neue Behauptung muss an zugehörige CSV, Checkpoint, Betreuerinformation, Originalquelle oder eigene Herleitung rückführbar sein.
+ENDGÜLTIGE ÜBERGABEREGEL: Originaler 08.11-Handover = Historie und frühere Forschung. Dieses 10.11-Handover = jüngster, verbindlicher Abschlussstand. Widersprüche nicht stillschweigend glätten; Datum, Datenart und Evidenzkürzel nennen.

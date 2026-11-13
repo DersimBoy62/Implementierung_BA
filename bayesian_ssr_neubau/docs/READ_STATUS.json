@@ -1,0 +1,282 @@
+{
+  "handover/00_START_HIER.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historischen Status von aktuellem Nutzerauftrag getrennt; kein neuer wissenschaftlicher Beweis"
+  },
+  "handover/01_MASTER_PROMPT_VSCODE_AGENT.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historischen Status von aktuellem Nutzerauftrag getrennt; kein neuer wissenschaftlicher Beweis"
+  },
+  "handover/03_ENTSCHEIDUNGEN_UND_STATUS/AKTUELLE_ENTSCHEIDUNGSMATRIX.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historischen Status von aktuellem Nutzerauftrag getrennt; kein neuer wissenschaftlicher Beweis"
+  },
+  "handover/03_ENTSCHEIDUNGEN_UND_STATUS/PROJEKTUEBERNAHME_BAYESIAN_BACHELOR_2026-11-12.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historischen Status von aktuellem Nutzerauftrag getrennt; kein neuer wissenschaftlicher Beweis"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_A_NEU_Modellstruktur_2026-11-11.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_A_NEU_Modellstruktur_2026-11-11.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Formeln gelesen; veraltete K3/C1/M1/10E und Priorwerte im ABGLEICH korrigiert"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_B_NEU_Strukturierte_VI_2026-11-11.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_B_NEU_Strukturierte_VI_2026-11-11.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Formeln gelesen; veraltete K3/C1/M1/10E und Priorwerte im ABGLEICH korrigiert"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_C_NEU_ELBO_Training_2026-11-11.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_C_NEU_ELBO_Training_2026-11-11.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Formeln gelesen; veraltete K3/C1/M1/10E und Priorwerte im ABGLEICH korrigiert"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_D_NEU_Posterior_Predictive_2026-11-11.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/01_NEUE_HERLEITUNGEN/Herleitung_D_NEU_Posterior_Predictive_2026-11-11.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Formeln gelesen; veraltete K3/C1/M1/10E und Priorwerte im ABGLEICH korrigiert"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/03_ORIGINALE_UNVERAENDERT/Bayesian_SSR_Ringwalzen_Entscheidungen_Herleitung_A.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/03_ORIGINALE_UNVERAENDERT/Herleitung_B_Strukturierte_Variationsverteilung_Bayesian_SSR.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/03_ORIGINALE_UNVERAENDERT/Herleitung_C_Vollstaendiger_Trainingsalgorithmus_Bayesian_SSR.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/02_HERLEITUNGEN_A_B_C_D/03_ORIGINALE_UNVERAENDERT/Herleitung_D_Posterior_Predictive_Bayesian_SSR.docx": {
+    "gelesen": "ja (Text/OMML; mathematische Abschnitte)",
+    "offene_punkte": "Vollständig extrahiert; keine visuelle Layout-/Objektprüfung; aktuelle Formeln separat fortgeschrieben"
+  },
+  "handover/03_ENTSCHEIDUNGEN_UND_STATUS/ABGLEICHMATRIX_Original_A-D_zu_finalem_DM_Modell_2026-11-11.docx": {
+    "gelesen": "ja (Text/OMML)",
+    "offene_punkte": "Historischer 11.11.-Stand; aktuelle eigene Abgleichmatrix ersetzt obsolete Parameter"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V58/research_math_v58/README.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historische Tests/Realzahlen nicht als neue Ausführung übernommen; V63 war laut Übergabe Windows-unbestätigt"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V59/research_math_v59/README.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historische Tests/Realzahlen nicht als neue Ausführung übernommen; V63 war laut Übergabe Windows-unbestätigt"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V60/research_math_v60/README.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historische Tests/Realzahlen nicht als neue Ausführung übernommen; V63 war laut Übergabe Windows-unbestätigt"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V61/research_math_v61/README.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historische Tests/Realzahlen nicht als neue Ausführung übernommen; V63 war laut Übergabe Windows-unbestätigt"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V62/research_math_v62/README.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historische Tests/Realzahlen nicht als neue Ausführung übernommen; V63 war laut Übergabe Windows-unbestätigt"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V63/research_math_v63/README.md": {
+    "gelesen": "ja",
+    "offene_punkte": "Historische Tests/Realzahlen nicht als neue Ausführung übernommen; V63 war laut Übergabe Windows-unbestätigt"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V60/research_math_v60/V60_30E_LOCAL_RESEARCH_SUMMARY.json": {
+    "gelesen": "ja",
+    "offene_punkte": "Historischer train-only-Verlauf, ausschließlich Methoden-/Provenienzaudit; kein Trainingsinput"
+  },
+  "handover/06_FORSCHUNGSBEFUNDE_UND_AUDITS/BA_V55_Konvergenzanalyse_30_Epochen_und_Folgeexperimente_2026-11-12.docx": {
+    "gelesen": "ja (Text/OMML)",
+    "offene_punkte": "Historischer Befund; keine neue Trainingsevidenz"
+  },
+  "handover/06_FORSCHUNGSBEFUNDE_UND_AUDITS/BA_V61_Globaler_Prozessposterior_ELBO_Sprung_2026-11-12.docx": {
+    "gelesen": "ja (Text/OMML)",
+    "offene_punkte": "Historischer Befund; keine neue Trainingsevidenz"
+  },
+  "final_candidate_v52/final_core/dm_data.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "F2-/Feature-/Target-API; Datenagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "final_candidate_v52/final_core/quality_link_challenge.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "extract_descriptors, relevant gelesen; Datenagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "final_candidate_v52/final_core/compare_two_head_cv4.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "Kopf-Featuregruppen, relevant gelesen; Datenagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "final_candidate_v52/final_core/dynamic_markov_v2.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "Spec/increments und Rewardrekursion; Audit und Mathematikagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "final_candidate_v52/final_core/dynamic_quality_v2.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "Prior, Initialisierung, lokale/globalen Updates; Audit und Root; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "final_candidate_v52/final_core/two_head_b1.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "NIG-Dichte-/Momentkonvention, Kopfkopplung und Update; Audit und Root; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/final_core/dm_data.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "F2-/Feature-/Target-API; Datenagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/final_core/quality_link_challenge.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "extract_descriptors, relevant gelesen; Datenagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/final_core/compare_two_head_cv4.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "Kopf-Featuregruppen, relevant gelesen; Datenagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/final_core/dynamic_markov_v2.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "Spec/increments und Rewardrekursion; Audit und Mathematikagent; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/final_core/dynamic_quality_v2.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "Prior, Initialisierung, lokale/globalen Updates; Audit und Root; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/final_core/two_head_b1.py": {
+    "gelesen": "ja (relevanter Code)",
+    "offene_punkte": "NIG-Dichte-/Momentkonvention, Kopfkopplung und Update; Audit und Root; read-only-Referenz, keine Produktivabhängigkeit"
+  },
+  "final_candidate_v52/input_safety_v51.py": {
+    "gelesen": "ja (Datenagent)",
+    "offene_punkte": "V51-Sicherheits-/Gatevertrag im Neubau unabhängig geprüft"
+  },
+  "final_candidate_v52/test_development_logger_equivalence_v51.py": {
+    "gelesen": "ja (Datenagent)",
+    "offene_punkte": "V51-Sicherheits-/Gatevertrag im Neubau unabhängig geprüft"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/input_safety_v51.py": {
+    "gelesen": "ja (Datenagent)",
+    "offene_punkte": "V51-Sicherheits-/Gatevertrag im Neubau unabhängig geprüft"
+  },
+  "handover/04_REFERENZCODE_READ_ONLY/V52_ORIGINAL_CORE/final_candidate_v52/test_development_logger_equivalence_v51.py": {
+    "gelesen": "ja (Datenagent)",
+    "offene_punkte": "V51-Sicherheits-/Gatevertrag im Neubau unabhängig geprüft"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Beal (2003) Variational Algorithms for Approximate Bayesian Inference(1).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF10–15; Kapitel3-Auszug, Druck91–96; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Bishop 2006 -Pattern-Recognition-and-Machine-Learning-2006(4).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF710–717; NW/Wishart/Student-t; weitere Suchtreffer nicht als gelesen gezählt; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Cawley & Talbot (2010) On Over-Fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation..pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–2; Auswahlüberanpassung; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Dai, Li & Cheng (2023) – Semi-Supervised Deep Regression with Uncertainty Consistency and Variational Model Ensembling via Bayesian Neural Networks.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; Abstract/Fig1 Pseudolabel-Verfahren, Methodenteil offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Formatvorlage Röntgenfluoreszenzanalyse Gruppe 2.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1 identifiziert studentisches Fachlaborprotokoll, kein Modellbeleg; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Gabry et al. (2019), Visualization in Bayesian Workflow(2).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–2; Workflow/Simulation/Predictive Checks; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Gelman et al. (2020), Bayesian Workflow(2).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–2; Abstract/Inhaltsübersicht; Schriftkodierung teilweise beschädigt; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Kang, Kim & Cho (2016) – Semi-supervised support vector regression based  on self-training with label uncertainty An application to virtual metrology in semiconductor manufacturing(1).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; self-training-Abstract, Methodenteil offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Kapoor & Narayanan (2023) Leakage and the reproducibility crisis in machine-learning-based science.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; Leakage-Highlights, konkreter Methodenteil offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Kaufman, Rosset & Perlich (2011) Leakage in data mining formulation, detection, and avoidance.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; learn-predict separation im Abstract, weitere Details offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/kostopoulos-et-al-2018-semi-supervised-regression-a-recent-review.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; SSR-Survey-Abstract, weitere Details offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Li et al. (2026) – A neural networks-aided Bayesian semi-supervised nonlinear hidden Markov model for regressive soft sensing application.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; Abstract und Ausgabe2026/online2025, Methodenteil offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Mowbray et al. (2022), Probabilistic machine learning based soft-sensors for product quality prediction in batch processes(2).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–2; Batch-Endqualität; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Rabiner (1989) A Tutorial on Hidden Markov Models(1).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–8; konkrete FB/Pfad-Stellen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Roberts (2016) Cross‐validation strategies for data with temporal  spatial  hierarchical  or phylogenetic.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–2; strukturierte CV; Publikationsjahr2017; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Shao et al. (2022) – Real-time estimation of quality-related variable for dynamic and non-Gaussian process based on semisupervised Bayesian HMM.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–4,6 und Teile5; dynamische SSR und NW; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Shao, Ge & Song (2021) – Semisupervised Bayesian Gaussian Mixture Models for Non-Gaussian Soft Sensor.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1,3–5; WVI weicht von unserem gesamten U-Beitrag ab; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/van Engelen & Hoos (2020) A Survey on Semi-Supervised Learning(1).pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; Classification-Survey-Abstract, Methodenteil offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Varma & Simon (2006) Bias in error estimation when using cross-validation for model selection.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1–2; CV-Modellauswahl-Bias; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/07_ORIGINALQUELLEN_PDF/Yuan et al. (2024) – …knowledge-informed semi-supervised Variational Bayesian Gaussian mixture regression.pdf": {
+    "gelesen": "ja (benannter Auszug)",
+    "offene_punkte": "PDF1; Abstract und bibliografische Einordnung, Methodenteil offen; keine Vollprüfung/Supplementprüfung behauptet"
+  },
+  "handover/05_DATENSCHEMA_PROVENIENZ/Bayesian_Bachelor_DM_Pickle_Datenaudit_2026-11-10.zip!Datenpruefung_Pickles_ausfuehrlich.md": {
+    "gelesen": "ja (Datenagent vollständig)",
+    "offene_punkte": "Ursprungs-all_targets nicht mitgeliefert; Metrologie axialer Höhenschlag offen; historische Evidenz"
+  },
+  "input/DM_16_aktive_Ringe.pkl": {
+    "gelesen": "ja (kontrollierter Daten-/Header-/L-Targetzugriff)",
+    "offene_punkte": "SHA exakt;16IDs,12Dev-Prozesse/L-Ziele geprüft; U-/Außenlabels nicht für Modell/Score verwendet"
+  },
+  ".venv/pyvenv.cfg": {
+    "gelesen": "ja",
+    "offene_punkte": "Python3.11.9; Paketversionen im Environment-/Locknachweis"
+  },
+  "C:/Users/umutj/Downloads/MASTER_PROMPT_CHATGPT_VSCODE_AGENT_BAYESIAN_BACHELOR_2026-11-13 (1).md": {
+    "gelesen": "ja (Root; bitgleiche Kopien)",
+    "offene_punkte": "Vom Nutzer ausdrücklich zur Ausführung beauftragt; beide Downloadkopien SHA-identisch"
+  },
+  "C:/Users/umutj/Downloads/MASTER_PROMPT_CHATGPT_VSCODE_AGENT_BAYESIAN_BACHELOR_2026-11-13.md": {
+    "gelesen": "ja (Root; bitgleiche Kopien)",
+    "offene_punkte": "Vom Nutzer ausdrücklich zur Ausführung beauftragt; beide Downloadkopien SHA-identisch"
+  },
+  "C:/Users/umutj/.codex/attachments/b6678fb2-413d-492a-88d0-f294901cd196/Pasted text.txt": {
+    "gelesen": "ja (bitgleich mit gelesenem Master)",
+    "offene_punkte": "Alle drei Pasted-Anhänge per SHA256 mit dem vollständig gelesenen Download-Master identisch"
+  },
+  "C:/Users/umutj/.codex/attachments/7a2cfbaa-f3cf-4cbf-bcd2-4f7c3851b885/Pasted text.txt": {
+    "gelesen": "ja (bitgleich mit gelesenem Master)",
+    "offene_punkte": "Alle drei Pasted-Anhänge per SHA256 mit dem vollständig gelesenen Download-Master identisch"
+  },
+  "C:/Users/umutj/.codex/attachments/b7f68f4b-bad7-4fda-bb05-1fd466723eb4/Pasted text.txt": {
+    "gelesen": "ja (bitgleich mit gelesenem Master)",
+    "offene_punkte": "Alle drei Pasted-Anhänge per SHA256 mit dem vollständig gelesenen Download-Master identisch"
+  }
+}

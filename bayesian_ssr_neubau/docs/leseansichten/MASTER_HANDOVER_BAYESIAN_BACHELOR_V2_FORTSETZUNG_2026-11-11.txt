@@ -1,0 +1,1504 @@
+BAYESIAN BACHELORMASTER-ÜBERGABE – FORTSETZUNG V2
+Dynamische Bayesian-Qualitätskopplung · Wechselmerkmale · Vorverarbeitung · Zustandszahl K · vollständige Entwicklungsvergleiche · Optuna-Anschluss
+Verbindlicher Übergabestand: 11. November 2026, nach den 16/16 manuellen Zustandsvergleichen und vor Beginn der Optuna-Implementierung.
+Anschlussdokument zum „MASTER_HANDOVER_BAYESIAN_BACHELOR_DM_2026-11-11.docx“ vom selben Datum. Dieses Dokument ersetzt die frühere Übergabe nicht; es dokumentiert lückenlos die anschließende explorative Forschungsphase.
+Sofortübernahme für einen neuen Chat
+Arbeitsstand: V2/V2.1 ist mathematisch programmiert und getestet. V2-M0/M1/M2/M3, V2.1-Switch-Rate, P0/P1/P2 sowie manuelles K-Raster 16/16 auf acht Entwicklungsringen ausgeführt.
+Ergebnis: Pareto-Kandidaten der manuellen K-Studie: (P0, M0, K=2), (P0, M2, K=3), (P2, M0, K=3). Keine unabhängige Bestätigung; keine allgemeine Rangfolge.
+Unveränderliche Grenze: Die ursprüngliche K3-Abschlussversion und die einmalige äußere Testauswertung auf DM07/DM08/DM11/DM15 sind abgeschlossen. Die vier bereits bekannten Testlabels dürfen in neue Entscheidungen und Vergleiche nicht eingehen.
+Unmittelbarer nächster Schritt: Optuna-HPO auf Entwicklungsdaten implementieren und Literatur-/Quellenstatus überprüfen; die manuelle Suche nicht nachträglich durch Optuna-Ausgaben uminterpretieren; zuerst Budget und Zieldefinition registrieren.
+Datei-/Code-Bestand: Vorhandene ZIP-Updates und Python-Dateien im Windows-Projektordner; dieses Dokument enthält exakte Dateinamen, Befehle, Werte und Prüfstatus.
+Leseschlüssel und Belegstatus
+[NUTZER-LOG] = im hier vorliegenden Terminalprotokoll ausdrücklich vom Nutzer ausgeführtes Ergebnis; [REFERENZ-CODE] = vorhandene Projektdateien/README und Referenz-JSONs geprüft; [TEST] = bestandener synthetischer Test laut Terminalausgabe; [ENTWURF] = mathematisch abgeleitete, noch explorative Modellentscheidung; [OFFEN] = erst für kommende Forschung geplant; [QUELLE-ORIGINAL] = Originalquelle im Projektbestand bzw. dort gezielt gesichtet; [BIBLIOGRAFISCH] = bibliografische/Abstract-Einordnung, ohne vollständige Originalseitenprüfung.
+Genauigkeit: In vielen Logs sind Werte auf vier Dezimalstellen gerundet; die tatsächlichen JSON-Berichte enthalten höhere Präzision. Die komplette 16er-Studiensumme und ihre je acht Validierungsfehler sind hier direkt aus dem Nutzer-Terminalprotokoll extrahiert und mit den aggregierten RMSE-Werten auf Rundungsgenauigkeit abgeglichen.
+Dokumentnavigation
+Teil
+Inhalt
+I – Grundlagen
+Abschnitte 1–4: Verbindung zur früheren Übergabe; Daten- und Modellbasis; Quellen
+II – Forschungsschritte
+Abschnitte 5–10: V2, V2.1, Audit, P0/P1/P2, manuelle K-Studie
+III – Schlussfolgerungen
+Abschnitte 11–14: Interpretation, wissenschaftliche Grenzen und sicherer Fortgang
+IV – Technische Übergabe
+Abschnitte 15–19: Software, Tests, Befehle, Optuna-Plan, Literaturstatus
+Anhang
+Alle 16 Konfigurationen und 128 ringweise Validierungsfehler, Kontinuitäts-Checkliste
+
+1.  Projektgrenze: alter Abschluss und neue V2-Forschung
+Die DM-Studie besitzt eine abgeschlossene ursprüngliche Abschlussversion (zweiköpfiges Bayesian-SSR-HMM mit K=3, FULL_JOINT-Inferenz, vollständigen Gauß-Wishart-Emissionen) und eine danach eröffnete Explorationsphase. Die neuen Erkenntnisse sind Kandidaten für die weitere Modellfindung, aber nicht rückwirkende Änderungen des bereits einmalig evaluierten Abschlussmodells.
+Die im früheren Master-Handover dokumentierten Herleitungen A–D beziehen sich auf die abgeschlossene Modellstruktur. Für V2 wird später eine separat versionierte mathematische Herleitung erforderlich sein; die früheren Originale bleiben unverändert.
+Der abgeschlossene äußere Test (DM07, DM08, DM11, DM15) ist für jede neue V2-/Optuna-Modellwahl tabu, unabhängig davon, ob er bei einem neuen Programm „nur noch einmal kurz“ evaluiert würde.
+Die fortgesetzte Nutzung derselben acht Entwicklungs-Labels für viele Varianten führt zur adaptiven Überanpassung an die innere Validierung. Explorative Rangordnungen dürfen nicht als neue unabhängige Bestätigung ausgegeben werden.
+Das vorliegende Dokument ist eine Momentaufnahme der Projektentwicklung, keine Behauptung, die nächsten Programme seien schon implementiert oder neue unabhängige Testdaten lägen vor.
+2.  Unveränderte Datenbasis, Ziele und Splits
+Die Grundlage bleibt der geprüfte 16-Ring-DM-Pickle. DM03 fehlt als abgebrochener Versuch; DM13 wurde wegen unvollständigem Prozessfenster ausgeschlossen. Die gültigen Daten wurden im ursprünglichen Audit abgegrenzt.
+Funktion
+Ringe
+L – acht gelabelte Entwicklungsringe
+DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18
+U – vier künstlich ungelabelte Trainingsringe
+DM01, DM02, DM10, DM14
+Bereits geöffneter ehemaliger Außentest – für neue Forschung gesperrt
+DM07, DM08, DM11, DM15
+
+Die U-Ringe besitzen physisch Qualitätswerte im Originaldatensatz; ihr Zugang wird im neuen Training absichtlich gesperrt. D_U heißt hier also „nur X für das Training“, nicht „nie im Labor gemessen“. Gelabelte Ringe liefern X und die zwei ringweiten Zielgrößen. Keine Pseudo-Labels.
+Einzelner Ring: komplette multivariate Logger-Zeitreihe x₁,…,x_T mit 0,1-s-Messraster in der genutzten F2-Selektion, plus genau zwei Zielgrößen (Außenunrundheit und Höhenschlag, beide mm). Die Grundsignale bleiben F_rad63, F_ax64, Ist_D150, Ist_s151, Ist_h152, RWG55. Alle Modelle nutzen dieselbe F2-Fensterdefinition und die gelabelte Zielmessung pro Ring, nicht pro Messzeitpunkt.
+Vollständiger Pickle-SHA256: bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5. Dieser Hash ist die Referenzidentität der auf dem Nutzer-Rechner verwendeten Projektdatei; keine abweichende Version stillschweigend substituieren.
+2.1 Innere vierfache Datenaufteilung
+Fold
+L-Train (6 Ringe)
+U-Train (immer 4 Ringe)
+Validation (2 Ringe)
+1
+DM06, DM09, DM12, DM16, DM17, DM18
+DM01, DM02, DM10, DM14
+DM04, DM05
+2
+DM04, DM05, DM12, DM16, DM17, DM18
+DM01, DM02, DM10, DM14
+DM06, DM09
+3
+DM04, DM05, DM06, DM09, DM17, DM18
+DM01, DM02, DM10, DM14
+DM12, DM16
+4
+DM04, DM05, DM06, DM09, DM12, DM16
+DM01, DM02, DM10, DM14
+DM17, DM18
+
+Seed 20261111, zehn Trainingsepochen, acht lokale Schritte, unlabeled-Prozessgewicht C=1, sofern nicht explizit anders registriert. Jeder L-Ring wird im CV4 genau einmal zur Validation herangezogen. Die vier U-Prozessringe sind während eines Folds stets auf der Trainingsseite und tragen keine beobachtete Qualitätslikelihood.
+3.  Das geerbte Bayesian-Grundmodell
+Das Basis-HMM beschreibt die Zeitreihe über latente, erste-Ordnung-Markov-Zustände z_t und zustandsbedingte multivariate Normalverteilungen für die standardisierten Loggerkanäle. Es verwendet Bayesian-Priors auf Anfangs-/Übergangswahrscheinlichkeiten und volle Gauß-Wishart-Priors auf Emissionsparameter. Die Qualitätskopplung erfolgt über zwei verschiedene Bayesian-NIG-Regressionsköpfe für Außenunrundheit und Höhenschlag.
+In der bisherigen M0-Version erhalten die Qualitätsköpfe als stochastische, gemeinsame Prozessrepräsentation die posterioren Zustandsanteile h_k = (1/T) Σ_t 1[z_t=k]. Dazu kommen zielgrößenspezifische deterministische Ringkennwerte aus den Prozesssignalen. Das FULL_JOINT-Verfahren berücksichtigt den Einfluss der beobachteten Qualität auf die lokalen Markov-Zustandswahrscheinlichkeiten. Die praktische Posteriorinferenz bleibt strukturierte Variational Inference, nicht exakte vollständige Bayesintegration.
+Qualitätsziel j: y_ij | z_i, x_i, β_j, σ_j² ~ N( β_jᵀ [g_i(z_i); s_ij(x_i)], σ_j² ). Die zwei Köpfe haben getrennte Koeffizienten, Priors und skalierte physikalische Eingangsmerkmale. Die q(Z)-Unsicherheit wird bei der Regression über die ersten und zweiten Merkmalsmomente berücksichtigt.
+4.  Quellengeleitete Erweiterung: dynamische Pfadmerkmale
+Motivation: Zwei Ringe mit gleichen Zustandsanteilen können sehr unterschiedliche zeitliche Anordnungen und Wechselverläufe haben. Die neuen Merkmale sollen genau diese bisher in der Qualitätskopplung komprimierte Information erfassen. Die Literatur begründet Markov-Inferenz, Bayesian-SSR und Soft-Sensoren; die konkrete neue Kopplung ist ausdrücklich unsere eigene Modellkonstruktion.
+4.1 Definitionen der neuen Merkmale
+Symbol / Gruppe
+Definition und Interpretation
+h_k – Zustandshäufigkeit
+Anteil der Zeitpunkte eines Rings im verborgenen Zustand k; Summe über k = 1.
+e_k – Zeitkontrast
+Zustandsanteil in zweiter Hälfte minus Zustandanteil in erster Hälfte; Summe über k = 0.
+r_E – frühe Wechselrate
+Anteil der aufeinanderfolgenden Intervalle mit z_t ≠ z_(t+1) in der frühen Prozesshälfte.
+r_L – späte Wechselrate
+Entsprechender Anteil der Wechsel in der späten Prozesshälfte.
+s_ij – Prozessdescriptoren
+Zielkopfspezifische, aus X abgeleitete und pro Fold skalierte Ringkennwerte; keine Qualitätslabels.
+
+Ein Zustandsindex (beispielsweise „Zustand 1“) ist zwischen zwei Fits oder verschiedenen K-Werten NICHT physikalisch fest identifiziert. Bei HMM gilt Label-Switching. Der Zeitkontrast e_k ist wegen Σ_k e_k=0 linear abhängig; die reguläre Bayesian-Priorstruktur hält die Regression numerisch wohldefiniert, verleiht den Einzelkoeffizienten aber keine kausale Eindeutigkeit.
+4.2 Vier abgeleitete Modellvarianten
+Variante
+Latente Qualitätsmerkmale
+Dimension
+M0
+h: ursprüngliche zwei Qualitätsköpfe
+K
+M1
+h + zwei Wechselraten (früh/spät)
+K + 2
+M2
+h + K Zeitkontraste (spät minus früh)
+2K
+M3
+h + K Zeitkontraste + zwei Wechselraten
+2K + 2
+
+Die zwei physikalischen Qualitätskopfsätze bleiben in sämtlichen Varianten erhalten; nur die latente Pfadrepräsentation g_i wird erweitert. M0 ruft den bisherigen two_head_b1-Kern unverändert auf und ist eine Regressionstest-Referenz für V2.
+4.3 Mathematische Qualität der Erweiterung
+Die Merkmale werden als additive Pfadfunktion g(z) = Σ_t a_t(z_t) + Σ_(t≥2) b_t(z_(t−1), z_t) dargestellt. Unter einer lokalen Markov-Variationsverteilung q(z) berechnet der V2-Kern m = E_q[g] sowie H = E_q[g gᵀ] über Vorwärtsrekursionen mit Zustands-/ersten-/zweiten Momenten. Für den lokalen Qualitätsanteil der ELBO wird der Erwartungswert des quadratischen Residuals auf Grundlage dieser Momente verwendet. Eine zusätzliche Ableitung berechnet Gradienten für den lokalen q(Z)-Schritt. Kleine künstliche Ketten wurden gegen vollständige Pfadaufzählung und Finite-Differenzen geprüft.
+Dies ist wichtig: Die Zustandswechselraten werden nicht aus einer einzigen Viterbi-Pfadschätzung als feste, fehlerfreie Kennwerte übernommen; ihre Unsicherheit unter der Markov-Verteilung wird in der Regression berücksichtigt. Das bleibt mit dem Bayesian-Konzept vereinbar. Die konkrete Rekursion ist eigene, numerisch geprüfte Herleitung, nicht aus einer genannten Originalquelle wörtlich übernommen.
+4.4 Priors der V2-Basis
+Parametergruppe
+Verwendete Ausgangsannahme
+Status
+Zustandsanteil-Koeffizienten
+Priorvarianz 2,0
+historische Modellkonfiguration
+Physikalische Kopfkoeffizienten
+Priorvarianz 0,25
+historische Modellkonfiguration
+Neue Zeitkontrast-/Wechselkoeffizienten
+Priorvarianz 0,15
+eigene explorative stärkere Schrumpfung
+NIG-Nebenparameter
+a0=2,5; b0=1,5
+geerbte Konfiguration
+U-Prozessgewicht
+C=1,0
+für alle jetzigen Raster fixiert
+
+Die Wahl von 0,15 ist weder universell optimal noch durch ein Originalpaper als geeigneter Ringwalzwert nachgewiesen. Sie ist dokumentierte eigene Regularisierung und wird in einer späteren Optuna-Phase als mögliche Sensitivitätsachse behandelt.
+5.  V2: Implementierung, mathematische Tests und erste Vollvergleiche
+Das erste neue Paket „Bayesian_Bachelor_V2_Dynamische_Qualitaetskopplung_Basismodell_2026-11-11.zip“ wurde erstellt und auf dem Nutzer-PC reproduziert. Die vier neuen Python-Dateien sind dynamic_markov_v2.py, dynamic_quality_v2.py, compare_dynamic_quality_cv4.py und test_dynamic_markov_v2.py. Zusätzlich enthält das Paket README, Versuchsprotokoll und Dateihashes.
+5.1 Mathematische und synthetische Tests [TEST]
+PASS test_exact_path_moments – erste/zweite Pfadmomente gegen vollständige Aufzählung
+PASS test_exact_gradient_all_variants – lokale Gradienten für M0–M3 kontrolliert
+PASS test_occupancy_matches_legacy – Identität mit früheren Zustandsanteilen
+PASS test_invariants_and_k – Dimensions-/Invarianzprüfungen verschiedener K
+PASS test_train_predict_synthetic – künstliches zweiköpfiges Training und Vorhersage
+Anschließend bestanden M0 und M3 jeweils einen 1-Fold-/1-Epochen-/1-Schritt-Smoke-Test auf denselben zwei Entwicklungs-Validierungsringen. Diese Tests waren ausdrücklich nur technisch, keine finale Qualitätsbewertung.
+5.2 Vollständiger Vergleich M0–M3 bei P0, K=3
+Variante
+RMSE Außen [mm]
+RMSE Höhe [mm]
+MAE Außen [mm]
+MAE Höhe [mm]
+M0
+0,5529
+3,2026
+0,4675
+2,7133
+M1
+0,5529
+3,2026
+0,4675
+2,7133
+M2
+0,5522
+3,1767
+0,4622
+2,6670
+M3
+0,5522
+3,1767
+0,4622
+2,6670
+
+Die vom Nutzer ausgeführten vier vollständigen Entwicklungs-CV4-Läufe sind vergleichbar (zehn Epochen, acht lokale Schritte, vier Folds). M1/M0 und M3/M2 erscheinen auf vier Nachkommastellen gleich; dies ist keine Behauptung bitgenauer Identität. M2 verändert die Größen geringfügig; die Verbesserungen sind nicht über die acht Ringbeispiele konsistent.
+DM-Validierungsfehler im Smoke-Vergleich (Fold 1, 1 Epoche): M0 RMSE [0,5048; 4,0894] mm gegenüber M3 [0,5043; 4,1206] mm. Die sehr kurzen Läufe dienen ausschließlich dem Funktionsnachweis.
+6.  V2.1: Warum die Wechselmerkmale zunächst wirkungslos waren
+Nach den M0/M1/M2/M3-Läufen wurde eine gezielte Code-/Datendiagnose durchgeführt. Ergebnis: Die zwei Wechselraten sind im Qualitätskopf und im Markov-Momentenmodell tatsächlich implementiert, liefern aber im Originalmaßstab äußerst kleine Beiträge zu den vorhergesagten standardisierten Qualitätsgrößen.
+6.1 Diagnose eines Entwicklungsfolds
+Posteriorerwartete frühe/späte Roh-Wechselraten im untersuchten Entwicklungsfold ungefähr 0 bis 0,014 je Messintervall. Späte Raten oft nahe null.
+Posterior-Mittelwerte der Wechselkoeffizienten (auf standardisierten Qualitätswerten): Außen [-0,0000742; -0,0003987], Höhe [+0,0009659; -0,0002521]. Nur für diesen Fold – keine globale physikalische Effektgröße.
+Kleine Wechselraten mal kleine Koeffizienten erzeugen praktisch vernachlässigbare Beiträge. Das erklärt die Gleichheit der auf vier Stellen gerundeten M0/M1- bzw. M2/M3-Vorhersagen.
+6.2 Per-100-Definition und Bayesian-Konsequenz
+V2.1 definiert r100 = 100 · rroh: Anzahl der erwarteten Zustandswechsel je 100 Zeitintervalle, getrennt für frühe und späte Prozesshälfte. Das ist eine physikalisch interpretierbare Skalenumstellung, sofern die Zeitabstände vergleichbar sind. Im Code zählt die Anzahl der Beobachtungsintervalle, nicht eine stets fest unterstellte reale Sekundenzahl.
+Achtung: Die numerische Koeffizienten-Priorvarianz 0,15 wurde in dieser Sensitivitätsstudie nicht invers umskaliert. Bezogen auf den ursprünglichen Wechselratenbegriff vergrößert sich dadurch die induzierte Varianz des Effektkoeffizienten um Faktor 10.000. Deshalb ist V2.1 zugleich ein Prior-/Regularisierungsexperiment, nicht nur ein Einheitenwechsel.
+6.3 Tests und CV4-Werte der V2.1-Variante
+Die fünf V2.1-Python-Dateien dynamic_markov_v21.py, dynamic_quality_v21.py, compare_dynamic_quality_cv4_v21.py, test_dynamic_markov_v21.py und summarize_dynamic_grid_v21.py wurden getrennt angelegt. Sie überschreiben die ursprüngliche V2 nicht. [NUTZER-LOG] Sieben synthetische Tests bestanden, inklusive per100-Definition und Outer-Datensperre.
+Variante
+RMSE Außen
+RMSE Höhe
+MAE Außen
+MAE Höhe
+M0 (Vergleich)
+0,5529
+3,2026
+0,4675
+2,7133
+M2 (Vergleich)
+0,5522
+3,1767
+0,4622
+2,6670
+M1, Wechsel je 100
+0,5483
+3,2049
+0,4644
+2,7250
+M3, Wechsel je 100
+0,5475
+3,1786
+0,4590
+2,6780
+
+Die neuen Wechselmerkmale bewirken nun messbare, jedoch kleine Vorhersageänderungen. Der Außen-RMSE sinkt etwas, während die Höhe nicht gegenüber der jeweiligen Referenz verbessert wird. Wegen mehrfacher Entwicklungsauswahl auf acht L-Ringen ist diese Beobachtung kein belastbarer Beweis für den Zusatznutzen.
+7.  Audit der Eingangsgrößen und Vorverarbeitung
+Der Nutzer betonte ausdrücklich die Bedeutung sauberer Vorverarbeitung. Ein eigener Entwicklungsdaten-Audit prüfte Skalierung, Folds, Zeitfenster, kanalweise Signalverteilungen und Ausreißerindikatoren, ohne HMM-Training oder äußere Testbewertung auszuführen.
+7.1 Was bereits korrekt implementiert war
+X-Scaler: je Fold ausschließlich Prozesswerte aus Train-L + Train-U; keine Anpassung an innere Validierungsringe.
+Y-Scaler: je Zielgröße ausschließlich bekannte Qualitätswerte der gelabelten Trainingsringe.
+Physikalische Ringdeskriptoren: nach X-Skalierung abgeleitet und zusätzlich pro Qualitätskopf mit ausschließlich Trainingsringen skaliert.
+U-Labels: im Training verborgen; Zielkopflikelihood für U nicht aus realen Werten aufgebaut.
+F2-Prozessfenster: auf den zwölf Entwicklungsringen im Audit zusammenhängend und 0,1-s-getaktet.
+Keine ungeprüften manuellen Ausreißerkorrekturen; P2 schneidet extreme Messwerte ausdrücklich nicht ab.
+7.2 Offene Statistik- und Modellrisiken
+P0 gewichtet Messzeitpunkte gleich und dadurch längere Ringtrajektorien in der Skalierungsstatistik stärker. Fold-1-Anteile der Messpunkte: beispielsweise DM12 ca. 21,9 %, DM01 ca. 2,5 %.
+Mehr hochfrequente Messpunkte liefern zusätzlichen Prozesskontext, jedoch nicht zwingend proportional viele unabhängige Informationen und keine zusätzlichen ringweisen Labels.
+Sehr große z-standardisierte RWG55-Werte (vereinzelt ca. 7–8) und Validierungsverschiebungen; in Fold 2 hat DM09 ca. 62 % der radialen Kraftpunkte mehr als drei Trainings-SD Abstand.
+Vollständige Gauß-Kovarianz modelliert lineare Korrelationen, beseitigt weder physikalische Redundanz noch OOD-Prozessbereiche.
+Bei festgehaltenem numerischem Normal-Wishart-Prior verändert jede neue X-Skalierung die induzierte Priorinterpretation auf der ursprünglichen Einheitenskala.
+Der Audit wurde als „Bayesian_Bachelor_DM_V21_Vorverarbeitungs_Audit_2026-11-11.zip“ bereitgestellt; das rein lesende Skript heißt audit_preprocessing_v21.py. Echte CV-Vergleiche erfolgten anschließend separat mit P0/P1/P2.
+8.  Kontrollierter Vorverarbeitungsvergleich P0/P1/P2
+Die drei Verfahren wurden bei K=3, C=1, zehn Epochen, acht lokalen VI-Schritten und denselben vier Entwicklungsfolds sowohl für M0 als auch für M2 verglichen.
+8.1 Exakte Definitionen
+Variante
+X-Mittel-/Skalierungsdefinition
+Konsequenz
+P0 – punktgewichtet
+μ = Mittelwert über alle Trainingszeitpunkte; s² = gepoolte Populationsvarianz
+Lange Ringe beeinflussen Skalierung proportional zu ihrer Anzahl Messpunkte; bestehende Referenz.
+P1 – ringgleichgewichtet
+μ = gleiches Mittel der pro-Ring-Mittel; Varianz = gleiches Mittel aller pro-Ring-Quadratabweichungen zum gemeinsamen μ
+Jeder Trainingsring erhält dasselbe Gesamtgewicht in der X-Skalierungsstatistik; HMM-Likelihood bleibt punktgewichtet.
+P2 – robust
+Zentrum = Median über gepoolte Trainingszeitpunkte; Skala = IQR/1,3489795003921634
+Robuster gegen extreme Werte; nicht ringgleichgewichtet; keine Clipping-Operation.
+
+Bei degenerierten Kanälen wird wie im bisherigen Code eine sichere Standardskala eingesetzt. Der normale Zielskalierer und die per-Kopf-Skalierung der physikalischen Ringdeskriptoren bleiben in P0/P1/P2 unverändert.
+8.2 Sechs vollständige CV4-Vergleiche
+Prep
+Kopf
+RMSE Außen
+RMSE Höhe
+MAE Außen
+MAE Höhe
+P0
+M0
+0,5529
+3,2026
+0,4675
+2,7133
+P0
+M2
+0,5522
+3,1767
+0,4622
+2,6670
+P1
+M0
+0,5621
+3,3131
+0,4780
+2,7486
+P1
+M2
+0,5623
+3,3045
+0,4729
+2,7114
+P2
+M0
+0,5606
+3,0258
+0,4741
+2,5268
+P2
+M2
+0,5645
+3,0419
+0,4793
+2,5161
+
+8.3 Paarweise quantitative Prüfung
+Kopf
+Vergleich
+ΔMSE Außen [mm²]
+ΔMSE Höhe [mm²]
+Einzelringe besser (Außen / Höhe)
+M0
+P1 − P0
++0,0102
++0,7197
+3 / 3
+M0
+P2 − P0
++0,0086
+−1,1013
+3 / 3
+M2
+P1 − P0
++0,0112
++0,8287
+2 / 2
+M2
+P2 − P0
++0,0137
+−0,8378
+3 / 2
+
+Negatives ΔMSE bedeutet Verbesserung. Der niedrige P2-Höhenschlag-RMSE ist zum großen Teil durch den Ring DM09 beeinflusst: unter M0 fällt sein absoluter Höhenfehler etwa von 3,9879 auf 2,1226 mm; unter M2 von 3,7758 auf 2,0148 mm. Eine Mehrheit der acht Ringe verbessert sich durch P2 nicht. Deshalb keine allgemeine Überlegenheit behaupten.
+Ergebnis dieser Phase: P0 bleibt eine fachlich vertretbare Standardreferenz; P1 zeigt in diesem Raster keinen Vorteil; P2 bleibt eine relevante Sensitivitätsalternative, gerade für die Höhenschlag-Verteilung, jedoch nicht eindeutig für beide Ziele.
+8.4 Tests und Ergebnisdateien
+[NUTZER-LOG] test_preprocessing_cv4.py: 6/6 Tests bestanden (Identität P0, gewichtete Ringmischung P1, robuste Definition P2 ohne Clipping, Reject von Outer-IDs, keine Quality-Abfragen, registrierte Entwicklungsgrenze). Der Nutzer führte alle sechs Foldsätze mit compare_preprocessing_cv4.py aus und validierte sie mit summarize_preprocessing_cv4.py erfolgreich: „6/6 BERICHTE UND SPLITS VALIDiERT“.
+Die sechs Ergebnisdateien liegen auf dem Nutzer-PC in results\preprocessing_cv4\CV4_P0_M0_K3 bis CV4_P2_M2_K3; der bereitgestellte Vorverarbeitungs-ZIP enthält außerdem vollständige Referenz-JSONs.
+9.  Manuelle Zustandswahl: 16/16 volle CV4-Rasterläufe
+Nach der Vorverarbeitung wurde K systematisch geöffnet. Vorgeplant waren K∈{2,3,5,8}, P∈{P0,P2}, Kopf∈{M0,M2}. Alle anderen relevanten Trainingsgrößen blieben fix. Die geplanten 16 Konfigurationen sind jetzt vollständig vom Nutzer auf seinem Rechner ausgeführt und durch summarize_state_grid.py validiert. [NUTZER-LOG]
+Alle 16 Ergebnisse sind für dieselben acht Validierungsringe nach vier CV-Folds gepaart. Es wurde weder ein äußeres Testlabel abgerufen noch eine neue unabhängige Bestätigung durchgeführt. Für K=5 und K=8 steigt die Parameterzahl der HMM-Emissionen, Transitionen und Regressionsköpfe; dies ist bei nur sechs Trainingslabels je Fold besonders kritisch.
+9.1 Sämtliche 16 RMSE- und MAE-Werte
+Prep
+Kopf
+K
+RMSE außen
+RMSE Höhe
+MAE außen
+MAE Höhe
+Aktive min.
+eff. K
+P0
+M0
+2
+0,5629
+2,9956
+0,4796
+2,4975
+2
+1,91
+P0
+M0
+3
+0,5529
+3,2026
+0,4675
+2,7133
+2
+2,24
+P0
+M0
+5
+0,5620
+3,3733
+0,4761
+2,9793
+4
+3,78
+P0
+M0
+8
+0,5923
+3,5530
+0,4937
+3,1099
+5
+5,63
+P0
+M2
+2
+0,5673
+3,0233
+0,4836
+2,4994
+2
+1,91
+P0
+M2
+3
+0,5522
+3,1767
+0,4622
+2,6670
+2
+2,24
+P0
+M2
+5
+0,5631
+3,3595
+0,4781
+2,9520
+4
+3,78
+P0
+M2
+8
+0,5917
+3,5409
+0,4945
+3,0885
+5
+5,63
+P2
+M0
+2
+0,5717
+3,2001
+0,4881
+2,7304
+1
+1,45
+P2
+M0
+3
+0,5606
+3,0258
+0,4741
+2,5268
+2
+2,04
+P2
+M0
+5
+0,5675
+3,3853
+0,4884
+2,9415
+4
+3,69
+P2
+M0
+8
+0,5895
+3,5278
+0,4981
+3,1317
+5
+5,65
+P2
+M2
+2
+0,5738
+3,2088
+0,4906
+2,7334
+1
+1,45
+P2
+M2
+3
+0,5645
+3,0419
+0,4793
+2,5161
+2
+2,04
+P2
+M2
+5
+0,5694
+3,3345
+0,4865
+2,8746
+4
+3,69
+P2
+M2
+8
+0,5941
+3,5094
+0,5052
+3,0970
+5
+5,66
+
+„Aktive min.“ = minimale Anzahl Zustände je Fold mit mindestens 5 % Belegung; „eff. K“ = aus dem Summarizer gemeldete Entropie-Effektivzahl (gerundet). Die Anzahl aktiver Zustände belegt allein weder physikalisch interpretierbare Prozessphasen noch bessere Qualitätsvorhersage.
+9.2 Drei nicht-dominierte Konfigurationen (Pareto)
+Kandidat
+RMSE Außen [mm]
+RMSE Höhenschlag [mm]
+Interpretation
+P0 / M0 / K=2
+0,5629
+2,9956
+Günstigster Höhen-RMSE in den 16 Kandidaten.
+P0 / M2 / K=3
+0,5522
+3,1767
+Günstigster Außen-RMSE im Raster.
+P2 / M0 / K=3
+0,5606
+3,0258
+Nicht-dominierter Kompromiss; robuste Vorverarbeitung.
+
+Definition: Eine Konfiguration ist Pareto-dominiert, wenn eine andere in beiden RMSE-Zielen nicht schlechter und in mindestens einem strikt besser ist. Die manuelle Studie hat damit keinen einzigen Gewinner, solange beide Ziele ohne willkürliche Gewichte relevant sind.
+9.3 Was ergibt die Variation von K?
+Unter P0/M0: K=2 hat Höhen-RMSE 2,9956; K=3 erhöht auf 3,2026; K=5 auf 3,3733; K=8 auf 3,5530 mm.
+Unter P0/M2: K=3 besitzt den niedrigsten Außen-RMSE 0,5522; K=5 0,5631 und K=8 0,5917 mm.
+Unter P2/M0: K=3 verbessert Höhe gegenüber K=2 (3,0258 versus 3,2001), während K=5/K=8 schlechter werden.
+Bei P0/M0 steigt die gemeldete effektive Zustandszahl von 1,91 (K=2) über 2,24 (K=3) und 3,78 (K=5) auf 5,63 (K=8). Mehr Zustände werden tatsächlich teilweise genutzt, ohne die Qualitätsvorhersage automatisch zu verbessern.
+Bei P2/K=2 kann in mindestens einem Fold nur ein Zustand die Schwelle von 5 % erreichen; Zustandsnutzung und Nützlichkeit hängen somit von der Vorverarbeitung ab.
+Interpretationsgrenze: Diese Ergebnisse gelten für die festgelegten Priors, Initialisierung, Anzahl Epochen und CV-Folds. Sie widerlegen nicht generell K≥5, sondern zeigen nur, dass diese K-Werte in genau diesem Vergleich keine bessere Quality-CV geliefert haben. Vor allem darf der Trainings-ELBO nicht als Ersatz für ringweise Endqualitätsmetriken dienen.
+9.4 Mathematik und Sicherheitsprüfungen
+[NUTZER-LOG] test_state_grid.py: sieben Tests bestanden; im Entwicklungsraster wurden 16/16 Ergebnisberichte ausgeführt; der Summarizer meldete vollständige Vergleiche und die obige Pareto-Front. Das Update „Bayesian_Bachelor_V2_Manual_State_Grid_und_Optuna_Plan_2026-11-11.zip“ umfasst compare_states_cv4.py, summarize_state_grid.py und test_state_grid.py. Die Rohdaten des vollständigen Terminalprotokolls sind im Anhang quantitativ erfasst.
+10.  Chronologie der seit dem Master-Handover abgeschlossenen Arbeiten
+Die Reihenfolge ist methodisch wichtig, weil jede spätere Designänderung aus einer zuvor überprüften Schwachstelle motiviert wurde. Die CV-Daten wurden mehrfach verwendet; die untenstehende Chronologie ist daher eine Explorationshistorie und keine Reihe unabhängiger Bestätigungen.
+Phase
+Entscheidung / Test
+Beobachteter Status
+V2-I
+Zeitlage und Zustandswechsel als neue latente Pfadfeatures; volle Markov-Momente
+5 Mathematiktests PASS; reale Smoke-Tests PASS
+V2-II
+M0/M1/M2/M3 mit K3/P0 CV4
+4/4 vollständige Entwicklungsvergleiche
+V2.1-I
+Diagnose winziger Roh-Wechselbeiträge und stärkerer Priorwirkung
+1 Entwicklungsfold diagnostiziert; keine vergessenene Codekopplung
+V2.1-II
+Wechsel je 100 Intervalle; separate Codeversion
+7 synthetische Tests PASS; 2 CV4-Vergleiche M1/M3
+Preprocessing Audit
+Train-only Scaling, Kanalextreme, Längen-/Ringgewichtung
+Audit auf 12 Entwicklungsringen; keine Außentestlabels
+Preprocessing CV4
+P0/P1/P2 × M0/M2, K3
+6/6 vollständige Berichte; 6 Tests PASS; paarweise Differenzen
+Manuelles K-Raster
+K2/3/5/8 × P0/P2 × M0/M2
+16/16 Berichte; 7 Tests PASS; Pareto=3 Kandidaten
+Optuna-Phase
+Automatisierter TPE-Hyperparametervergleich
+NOCH NICHT IMPLEMENTIERT UND NICHT AUSGEFÜHRT
+
+11.  Die wesentlichen wissenschaftlichen Erkenntnisse
+Der Projektstand liefert klare methodische Erkenntnisse, aber weiterhin keine unabhängige Bestätigung der neuen V2-Varianten.
+Dynamische Qualitätsmerkmale: Zeitkontrast und Wechselraten sind mathematisch integrierbar, einschließlich Unsicherheit und q(Z)-Rückkopplung. Die beobachteten CV-Gewinne sind bislang klein und inkonsistent.
+Wechselraten: Ein Rohmerkmal mit geringem Zahlenbereich und engem Prior kann praktisch wirkungslos bleiben. Die per100-Umformung zeigt, dass die effektive Prior-Regularisierung eine Schlüsselgröße ist.
+X-Skalierung: Eine korrekte fold-lokale Standardisierung schließt Validierungsleakage aus, garantiert aber nicht Robustheit gegenüber Verteilungsverschiebungen. P1 führt auf diesen Daten nicht zu allgemeiner Verbesserung.
+P2-Ausreißerrobustheit: Median/IQR verändert die regressiven Ergebnisse, besonders für DM09. Das ist eine empirische Sensitivität, kein Nachweis universell besserer Robustskalierung.
+Zustandskomplexität: Mehr nominelle und effektiv besetzte HMM-Zustände sind nicht automatisch besser für zwei ringweise Endqualitätsziele bei sehr wenigen L-Ringen.
+Kompromissentscheidungen: Die Zielgrößen stehen teilweise im Konflikt. Pareto-Analyse ist methodisch angemessener als ein ungekennzeichnetes Ranking nur anhand des numerisch größeren Höhen-RMSE.
+Wiederholte CV: Viele neue Hypothesen wurden auf denselben acht L-Ringen erzeugt und verglichen. Daher ist der kleinste beobachtete CV-Fehler selbst bei sauberer mathematischer Implementierung selektionsanfällig.
+12.  Forschungsintegrität und bereits verbrauchte Daten
+Die einmalige alte äußere Bewertung vom 11.11.2026 ist unwiderruflich abgeschlossen und dokumentiert. Es ist unzulässig, ihre vier Qualitätslabels oder Fehler nachträglich zur V2-Konfigurationswahl, zur Optuna-Zieldefinition, zur Anpassung von Priors oder zur Beurteilung neuer Modelle heranzuziehen.
+Die alten Test-Ring-IDs DM07/DM08/DM11/DM15 dürfen nicht in neue Train-/Val-Splits, P0/P2-Scaler-Fits, Qualitätsbewertungen, Optuna-Objective-Funktionen, Featureauswahl oder Ablationen geraten.
+Die vier U-Prozessringe DM01/DM02/DM10/DM14 dürfen unter SSR nur mit X für HMM und Training-Preprocessing verwendet werden; ihre realen Y-Werte sind bewusst verborgen.
+Skalierer für X und ringweite physikalische Merkmale sind je Fold auf Train-L+U anzupassen; Y-Skalierer nur auf Train-L. Keine Auswahl von Trainingskanälen anhand Validierungslabeln ohne dokumentierten Suchstatus.
+Ein zeitlich langer Ring bringt mehr Prozessbeobachtungen; er liefert aber keine zusätzlichen unabhängigen Ring-Qualitätslabels. Erklärungen zu Gewichtung müssen zwischen X-Scaling, HMM-Likelihood und ringweiser Qualitätsmetriken unterscheiden.
+Jede neue explorative Konfiguration erhält neue Ergebnisdateinamen, Versions-/Seedangabe und Fehlerstatus. Bereits protokollierte Ausgaben nicht löschen, um nachträglich abweichende Ergebnisse passend zu machen.
+Die früheren vier Außentestringe sind jetzt bekannt; eine künftige unabhängige Leistungsbestätigung für Optuna/V3 benötigt neue, vorher unberührte Ringe.
+13.  Kritische offene Probleme vor belastbaren Modellbehauptungen
+Die folgende Liste ist ausdrücklich ein offener Forschungsplan, nicht der Nachweis bereits geprüfter Verbesserungen.
+Mehrfach-Seeds: Bisherige K-Studie verwendet einen festen Seed. Für numerische Robustheit sollten mehrere vorher registrierte Seeds auf Entwicklungsdaten verglichen werden; dabei nicht einzelne günstige Seeds selektieren.
+Prior-Sensitivität: Besonders die Qualitätskoeffizienten und Emissions-Wishart-Priors bei K5/K8 könnten die K-Rangfolge beeinflussen. Skalierung und Prior müssen gemeinsam interpretiert werden.
+Auswirkung von C: Der tatsächliche Anteil U-ELBO gegenüber Trainingsvorverarbeitung und Initialisierung sollte in späteren Ablationen erneut getrennt geprüft werden.
+Physikalische Interpretierbarkeit: Mehrere HMM-Zustände können denselben Prozessbereich unterscheiden oder lediglich statistische Komponenten darstellen. Zustandsnamen nicht ohne Prozessnachweis vergeben.
+Likelihood und Qualitätsmetrik: Hohe lokale HMM-ELBO muss nicht niedrige Quality-RMSE bedeuten; Prozessmodell und Endqualität getrennt diagnostizieren.
+Relative Zeitdarstellung: Die Früh-/Spät-Teilung ist eine eigene Entscheidung. Alternative normalisierte Zeitkoordinaten, Change-Point-Segmente oder explizite Dauermodelle wären später eigene Studien.
+Selektion und Unsicherheitskalibrierung: Die bereits wiederholt beobachteten Entwicklungsringe reichen allein nicht für eine verlässliche generalisierende Unsicherheitskalibrierung.
+Datenlage: Die Anzahl unabhängiger ringweiter Qualitätslabels bleibt das engste Statistik-Limit, nicht die Anzahl Prozessmesspunkte.
+14.  Verbindlicher nächster Schritt: Optuna – erst nach manueller K-Studie
+Die manuelle K-Studie ist abgeschlossen. Der Nutzer möchte ausdrücklich einen Vergleich zwischen fachlich vorab begründeten eigenen Modellentscheidungen und einer Bayes-/TPE-gestützten Optuna-Suche. **Optuna wurde zum Zeitpunkt dieser Übergabe noch nicht implementiert, installiert oder auf den DM-Daten ausgeführt.** Es darf daher kein Best-Trial, kein Pareto-Optuna-Ergebnis und keine Optuna-Testgüte erfunden werden.
+14.1 Wissenschaftlich korrekte Fragestellung
+Nicht: „Welches einzelne Modell liefert im bestehenden Raster den kleinsten Zahlenwert?“ Sondern: „Findet eine vorregistrierte modellbasierte Hyperparametersuche unter gleichem Entwicklungsbudget reproduzierbar günstige Konfigurationen und wie verhalten sich diese gegenüber fachlich begründeten Startkandidaten?“
+14.2 Technischer zweistufiger Suchplan
+Zunächst Installation/Version der lokal verfügbaren Optuna-API feststellen und eine kleine synthetische Trial- und Speicherprüfung erstellen; Version, Seed und Storage fixieren.
+Die bestehende CV4-Engine aus compare_states_cv4.py wiederverwenden; sie darf niemals den alten Außentest evaluieren. Optuna soll nur die vorkonfigurierten Entwicklungsdaten-Folds verwenden.
+Das bereits vollständig untersuchte 2×2×4-Raster nicht als neuen Erkenntnisgewinn „optimieren“. Es bildet die menschliche Referenz. Automatischer Suchraum muss zusätzliche sinnvolle Freiheitsgrade eröffnen, zum Beispiel U-Gewicht C und Priorvarianz der Qualitätskopf-Deskriptoren; zunächst kleine fachlich begründete Bereiche, dann optional Emissions-/Transition-Priors.
+Zieldefinition VOR ersten Trials festlegen: entweder gleichrangiges Multiobjective (RMSE Außen, RMSE Höhe) mit Pareto-Front oder einen expliziten dimensionslosen normierten MSE-Aggregator mit vorher registrierten Nennern. Die mm-Größen nicht roh addieren.
+Gleicher oder transparent vergleichbarer Rechenaufwand gegenüber manuell ausgewählten Kandidaten; identische Trainings-/CV-Folds und Epochenschritte; feste Seeds, Trial-ID, Laufzeiten, HMM-Zustandsdiagnosen, Einzelringfehler und Ausnahmefälle loggen.
+Zunächst deterministisch mit Optuna n_jobs=1 und explizitem TPESampler-Seed. Startphasen mit zufälligen Vorschlägen kennzeichnen; TPE beruht auf modellbasierter Dichteschätzung, nicht automatisch auf Gaußprozess-Optimierung.
+Nach Optuna-Search keine externe „Bestätigung“ durch Rückgriff auf DM07/08/11/15. Endgültige Beurteilung neuer Architektur nur mit neuem unberührtem Messdatensatz.
+14.3 Vorab zu registrierende Suchachsen
+Achse
+Status heute
+Wissenschaftliche Rolle
+K = {2,3,5,8}
+manuell vollständig verglichen
+Komplexität des HMM und der latenten Qualitätsfeatures
+P0 / P2
+manuell vollständig verglichen
+Skalierung und induzierte Priorwirkung
+M0 / M2
+manuell vollständig verglichen
+Zusätzlicher Zeitkontrast
+C = 1,0 als Basis
+K bisher fixiert; neue Werte offen
+Gewicht der U-Prozessbeiträge gegenüber gelabelten Daten
+Varianz der physikalischen Kopf-Priors
+bisher fixiert 0,25; neue Werte offen
+Regressions-Schrumpfung bei wenigen Ringlabels
+Varianz der neuen dynamischen Merkmale
+V2 auf 0,15 fixiert; neue Werte offen
+Stärke der Zeitkontrast-/Wechselregularisierung
+Emissions-Wishart-/Transition-Dirichlet-Priors
+in V2-Forschung fixiert
+Stabilität und Interpretierbarkeit bei K>3
+Epochen und lokale Schritte
+bisher fixiert 10 / 8
+zunächst kein Optimierungsziel, da Konvergenz und Budget sonst verwechselt werden
+
+Vor Beginn von Optuna: konkrete Werteintervalle, Trialbudget, Unterbrechungs-/Pruningpolitik, Seedregel und Definition des Modellvergleichs schriftlich festlegen. Dieser Abschnitt ist ein methodischer Arbeitsvorschlag, noch keine ausgeführte Suche. Insbesondere wird NICHT behauptet, TPE werde bei gleicher Rechenzeit automatisch besser als die manuelle Studie sein.
+14.4 Fairness und Risiko der Optuna-Vergleiche
+Ein 16er manuelles Raster und eine 16-Trial-Optuna-Suche sind nicht zwangsläufig gleich schwierig oder gleich informativ, wenn Optuna zusätzliche kontinuierliche Hyperparameter untersucht. Deshalb müssen Rechenbudget, Suchvolumen und Baselines transparent dokumentiert werden. Um Optimismus durch adaptive Modellsuche sichtbar zu machen, sind fest definierte Wiederholungsläufe und später externe Ringe wesentlich. Bei nur acht Labeln kann auch eine elegante Bayesian-Hyperparameteroptimierung die begrenzte Informationslage nicht beseitigen.
+15.  Softwareinventar: installierte / bereitgestellte Projektmodule
+Alle genannten Dateien sind in den dokumentierten ZIP-Artefakten enthalten oder befinden sich als unveränderte Abhängigkeit im bisherigen Projektordner. Die folgende Liste ist eine Verantwortlichkeitsübersicht, keine Behauptung, der komplette aktuelle Windows-Arbeitsbaum sei in dieser Laufzeit bytegenau erneut gehasht worden.
+Datei
+Aufgabe
+dm_data.py
+Laden/Filtern, Split-Protokoll, train-lokale Skalierer, Kanäle; Kernabhängigkeit
+two_head_b1.py
+Alte zwei Bayesian-NIG-Qualitätsköpfe und FULL_JOINT-Kern; M0-Referenz
+dynamic_markov_v2.py
+Additive Pfadfeatures, erste/zweite Momente, lokale Ableitungen
+dynamic_quality_v2.py
+M1–M3 Qualitätskopplung mit strukturierten Markov-Momenten
+compare_dynamic_quality_cv4.py
+CV4 für M0/M1/M2/M3; Entwicklung only
+test_dynamic_markov_v2.py
+5 mathematische V2-Synthetikprüfungen
+dynamic_markov_v21.py; dynamic_quality_v21.py
+Separate V2.1-Version mit Rate × 100
+compare_dynamic_quality_cv4_v21.py; test_dynamic_markov_v21.py
+V2.1-CV und 7 Tests
+summarize_dynamic_grid_v21.py
+V2-/V2.1-Referenzberichte zusammenführen
+audit_preprocessing_v21.py
+Entwicklungs-Audit ohne Training/Testlabels
+compare_preprocessing_cv4.py
+Kontrollierte P0/P1/P2-CV4-Vergleiche
+test_preprocessing_cv4.py; summarize_preprocessing_cv4.py
+6 Vorverarbeitungstests / 6er-Resultatvalidierung
+compare_states_cv4.py
+K2/3/5/8 × P0/P2 × M0/M2, state occupancy und Quality-CV4
+test_state_grid.py; summarize_state_grid.py
+7 State-Grid-Tests / 16/16 Ergebnis- und Paretoauswertung
+
+15.1 Änderungsprinzip
+Die ursprünglichen Dateien des eingefrorenen Abschlussmodells wurden in der dokumentierten V2-Forschung nicht überschrieben. Die jüngsten Erweiterungen sind getrennte Module mit eigenem Namenssuffix. Keine automatische Bereitstellung von Optuna- oder V3-Dateien ist bislang erfolgt.
+16.  Datei- und Berichtsnamen – exakte Referenzen
+Die Dateinamen sind für die Fortsetzung wichtig, weil viele Modelle in unterschiedlichen ZIP-Paketen liegen. Die angegebenen Windows-Pfade sind die vom Nutzer verwendeten lokalen Ausgabepfade, nicht automatisch in jedem neuen Chat vorhandene Dateien.
+Paket / Pfad
+Enthaltene maßgebliche Informationen
+Bayesian_Bachelor_DM_Herleitungen_A_bis_D_und_MASTER_HANDOVER_2026-11-11.zip
+Vorige Master-Übergabe, A–D-Neufassungen, eingefrorene Abschlussbelege und Code-Snapshots.
+Bayesian_Bachelor_V2_Dynamische_Qualitaetskopplung_Basismodell_2026-11-11.zip
+V2-Kern, M0–M3, Originalquellenstatus, Tests.
+Bayesian_Bachelor_V21_SwitchRate_Diagnose_und_CV4_2026-11-11.zip
+Wechselraten-Diagnose, per100-Code, zwei Referenzberichte.
+Bayesian_Bachelor_DM_V21_Vorverarbeitungs_Audit_2026-11-11.zip
+Train-/Val-Scaler- und Kanalanalyse, nur Entwicklungsdaten.
+Bayesian_Bachelor_P0_P1_P2_Vorverarbeitung_CV4_2026-11-11.zip
+P0/P1/P2-CV-Code, 6 Referenzberichte und Checksummen.
+Bayesian_Bachelor_V2_Manual_State_Grid_und_Optuna_Plan_2026-11-11.zip
+Manuelles Zustandsraster, Diagnosegrößen, Optuna-Planskizze.
+results\dynamic_quality_v2\CV4_M{0,1,2,3}_K3
+Vier ursprüngliche V2-CV4-Berichte.
+results\dynamic_quality_v21\CV4_M{1,3}_RATE100_K3
+Zwei V2.1-Rate100-CV4-Berichte.
+results\preprocessing_cv4\CV4_P{0,1,2}_M{0,2}_K3
+Sechs Preprocessing-CV4-Berichte.
+results\state_grid_manual\P{0,2}_M{0,2}_K{2,3,5,8}
+16 manuelle Zustands-Rasterverzeichnisse mit JSON.
+results\experiment_freeze\OUTER_FINAL_SCORE_V1.json
+Alte, einmalige und für neue Forschung ausgeschlossene Outer-Test-Bewertung.
+
+Arbeitsordner Windows: C:\Users\umutj\OneDrive\Dokumente\PA und BA\Implementierung_BA. Interpreter: .\.venv\Scripts\python.exe. Einzelne ZIPs enthalten eigene README-Dateien und SHA256_MANIFEST.json; diese bei Übertragung prüfen. Keine bestehende Ausgabedatei überschreiben, wenn der Code eine Sperre signalisiert.
+17.  Exakte Reproduktionsbefehle und Prüfmeldungen
+Die folgenden Befehle wurden im alten Chat ausgeführt und ihre Ausgaben dokumentiert. Sie werden hier für die Übergabe gespeichert; sie müssen vor Optuna nicht unnötig erneut gestartet werden. Bei Wiederholung neue Ausgabeordner verwenden.
+17.1 Mathematiktests
+.\.venv\Scripts\python.exe test_dynamic_markov_v2.py .\.venv\Scripts\python.exe test_dynamic_markov_v21.py .\.venv\Scripts\python.exe test_preprocessing_cv4.py .\.venv\Scripts\python.exe test_state_grid.py
+Nutzerkonsolen: 5/5 V2, 7/7 V2.1, 6/6 Preprocessing und 7/7 State-Grid-Tests bestanden. Nicht jede Testgruppe ist ein empirischer Qualitätsnachweis; die eigentlichen Qualitätsvergleiche stehen in den CV4-Tabellen.
+17.2 Vollständiges manuelles K-Raster (bereits ausgeführt)
+foreach ($prep in @('P0','P2')) {    foreach ($k in @(2,3,5,8)) {        foreach ($model in @('M0','M2')) {            .\.venv\Scripts\python.exe compare_states_cv4.py --preprocessing $prep --variant $model --states $k --epochs 10 --steps 8 --folds 4 --out "results\state_grid_manual\${prep}_${model}_K${k}"            if ($LASTEXITCODE -ne 0) { throw "Fehler $prep $model K$k" }        }    }}.\.venv\Scripts\python.exe summarize_state_grid.py --root results\state_grid_manual
+Wichtig: Die Befehle geben bei erneut identischen --out-Ordnern möglicherweise absichtlich einen Fehler aus, um bestehende Ergebnisse nicht zu überschreiben. Das ist eine sinnvolle Ergebnisintegritätssperre, kein Anlass zum stillen Löschen.
+17.3 Reproduzierbarkeit der Übergabe
+Die Tabelle in Abschnitt 9 und der vollständige per-Ring-Anhang wurden aus dem hochgeladenen Terminaltext „Eingefügter Text(2).txt“ eingelesen. Kontrolle: genau 16 Konfigurationen und pro Konfiguration genau acht Validierungsringe erkannt; aus deren gerundeten Fehlern rekonstruierter RMSE stimmt mit der Konsole innerhalb der üblichen Rundung überein.
+18.  Wissenschaftliche Quellenbasis und ihr wirklicher Prüfstatus
+Die methodischen Quellen werden getrennt von unseren eigenen Modellentscheidungen ausgewiesen. Aus Originalen verifizierte Aussagen dürfen verwendet werden; ungesicherte Einzelseitenzahlen oder behauptete Fremdergebnisse werden nicht erfunden.
+Quelle
+Prüfstand
+Im Projekt verwendbarer Beitrag
+Shao, Xiao, Wang, Zhao & Song (2022), Journal of Process Control 111, 59–74
+[QUELLE-ORIGINAL] PDF vorhanden; V2-README prüfte S. 61–65
+Semi-Supervised Bayesian-HMM, Markov-Modell, VI, Normal-Wishart.
+Shao, Ge & Song (2021), IEEE Transactions on Cybernetics 51(7), 3455–3468
+[QUELLE-ORIGINAL] PDF vorhanden; V2-README prüfte 3455–3458 und 3460
+Bayesian-Mischmodelle und gesteuerte Nutzung unlabeled Prozessdaten.
+Mowbray et al. (2022), Chemometrics and Intelligent Laboratory Systems 228, 104616
+[QUELLE-ORIGINAL] PDF vorhanden; V2-README prüfte PDF-S. 1–4
+Soft-Sensoren für Endqualität ganzer Batch-Trajektorien.
+Rabiner (1989), Proceedings of the IEEE 77(2), 257–286
+[QUELLE-ORIGINAL, frühere Suche] relevante S. 258–262 genannt
+HMM-/Markov-Grundlagen; NICHT Beleg unserer eigenen Momentenrekursion.
+Pohle et al. (2017), Selecting the Number of States in Hidden Markov Models
+[BIBLIOGRAFISCH/ABSTRACT] keine behaupteten Originalseiten
+Problem der HMM-Zustandszahl und Überinterpretation von vielen Zuständen.
+Chen, Fuh & Kao (2025), JMLR 26(58), 1–59
+[BIBLIOGRAFISCH/WEB] methodische Zuordnung; Verfahren NICHT implementiert
+Marginal-Likelihood-Theorie zur HMM-Zustandszahl, kein direkter Softwarebaustein.
+Bergstra et al. (2011), Algorithms for Hyper-Parameter Optimization
+[ORIGINAL-LINK] in Optuna-Plan, keine hiesige Vollseitenprüfung
+TPE-basierte sequenzielle probabilistische HPO.
+scikit-learn: StandardScaler / RobustScaler
+[OFFIZIELLE DOKUMENTATION] Definitionen genannt
+Gepoolte Z-Skalierung, Gewichtung, Median und IQR.
+Optuna: TPESampler-Dokumentation
+[OFFIZIELLE DOKUMENTATION] für Planung, Paket nicht ausgeführt
+TPE-Sampler-API, Seed, sequenzielle Studien.
+
+18.1 URLs / prüfbare bibliografische Anker
+Shao et al. (2022): „Real-time estimation of quality-related variable for dynamic and non-Gaussian process based on semisupervised Bayesian HMM“, Journal of Process Control 111, 59–74.
+Shao, Ge & Song (2021): „Semisupervised Bayesian Gaussian Mixture Models for Non-Gaussian Soft Sensor“, IEEE Transactions on Cybernetics 51(7), 3455–3468.
+Mowbray et al. (2022): DOI 10.1016/j.chemolab.2022.104616.
+Rabiner (1989): DOI 10.1109/5.18626; https://www.fceia.unr.edu.ar/prodivoz/Rabiner_1989.pdf
+Pohle et al. (2017): DOI 10.1007/s13253-017-0283-8.
+Chen et al. (2025): https://www.jmlr.org/beta/papers/v26/23-0343.html
+Bergstra et al. (2011): https://papers.nips.cc/paper_files/paper/2011/file/86e8f7ab32cfd12577bc2619bc635690-Paper.pdf
+sklearn StandardScaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
+sklearn RobustScaler: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html
+Optuna TPESampler: https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html
+18.2 Nicht als Literaturergebnis ausgeben
+Die Wahl der Zustandszahlkandidaten, der beiden Zeitabschnitte, der zwei Wechselraten, der per100-Skalierung, der Regressions-Priorvarianz 0,15, der 5%-Aktivitätsgrenze, der entropiebasierten Effektivzahl und sämtlicher DM-Metriken ist eine eigene Modell- oder Messentscheidung. Die Originalarbeiten beweisen weder die Vorzüge unserer M2-Features noch einen einzelnen optimalen K-Wert für unsere DM-Ringe.
+19.  Handover-Anweisung: Was im nächsten Chat zuerst passieren soll
+Diese konkrete Anweisung kann zusammen mit dem Dokument in einem Folgedialog verwendet werden, um ohne Informationsverlust genau am Optuna-Einstiegspunkt weiterzumachen.
+Vorliegendes Word-Dokument und den früheren MASTER_HANDOVER_BAYESIAN_BACHELOR_DM_2026-11-11.docx als zusammengehörige Projektübernahmen behandeln. Nicht behaupten, die alten SFA-Daten oder externen DM-Testlabels seien neue Trainingsinformationen.
+Die 16/16 manuelle K-Studie als abgeschlossen markieren, einschließlich ihrer exakt drei Pareto-Kandidaten. Keine Wiederholung ohne konkreten Reproduktionsgrund.
+Vor dem Optuna-Code Quellcode und Datenstand überprüfen: compare_states_cv4.py, compare_preprocessing_cv4.py, dynamic_quality_v2.py, two_head_b1.py, dm_data.py sowie die Ergebnis-Summary. Die im ZIP gespeicherten Quellen sind historische Snapshots, nicht automatisch aktueller Windows-Working-Tree.
+Optuna-Hyperparameterraum fachlich und quellenorientiert definieren, zunächst mit kontrollierter Prior-/C-Sensitivität und den K-/Preprocessing-/Kopf-Kandidaten. Suchbudget, Zieldefinition, Seed, Trialspeicherung und Fehlerbehandlung vorab dokumentieren.
+Erst synthetische mathematische/sicherheitsbezogene Tests der Optuna-Evaluationsroutine ausführen. Danach ein Entwicklungs-Smoke-Trial und erst anschließend das vorab registrierte vollständige Entwicklungsbudget starten.
+Die automatische Suche mit den vorher festgelegten fachlichen Kandidaten fair vergleichen; Pareto-Front, per-Ring-Fehler, HMM-Zustandsnutzung, konvergente/fehlgeschlagene Trials, Rechenzeit und Stabilität berichten.
+Für eine wissenschaftliche Aussage jenseits explorativer CV neue, bisher unberührte Ringversuche gewinnen. Die vier bereits am 11.11.2026 geöffneten DM07/08/11/15 dürfen nicht wieder als unabhängig ausgegeben werden.
+19.1 Direkt wiederverwendbarer Einstiegstext
+„Wir setzen Bayesian Bachelor V2 fort. Stand: 16/16 manueller Entwicklungs-CV-Vergleiche zu P0/P2, M0/M2 und K2/3/5/8 abgeschlossen. Pareto: P0/M0/K2; P0/M2/K3; P2/M0/K3. Jetzt gemäß Master-Handover eine quellengeleitete, reproduzierbare Optuna-TPE-Optimierung planen/implementieren – zuerst Zielgröße und Budget fixieren, danach nur DEV-L/DEV-U verwenden. Keine alten Outer-Testlabels. Vorhandene Python-Versionen unverändert lassen und neue Dateien getrennt bereitstellen.“
+ANHANG A – Alle 16 Einzelring-Validierungsfehler
+Die vollständige folgende Übersicht wurde direkt aus dem Nutzer-Terminalprotokoll geparst. Je Tabelle sind die acht individuellen CV-Validierungsringe in der festen Reihenfolge DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18 angegeben. Die Vorzeichen der Fehler werden aus der Konsolenausgabe übernommen. SD-Werte sind die im jeweiligen Modellbericht ausgegebenen prädiktiven Standardabweichungen; keine Konfidenzgarantie.
+A.1.1  P0 / M0: alle K
+P0 / M0 / K=2: Außen-RMSE 0,5629 mm; Höhen-RMSE 2,9956 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7025
+5,5864
+0,8327
+2,5059
+DM05
+-0,0675
+-1,1181
+0,7505
+2,3684
+DM06
+-0,9445
+-4,3973
+0,7083
+2,8665
+DM09
+0,1829
+-1,9186
+1,6460
+5,0287
+DM12
+0,1883
+-1,2727
+0,8226
+4,7076
+DM16
+-0,3977
+-2,9363
+1,0277
+5,1217
+DM17
+0,6462
+2,4456
+0,7361
+3,3922
+DM18
+0,7072
+-0,3052
+0,8786
+3,7854
+
+P0 / M0 / K=3: Außen-RMSE 0,5529 mm; Höhen-RMSE 3,2026 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7007
+5,6056
+0,8346
+2,5317
+DM05
+-0,0614
+-1,1082
+0,7524
+2,3882
+DM06
+-0,9198
+-4,4034
+0,7051
+2,8108
+DM09
+-0,1202
+-3,9879
+1,5780
+4,7813
+DM12
+0,2080
+-0,8708
+0,8286
+4,9358
+DM16
+-0,3974
+-2,6963
+1,0253
+5,2457
+DM17
+0,6448
+2,3766
+0,7346
+3,4241
+DM18
+0,6879
+-0,6579
+0,8991
+4,0747
+
+P0 / M0 / K=5: Außen-RMSE 0,5620 mm; Höhen-RMSE 3,3733 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7193
+5,8156
+0,8202
+2,4767
+DM05
+-0,0917
+-1,4160
+0,7572
+2,4119
+DM06
+-0,9332
+-4,3718
+0,7161
+2,9088
+DM09
+-0,0684
+-3,8469
+1,4683
+4,5185
+DM12
+0,2167
+-1,4265
+0,8279
+4,6686
+DM16
+-0,4700
+-3,5571
+1,0070
+5,0045
+DM17
+0,6383
+2,3439
+0,7292
+3,4038
+DM18
+0,6711
+-1,0571
+0,9482
+4,3045
+
+P0 / M0 / K=8: Außen-RMSE 0,5923 mm; Höhen-RMSE 3,5530 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7548
+5,8426
+0,8205
+2,5268
+DM05
+-0,1007
+-1,4329
+0,7547
+2,3901
+DM06
+-0,9417
+-4,5458
+0,7147
+2,8792
+DM09
+-0,0469
+-4,3807
+1,4251
+4,1233
+DM12
+0,1481
+-1,8755
+0,8515
+4,9911
+DM16
+-0,4989
+-3,8495
+1,0404
+5,3885
+DM17
+0,6886
+2,5378
+0,7593
+3,5075
+DM18
+0,7696
+-0,4145
+0,9570
+4,2791
+
+A.1.2  P0 / M2: alle K
+P0 / M2 / K=2: Außen-RMSE 0,5673 mm; Höhen-RMSE 3,0233 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,6993
+5,6479
+0,8331
+2,5335
+DM05
+-0,0635
+-1,1687
+0,7516
+2,3873
+DM06
+-0,9539
+-4,4955
+0,7059
+2,8431
+DM09
+0,1968
+-1,9220
+1,6394
+4,9729
+DM12
+0,1932
+-1,2354
+0,8292
+4,7609
+DM16
+-0,3920
+-2,8932
+1,0350
+5,1873
+DM17
+0,6435
+2,4549
+0,7355
+3,3881
+DM18
+0,7268
+-0,1777
+0,8878
+3,8672
+
+P0 / M2 / K=3: Außen-RMSE 0,5522 mm; Höhen-RMSE 3,1767 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,6986
+5,6524
+0,8348
+2,5524
+DM05
+-0,0554
+-1,1628
+0,7563
+2,4196
+DM06
+-0,9220
+-4,4649
+0,7023
+2,7694
+DM09
+-0,0787
+-3,7758
+1,5789
+4,7233
+DM12
+0,2181
+-0,7248
+0,8406
+5,0701
+DM16
+-0,3890
+-2,5612
+1,0317
+5,3501
+DM17
+0,6450
+2,4103
+0,7342
+3,4138
+DM18
+0,6905
+-0,5842
+0,8989
+4,0692
+
+P0 / M2 / K=5: Außen-RMSE 0,5631 mm; Höhen-RMSE 3,3595 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7091
+5,8436
+0,8237
+2,5085
+DM05
+-0,0994
+-1,4066
+0,7578
+2,4148
+DM06
+-0,9445
+-4,4518
+0,7127
+2,9045
+DM09
+-0,0687
+-3,7349
+1,4778
+4,5176
+DM12
+0,2267
+-1,3000
+0,8273
+4,7422
+DM16
+-0,4688
+-3,4669
+1,0077
+5,0467
+DM17
+0,6254
+2,3640
+0,7331
+3,4377
+DM18
+0,6818
+-1,0478
+0,9490
+4,3096
+
+P0 / M2 / K=8: Außen-RMSE 0,5917 mm; Höhen-RMSE 3,5409 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7430
+5,8710
+0,8243
+2,5767
+DM05
+-0,1136
+-1,4436
+0,7559
+2,3973
+DM06
+-0,9541
+-4,6541
+0,7112
+2,8650
+DM09
+-0,0434
+-4,2238
+1,4294
+4,1361
+DM12
+0,1571
+-1,7661
+0,8777
+5,1911
+DM16
+-0,4933
+-3,7283
+1,0573
+5,5309
+DM17
+0,6866
+2,6653
+0,7739
+3,5794
+DM18
+0,7645
+-0,3554
+0,9620
+4,3118
+
+A.2.1  P2 / M0: alle K
+P2 / M0 / K=2: Außen-RMSE 0,5717 mm; Höhen-RMSE 3,2001 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7388
+5,9392
+0,8215
+2,4832
+DM05
+-0,0970
+-1,0875
+0,7510
+2,4408
+DM06
+-0,9392
+-4,3459
+0,7067
+2,8663
+DM09
+0,1911
+-2,0761
+1,6444
+5,0912
+DM12
+0,1470
+-1,6427
+0,8335
+4,5652
+DM16
+-0,4174
+-3,1261
+1,0208
+5,0332
+DM17
+0,6597
+3,0833
+0,7382
+3,3759
+DM18
+0,7144
+0,5423
+0,8853
+3,7417
+
+P2 / M0 / K=3: Außen-RMSE 0,5606 mm; Höhen-RMSE 3,0258 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7022
+5,6041
+0,8279
+2,5007
+DM05
+-0,0715
+-1,1718
+0,7467
+2,3776
+DM06
+-0,9418
+-4,4112
+0,7069
+2,8562
+DM09
+0,1461
+-2,1226
+1,5844
+4,6806
+DM12
+0,1851
+-1,3356
+0,8229
+4,6935
+DM16
+-0,3903
+-2,9339
+1,0329
+5,1653
+DM17
+0,6435
+2,4656
+0,7371
+3,4156
+DM18
+0,7120
+-0,1692
+0,8789
+3,7900
+
+P2 / M0 / K=5: Außen-RMSE 0,5675 mm; Höhen-RMSE 3,3853 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7290
+5,9785
+0,8302
+2,5121
+DM05
+-0,1186
+-1,6683
+0,7475
+2,3942
+DM06
+-0,9137
+-4,1630
+0,7192
+2,8766
+DM09
+-0,0932
+-4,0174
+1,4843
+4,5090
+DM12
+0,2358
+-1,2609
+0,8407
+4,7573
+DM16
+-0,4662
+-3,5126
+1,0052
+4,9825
+DM17
+0,6479
+2,3200
+0,7277
+3,3804
+DM18
+0,7031
+-0,6116
+0,8841
+3,9613
+
+P2 / M0 / K=8: Außen-RMSE 0,5895 mm; Höhen-RMSE 3,5278 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7580
+5,7861
+0,8146
+2,4707
+DM05
+-0,2022
+-1,6414
+0,7728
+2,4400
+DM06
+-0,9385
+-4,5054
+0,7166
+2,8971
+DM09
+-0,0269
+-4,3079
+1,4906
+4,5474
+DM12
+0,1267
+-1,8789
+0,8685
+5,1094
+DM16
+-0,5309
+-3,8537
+1,0719
+5,5613
+DM17
+0,6598
+2,3798
+0,7555
+3,4704
+DM18
+0,7418
+-0,7002
+0,9630
+4,3090
+
+A.2.2  P2 / M2: alle K
+P2 / M2 / K=2: Außen-RMSE 0,5738 mm; Höhen-RMSE 3,2088 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7388
+5,9369
+0,8215
+2,4813
+DM05
+-0,0970
+-1,0918
+0,7510
+2,4392
+DM06
+-0,9472
+-4,4268
+0,7039
+2,8459
+DM09
+0,2058
+-2,0558
+1,6373
+5,0432
+DM12
+0,1464
+-1,6433
+0,8337
+4,5649
+DM16
+-0,4152
+-3,1090
+1,0235
+5,0564
+DM17
+0,6597
+3,0767
+0,7382
+3,3762
+DM18
+0,7144
+0,5269
+0,8855
+3,7469
+
+P2 / M2 / K=3: Außen-RMSE 0,5645 mm; Höhen-RMSE 3,0419 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,6997
+5,6588
+0,8281
+2,5247
+DM05
+-0,0662
+-1,2253
+0,7490
+2,4018
+DM06
+-0,9504
+-4,5070
+0,7043
+2,8286
+DM09
+0,1780
+-2,0148
+1,5830
+4,6422
+DM12
+0,1884
+-1,2977
+0,8310
+4,7563
+DM16
+-0,3856
+-2,8844
+1,0450
+5,2594
+DM17
+0,6417
+2,4745
+0,7366
+3,4096
+DM18
+0,7240
+-0,0660
+0,8835
+3,8312
+
+P2 / M2 / K=5: Außen-RMSE 0,5694 mm; Höhen-RMSE 3,3345 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7293
+5,9462
+0,8288
+2,5124
+DM05
+-0,1180
+-1,6150
+0,7516
+2,4176
+DM06
+-0,9156
+-4,0490
+0,7255
+2,8865
+DM09
+-0,0605
+-3,8875
+1,4989
+4,4847
+DM12
+0,2407
+-1,2369
+0,8420
+4,8114
+DM16
+-0,4633
+-3,4816
+1,0072
+5,0157
+DM17
+0,6489
+2,3814
+0,7269
+3,3609
+DM18
+0,7158
+-0,3992
+0,8889
+3,9810
+
+P2 / M2 / K=8: Außen-RMSE 0,5941 mm; Höhen-RMSE 3,5094 mm
+Ring
+Fehler Außen [mm]
+Fehler Höhe [mm]
+SD Außen [mm]
+SD Höhe [mm]
+DM04
+0,7719
+5,8084
+0,8183
+2,4856
+DM05
+-0,2325
+-1,6607
+0,7827
+2,4758
+DM06
+-0,9516
+-4,6472
+0,7134
+2,8816
+DM09
+-0,0325
+-4,1709
+1,4920
+4,5283
+DM12
+0,1336
+-1,7232
+0,9030
+5,3648
+DM16
+-0,5305
+-3,7062
+1,0953
+5,7432
+DM17
+0,6521
+2,4381
+0,7639
+3,5154
+DM18
+0,7367
+-0,6215
+0,9703
+4,3584
+
+ANHANG B – Dokumentprüfungen und Objektidentitäten
+Die 16×8=128 Validierungs-Ringwerte wurden automatisch aus dem sichtbaren Original-Terminalprotokoll extrahiert. Die 16 CV-RMSE-Paare wurden aus den gerundeten Einzelringfehlern nachberechnet und gegen die protokollierten Summen geprüft. Unterschiedliche Präzisionsstufen der Einzelringwerte und Aggregationswerte erklären zulässige Rundungsabweichungen. Der vollständige Protokolltext ist für eine spätere forensische Reproduktion als gesonderte Benutzerdatei „Eingefügter Text(2).txt“ vorhanden; kein Training wurde zur Erstellung dieses Word-Dokuments ausgeführt.
+Terminal-Protokoll SHA256: 3e79d22ef9086c94d36c8f935c5ba5cf344c6b451dd25d88e2a2804cbaea231e
+Voriges Master-Handover DOCX SHA256: 7988b47fd544881120078c766cedec64f81a670bbd05283ab882abb459dbd020
+Bayesian_Bachelor_V2_Dynamische_Qualitaetskopplung_Basismodell_2026-11-11.zipSHA256: 76f3cee5435b47703ca5bb381c3dc54c09f3da2a86cc5830ed881e2e6b3f9192
+Bayesian_Bachelor_V21_SwitchRate_Diagnose_und_CV4_2026-11-11.zipSHA256: f5938f3ae348503efd03e1f89248fe9b6b5c88cf1bb20f6e82a8c9179a7972ac
+Bayesian_Bachelor_DM_V21_Vorverarbeitungs_Audit_2026-11-11.zipSHA256: ab94522242cc51f99a7a6c8e593a847212ad39aedc7906fb6458d285d27a2477
+Bayesian_Bachelor_P0_P1_P2_Vorverarbeitung_CV4_2026-11-11.zipSHA256: ef02fdf4e66ba4134f8cdd85c3e6c706609e1c0d4592a29571a57ea91d0b8a68
+Bayesian_Bachelor_V2_Manual_State_Grid_und_Optuna_Plan_2026-11-11.zipSHA256: 225598462229a4d9f3fd2d7778f8e3e33594da4f982dbc95236fe08bb0fe4d3c
+Endstatus: Übergabe erstellt und auf inhaltliche Konsistenz mit den vorhandenen Quellen geprüft. Die nächste programmatische Aktion ist die noch ausstehende Optuna-Forschung. Alle alten DM-Outer-Testdaten bleiben für diese Forschung gesperrt.

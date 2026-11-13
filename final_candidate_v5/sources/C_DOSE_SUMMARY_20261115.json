@@ -1,0 +1,531 @@
+{
+  "protocol": "DM-V3-U-WEIGHT-DOSE-2026-11-12-v1",
+  "source_protocol_sha256": "0048a2767989ddf1d6beadd2ff345e036ed88874297063fc8acfdc5194e05fcc",
+  "results": {
+    "13": {
+      "dose_curve": [
+        {
+          "C": 0.0,
+          "rmse_mm": [
+            0.475933489244323,
+            3.537837079975261
+          ],
+          "mae_mm": [
+            0.426082598903714,
+            2.9806950523180724
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            0.0,
+            0.0
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            0,
+            0
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            false
+          ],
+          "anchor": true
+        },
+        {
+          "C": 0.05,
+          "rmse_mm": [
+            0.47316096988037243,
+            3.6998108019519016
+          ],
+          "mae_mm": [
+            0.4252326275931725,
+            3.08968979584726
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.0026313827661413533,
+            1.1723087657920928
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            6,
+            3
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.1,
+          "rmse_mm": [
+            0.466170240492877,
+            3.4923910950368273
+          ],
+          "mae_mm": [
+            0.40843256337651856,
+            2.974184397547247
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.009197993063089369,
+            -0.3194956437553491
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            4
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            false
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.2,
+          "rmse_mm": [
+            0.47140633658044784,
+            3.5984988000960367
+          ],
+          "mae_mm": [
+            0.42572824841032586,
+            3.0317117336615045
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.004288752016077656,
+            0.43290240984473627
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            3
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.25053356993048204,
+          "rmse_mm": [
+            0.4689132436008212,
+            3.55371998520659
+          ],
+          "mae_mm": [
+            0.42278831548099427,
+            2.9837489602058693
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.006633056160033006,
+            0.11263452880884878
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            4
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            false
+          ],
+          "anchor": true
+        },
+        {
+          "C": 0.35,
+          "rmse_mm": [
+            0.46773109408912217,
+            3.545084513809335
+          ],
+          "mae_mm": [
+            0.4219408636963411,
+            2.982647272441437
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.007740309806468875,
+            0.05133300560288989
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            5
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            false
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.5,
+          "rmse_mm": [
+            0.46817658528750605,
+            3.54699006320381
+          ],
+          "mae_mm": [
+            0.42391721049354353,
+            2.985832174826352
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.007323371172806716,
+            0.06484730401868566
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            5
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            false
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.75,
+          "rmse_mm": [
+            0.46240741760459547,
+            3.563211285103875
+          ],
+          "mae_mm": [
+            0.4142543667843167,
+            2.99801254412157
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.012692066328525355,
+            0.18018345784372702
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            5
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            false
+          ],
+          "anchor": false
+        },
+        {
+          "C": 1.0,
+          "rmse_mm": [
+            0.46116061974986533,
+            3.5385280541799267
+          ],
+          "mae_mm": [
+            0.4141662548943152,
+            2.985453849204283
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.013843568976196182,
+            0.0048895857704960854
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            5
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            false
+          ],
+          "anchor": false
+        },
+        {
+          "C": 2.0,
+          "rmse_mm": [
+            0.4608061714085747,
+            3.465710543210018
+          ],
+          "mae_mm": [
+            0.41483403653744444,
+            2.9753880554602503
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.014170358576047384,
+            -0.5051416351308045
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            5
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            false
+          ],
+          "anchor": false
+        }
+      ],
+      "minimum_descriptive_rmse_C_by_target": [
+        2.0,
+        2.0
+      ],
+      "warning": "Selected C is post-hoc on reused 8-ring development labels. Minima are exploratory, NOT proven optimal.",
+      "trial_configuration": {
+        "K": 3,
+        "preprocessing": "P0",
+        "variant": "M2",
+        "C": 0.25053356993048204,
+        "physical_var": 0.473291536158372
+      },
+      "strict_supervised_rmse_mm": [
+        1.246122423841305,
+        4.715151409822082
+      ],
+      "selected_C": 0.25053356993048204,
+      "pairing": "20261115"
+    },
+    "22": {
+      "dose_curve": [
+        {
+          "C": 0.0,
+          "rmse_mm": [
+            0.48498863071705506,
+            3.4490824935800295
+          ],
+          "mae_mm": [
+            0.44957533672430416,
+            2.955597754108642
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            0.0,
+            0.0
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            0,
+            0
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            false
+          ],
+          "anchor": true
+        },
+        {
+          "C": 0.05,
+          "rmse_mm": [
+            0.4658144070140504,
+            3.162809201318498
+          ],
+          "mae_mm": [
+            0.41241549374465497,
+            2.755165722612931
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.0182309101429525,
+            -1.8928080035752786
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.1,
+          "rmse_mm": [
+            0.46442978053093764,
+            3.1718503715180857
+          ],
+          "mae_mm": [
+            0.40948041400814383,
+            2.74036233704867
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.01951895088078901,
+            -1.8355352682208148
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.2,
+          "rmse_mm": [
+            0.4656902433184615,
+            3.2158271649185663
+          ],
+          "mae_mm": [
+            0.4132099820208311,
+            2.762725024411629
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.01834656920279605,
+            -1.5546256928920503
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.35,
+          "rmse_mm": [
+            0.467621621495649,
+            3.2298224986357917
+          ],
+          "mae_mm": [
+            0.4166162673396056,
+            2.7679465008803943
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.016543991034583906,
+            -1.4644166748262852
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.36845006495018195,
+          "rmse_mm": [
+            0.46780524512190524,
+            3.230973202118026
+          ],
+          "mae_mm": [
+            0.4169110996694596,
+            2.7684397707962565
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.016372224561238095,
+            -1.4569822147154243
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            true
+          ],
+          "anchor": true
+        },
+        {
+          "C": 0.5,
+          "rmse_mm": [
+            0.4688294316779146,
+            3.235601922470297
+          ],
+          "mae_mm": [
+            0.4188923885461985,
+            2.7699528222030105
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.015412935917367537,
+            -1.4270502468267523
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 0.75,
+          "rmse_mm": [
+            0.4700265277457073,
+            3.2699951156102203
+          ],
+          "mae_mm": [
+            0.42165840003617916,
+            2.788788763266366
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.014289035140117793,
+            -1.2033019914055354
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 1.0,
+          "rmse_mm": [
+            0.46975281548643927,
+            3.277567811812494
+          ],
+          "mae_mm": [
+            0.4220760117480449,
+            2.7944150695260763
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.014546264267367316,
+            -1.1537192864908936
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            4,
+            6
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            false,
+            true
+          ],
+          "anchor": false
+        },
+        {
+          "C": 2.0,
+          "rmse_mm": [
+            0.46185911199882024,
+            3.2895549344490242
+          ],
+          "mae_mm": [
+            0.41407084625688684,
+            2.8411424271184886
+          ],
+          "delta_mse_vs_shared_C0_mm2": [
+            -0.02190013258846516,
+            -1.0749983807623134
+          ],
+          "better_rings_abs_vs_shared_C0": [
+            5,
+            5
+          ],
+          "loo_sign_stable_vs_shared_C0": [
+            true,
+            false
+          ],
+          "anchor": false
+        }
+      ],
+      "minimum_descriptive_rmse_C_by_target": [
+        2.0,
+        0.05
+      ],
+      "warning": "Selected C is post-hoc on reused 8-ring development labels. Minima are exploratory, NOT proven optimal.",
+      "trial_configuration": {
+        "K": 2,
+        "preprocessing": "P0",
+        "variant": "M2",
+        "C": 0.36845006495018195,
+        "physical_var": 0.38526108747593474
+      },
+      "strict_supervised_rmse_mm": [
+        1.1638547292532022,
+        4.4560583035007975
+      ],
+      "selected_C": 0.36845006495018195,
+      "pairing": "20261115"
+    }
+  },
+  "warning": "Repeated previously selected development rings; no independent test."
+}

@@ -1,0 +1,281 @@
+BAYESIAN BACHELOR – V5
+Vollständige C-Dosis-Nachprüfung, Hauptmodellentscheidung und reproduzierbarer Pilotcode
+Forschungsstatus 12. November 2026  |  Fortsetzung zum Master-Handover V3/V4  |  Entwicklungsdaten: 8 L + 4 U
+WICHTIG: VORLÄUFIGER MODEL-FREEZE, KEINE UNABHÄNGIGE LEISTUNGSBESTÄTIGUNG
+1. Herkunft, Vollständigkeit und Wiederholbarkeit
+Drei unveränderte, durch den Nutzer hochgeladene C_DOSE_SUMMARY.json wurden unmittelbar ausgelesen: canonical, 20261114 und 20261115. Jede Datei enthält die beiden registrierten Modellkandidaten Trial 13 und Trial 22, zehn C-Dosisstufen je Modell, jeweils Außen- und Höhenschlag-RMSE sowie MAE, gepaarte MSE-Unterschiede gegenüber Shared C=0, die Anzahl verbesserter Ringe und Leave-one-ring-out-Vorzeichenindikatoren.
+Die drei Dateien haben das gemeinsame Protokoll DM-V3-U-WEIGHT-DOSE-2026-11-12-v1, jedoch unterschiedliche Pairing-/Quellprotokoll-Prüfsummen. Das ist als drei getrennte Versuchsausführungen zu behandeln. Zusammengefasst sind dies 60 Modell-C-Pairing-Ergebnisse (2 Modelle × 10 Stufen × 3 Aufteilungen).
+Aufteilung
+Protokoll-SHA256 (Anfang)
+Datei-SHA256 (Anfang)
+canonical
+8585fdc4734b12ce
+588836f22f5962c8
+20261114
+fd48508d33acfc61
+c189e38670683ffe
+20261115
+0048a2767989ddf1
+dc84d18a9ccead91
+
+Sämtliche drei Aufteilungen verwenden dieselben acht gelabelten Entwicklungsringe und vier nur mit Prozesswerten genutzten U-Ringe. Dadurch entstehen keine 24 unabhängigen Versuchsringe, keine unabhängige Testgüte und keine statistische Signifikanz aus drei Split-Wiederholungen. Die vier früher geöffneten äußeren Testringe DM07, DM08, DM11 und DM15 bleiben für alle neuen Entscheidungen ausgeschlossen.
+2. Fixierte Modelle und Messgrößen
+Merkmal
+Trial 13
+Trial 22
+K (HMM-Zustände)
+3
+2
+Loggerkanäle und Fenster
+V1_Kern_6, F2
+V1_Kern_6, F2
+Prozessskalierung
+P0
+P0
+Qualitätskopplung
+M2
+M2
+Priorvarianz der physikalischen Koeffizienten
+0,473292
+0,385261
+Optuna-Anker-C
+0,250534
+0,368450
+Weitere Trainingseinstellungen
+10 Epochen, 8 lokale VI-Schritte
+10 Epochen, 8 lokale VI-Schritte
+
+C multipliziert den Prozess-ELBO-Beitrag ungelabelter Ringe und ist keine Prozentangabe oder Anzahl verwendeter U-Ringe. Im Modell Shared C=0 werden U-Sequenzen weiterhin für Prozessskalierung und K-Means-Initialisierung berücksichtigt; die reine U-ELBO-Last ist 0. Strict Supervised enthält keinerlei U-Daten im Training.
+3. Ergebnisse der drei C-Dosis-Kurven
+Die folgende Tabelle gibt für vorab ausgewählte Vergleichspunkte den arithmetischen Mittelwert der drei aufteilungsbezogenen RMSE wieder. Diese Mittelung ist rein deskriptiv; dieselben acht Ringe werden in jeder Aufteilung erneut prognostiziert.
+Modell
+C
+Außen RMSE [mm]
+Höhe RMSE [mm]
+Außen besser vs C0
+Höhe besser vs C0
+K3
+0,0000
+0,5254
+3,3712
+0/3
+0/3
+K3
+0,1000
+0,5176
+3,3197
+3/3
+3/3
+K3
+0,2000
+0,5192
+3,3487
+3/3
+2/3
+K3
+2,0000
+0,5117
+3,2463
+3/3
+3/3
+K2
+0,0000
+0,5351
+3,3195
+0/3
+0/3
+K2
+0,0500
+0,5219
+3,1969
+3/3
+2/3
+K2
+0,1000
+0,5194
+3,1474
+3/3
+2/3
+K2
+0,2000
+0,5219
+3,1509
+3/3
+3/3
+K2
+0,3500
+0,5250
+3,1502
+3/3
+3/3
+K2
+2,0000
+0,5148
+3,2439
+3/3
+2/3
+
+3.1 Verlauf bei K=3
+
+Abbildung: Außenunrundheits-RMSE, K=3; alle drei Aufteilungen und deren Mittelwert.
+
+Abbildung: Höhenschlag-RMSE, K=3; alle drei Aufteilungen und deren Mittelwert.
+3.2 Verlauf bei K=2
+
+Abbildung: Außenunrundheits-RMSE, K=2; alle drei Aufteilungen und deren Mittelwert.
+
+Abbildung: Höhenschlag-RMSE, K=2; alle drei Aufteilungen und deren Mittelwert.
+4. Ringweise Stabilitätsindikatoren – Aussagegrenzen
+Die Quelldateien liefern die ANZAHL der Ringe mit geringerem Absolutfehler gegenüber Shared C=0 je Dosis, aber nicht die Ring-IDs oder sämtliche individuellen Vorhersagen. Deshalb kann aus diesen drei JSON-Dateien keine neue Tabelle mit den acht vollständigen ringweisen Fehlerkurven pro C rekonstruiert werden. Für eine solche Aufarbeitung wären die einzelnen C-DOSE-TRIAL-Berichte mit per_ring-Feldern nötig.
+K=2, C=0,100
+Pairing
+Außen RMSE
+Höhe RMSE
+Außen bessere Ringe
+Höhe bessere Ringe
+LOO-Richtung A/H
+canonical
+0,5306
+2,9112
+5/8
+5/8
+ja/nein
+20261114
+0,5632
+3,3591
+4/8
+6/8
+nein/nein
+20261115
+0,4644
+3,1719
+4/8
+6/8
+ja/ja
+
+K=2, C=0,200
+Pairing
+Außen RMSE
+Höhe RMSE
+Außen bessere Ringe
+Höhe bessere Ringe
+LOO-Richtung A/H
+canonical
+0,5364
+2,9228
+3/8
+5/8
+nein/nein
+20261114
+0,5636
+3,3139
+4/8
+6/8
+nein/nein
+20261115
+0,4657
+3,2158
+4/8
+6/8
+ja/ja
+
+K=3, C=2,000
+Pairing
+Außen RMSE
+Höhe RMSE
+Außen bessere Ringe
+Höhe bessere Ringe
+LOO-Richtung A/H
+canonical
+0,5262
+2,9483
+6/8
+6/8
+ja/nein
+20261114
+0,5482
+3,3249
+5/8
+4/8
+nein/ja
+20261115
+0,4608
+3,4657
+5/8
+5/8
+ja/nein
+
+Die Leave-one-ring-out-Vorzeichenprüfung untersucht nur, ob der Vorteil gegenüber Shared C=0 beim Weglassen jeweils eines Rings dasselbe Vorzeichen behält; sie schätzt keine unabhängige Generalisierung und ersetzt keine Konfidenzintervalle auf neuen Ringen.
+5. Pareto-Front und Zielkonflikt
+
+Abbildung: Nicht-dominierte Kandidaten anhand des mittleren RMSE über drei erneut verwendete Entwicklungssplits; schwächerer RMSE ist besser.
+Über die beiden Modellstrukturen und alle zehn registrierten C-Stufen ergeben sich auf Basis des mittleren RMSE folgende deskriptive Pareto-Punkte: K3 / C=2,000 (Außen 0,5117; Höhe 3,2463); K2 / C=0,100 (Außen 0,5194; Höhe 3,1474); K2 / C=2,000 (Außen 0,5148; Höhe 3,2439).
+K2/C0,2 ist nicht auf dieser reinen Mittelwert-Pareto-Front: K2/C0,1 schneidet im Mittel bei beiden Zielgrößen minimal besser ab. Die Wahl von C=0,2 kann daher nur als bewusst robustheitsorientierte, deskriptive Kompromissentscheidung gelten: Gegenüber C=0 sind die beiden Ziel-RMSE in allen drei Aufteilungen niedriger. Beim K2/C0,1 verschlechtert sich der Höhen-RMSE auf Pairing 20261114 leicht.
+6. Verknüpfung mit der verschachtelten Optuna-CV
+Die separat bereits abgeschlossene 4×3-Nested-CV auf denselben acht Entwicklungsringen ergab für den innerlich ausgewählten SSL-Workflow Außen-/Höhen-RMSE von 0,5453/3,2100 mm; für separat optimiertes Strict Supervised 0,6541/3,1756 mm; für Shared C=0 mit SSL-fixierten Parametern 0,5503/3,2633 mm. Diese Metriken dürfen methodisch nicht als unabhängige Bestätigung der nachträglichen C-Dosiswahl interpretiert werden.
+Außenfold
+K SSL
+Gewähltes C SSL
+Gewählte phys. Priorvarianz
+1
+3
+0,05150
+0,20545
+2
+3
+0,09427
+0,24270
+3
+3
+0,11063
+0,20019
+4
+2
+0,05090
+0,46140
+
+Alle vier innerlich ausgewählten C-Werte liegen zwischen rund 0,05 und 0,11 und stehen im Spannungsverhältnis zum deskriptiven K3/C2-Minimum. Das spricht für eine explizite Diskussion von Trainingsumfang, Modellkopplung, Hyperparameterinteraktionen und Entwicklungs-Selection-Bias statt für ein allgemeingültiges optimales U-Gewicht.
+7. Vorläufiger Hauptmodellpfad: Model Freeze V0
+EMPFEHLUNG – PROVISORISCH, NOCH NICHT UNABHÄNGIG BESTÄTIGT: K=2, Prozessvorverarbeitung P0, zeitliche Qualitätskopplung M2, sechs Loggerkanäle V1_Kern_6 im zusammenhängenden F2-Walzfenster, zwei getrennte Bayesian-NIG-Qualitätsköpfe und volle Gaussian-Wishart-HMM-Emissionskovarianz. Gewählter U-Faktor C=0,2, physikalische Priorvarianz 0,3852610875 (ursprüngliche Optuna-Trial-22-Priorwahl). Weiterhin 10 Epochen, acht lokale VI-Schritte und Seed 20261111.
+Rationale: K2 ist sparsamer als K3; die drei geteilten Entwicklungsaufteilungen zeigen bei C0,2 eine RMSE-Verbesserung gegenüber C0 für beide Zielgrößen, während die gemittelten Fehler nur leicht über K2/C0,1 liegen. Der vollständig optimierte Nested-CV-Workflow bevorzugte kleine positive C-Werte, was gegen eine unkritische Fixierung auf den oberen Suchrand C2 spricht. Die Priorvarianz ist dabei nicht isoliert als optimal bestätigt; ihre Festlegung stammt aus der korrelierten Optuna-Trial-22-Studie.
+WICHTIGE ALTERNATIVEN: (i) K2/P0/M2/C0,1 mit besserem mittleren Fehler, (ii) K3/P0/M2/C2 mit bestem mittleren Außen-RMSE, (iii) die ursprüngliche eingefrorene Forschungsbaseline K3/C1 und (iv) strikt überwachtes Training. Diese Varianten bleiben für Kapitel 4 und 5 vollständig erhalten.
+8. Exakte Eingangsgrößen und Skalierungsprotokoll
+Modellkomponente
+Vorläufig festgelegte Spezifikation
+Prozesskanäle
+F_rad63, F_ax64, Ist_D150, Ist_s151, Ist_h152, RWG55
+Fenster
+F2: phase804 ∈ {1,2}, LaserOK=1, MessEin=1; zeitlich zusammenhängend
+Prozess-P0
+Pooled Mean/Standardabweichung je Kanal über alle zulässigen TRAIN-L- und TRAIN-U-Zeitpunkte
+Qualitätstransformation
+Mittelwert und Standardabweichung ausschließlich der gelabelten TRAIN-Ringe
+Physikalische Merkmale Außen
+Indizes 0,1,3,5,6,10 des 12-dimensionalen originalen Deskriptorvektors
+Physikalische Merkmale Höhe
+Indizes 0,2,4,7,11 des originalen Deskriptorvektors
+Merkmals-Skalierung
+StandardScaler pro Qualitätskopf, Fit nur auf TRAIN-L + TRAIN-U
+Dynamik
+M2: Markovzustandsbelegung + Differenz Spät-/Frühbelegung, analytische erste/zweite Momente
+HMM
+2 Zustände, Bayesian Full Gaussian-Wishart, keine pseudo-labels
+Priors / Lernen
+physische NIG-Priorvarianz = 0,3852610875; sonst ursprüngliche mathematische V3-Module unverändert
+Vorhersagezeitpunkt
+nach vollständigem F2-Prozessverlauf; keine bereits validierte Online-Prozessregelung
+
+Vor endgültiger wissenschaftlicher Freigabe ist die Kanalbedeutung von RWG55 aus der ursprünglichen Logger-Dokumentation zu überprüfen. Der historische Deskriptorname avg_radial_speed/std_radial_speed wurde im Forschungscode für Statistikwerte des sechsten Kanals verwendet; allein der Name beweist nicht, dass RWG55 tatsächlich eine Radialgeschwindigkeit ist. Bei unklarer Semantik die Größen als Mittelwert/Standardabweichung RWG55 beschreiben, ohne ihre numerische Berechnung zu ändern.
+9. Trennung von Forschung, Hauptmodell und Testgüte
+Alle bisherigen Modellvarianten und Berichte werden archiviert. Der neue, separate Modellwrapper nutzt die originalen mathematischen V3-Kerne bytegleich; eine versionierte PROPOSED_MODEL_FREEZE.json dokumentiert Parameter, erlaubte Ring-IDs und SHA-Prüfsummen. Ein kompletter TRAIN-Fit mit allen acht L und vier U-Ringen wurde technisch getestet; weder dieser Fit noch die technische Entwicklungsring-Replay-Prognose sind neue Leistungsnachweise. Der alte äußere Testringsatz DM07/08/11/15 darf nicht für erneute Modellwahl genutzt werden.
+Zur tatsächlichen Generalisierungsbestätigung sind neue, unabhängig erhobene DM-Ringe erforderlich. Erst danach kann eine zurückhaltende Aussage über den Einsatz als Soft-Sensor in der Prozessoptimierung folgen; ein Prognosemodell allein weist noch keine reale Verbesserung des Walzprozesses nach.
+10. Verwendung in der Bachelorarbeit
+Kapitel 4: Daten- und Foldabgrenzung, Definition des U-Gewichts als ELBO-Faktor, C-Dosis-Raster und drei Aufteilungen, Tabelle aller 20 K/C-Varianten, vier vollständige Kurvengrafiken, Pareto-Auswertung, Nested-CV mit acht ringweisen Prognosen, Baselines und Sicherheits-/Mathematiktests. Ergebnisse der geteilten acht Entwicklungsringe stets als explorativ kennzeichnen.
+Kapitel 5: Unterschiedlicher Nutzen von U für Außenunrundheit und Höhenschlag, kleine zusätzliche Wirkung der U-ELBO gegenüber geteilter Vorverarbeitung, Abhängigkeit von C und Prior, Trade-off zwischen deskriptivem Minimum und Robustheit, Einfluss einzelner Ringe, Selektionsverzerrung durch wiederverwendete Daten, Grenzen der Unsicherheitskalibrierung und die Differenz zwischen Qualitätsprognose und nachgewiesener Prozessoptimierung.
+11. Quellen- und Prüfstatus
+Vollständig maschinell geprüft: die drei aktuellen JSON-Dateien (je 532 File-Zeilen in der bereitgestellten Darstellung), die vorher bereitgestellten Nested-CV-CSV-/JSON-Dateien (als separate V4-Auswertung), die ursprünglichen Python-Quellmodule aus dem vorhandenen lokalen Forschungsarchiv, der unveränderte Daten-SHA und die registrierten Ringgruppen.
+Methodik-Hintergrund aus der vorherigen, bereits erstellten Forschungsnotiz: Varma & Simon (2006), Bias in error estimation when using cross-validation for model selection, BMC Bioinformatics 7:91; Cawley & Talbot (2010), On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation, JMLR 11, 2079–2107. Keine erneute originale Seitenprüfung dieser Paper in diesem Arbeitsschritt.
+Modellliteratur Shao et al. (2022), Mowbray et al. (2022) und Projekt-Herleitungen A–D sind im historischen Quellenbestand dokumentiert; hier keine neuen textlichen Originalquellenextraktionen und keine erfundenen Seitenzahlen. Eigene Entscheidungen (K2, M2, C0,2, Priorvarianz, 4×3-Nested-CV) sind nicht als Literaturvorgabe auszugeben.
+Für eine vollständige C-Dosis-Einzelringdiagnostik fehlen in den drei SUMMARY-Dateien die individuellen Ringprognosen aller C-Stufen. Detaillierte Einzelringanalysen sind bislang für die separate Nested-CV dokumentiert; C-Dosis-Per-Ring-Aussagen bleiben auf die berichteten Zählungen und LOO-Indikatoren begrenzt.
+12. Reproduzierbarer neuer Code – Freigabestatus
+Der separate Ordner enthält die vorläufige Konfiguration, ein Trainings-/Vorhersageprogramm und Original-Kernmodule mit verifizierbaren Hashes. Acht synthetische Vertragstests bestanden; vollständiger Fit auf Entwicklung L8+U4 und numerisch erfolgreiche Prozessvorhersage aus einem technischen Replay wurden geprüft. Bei absichtlich fremden/unplausiblen Sensoreingaben konnte der historische Forward-Backward-Kern numerisch nicht normieren. Der Wrapper bricht deshalb kontrolliert ab, statt in solchen Fällen eine Qualitätsprognose zu behaupten. Die Grenzen und die fehlende externe Bestätigung müssen vor einer offiziellen Codefreigabe behoben oder dokumentiert sein.

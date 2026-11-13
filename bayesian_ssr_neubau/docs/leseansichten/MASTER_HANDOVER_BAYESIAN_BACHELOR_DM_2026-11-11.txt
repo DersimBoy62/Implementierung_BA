@@ -1,0 +1,544 @@
+BAYESIAN BACHELOR – MASTER-HANDOVER
+DM-Daten · Originalherleitungen A–D → Neufassung · gesamte Modellforschung · eingefrorener äußerer Test · nächste Forschungsphase
+Verbindlicher Dokumentationsstand: 11. November 2026, nach Abschluss der einmaligen äußeren Bewertung
+Leseschlüssel und Verbindlichkeit
+Dieses Dokument übergibt den tatsächlich dokumentierten Projektstand nach sämtlichen in der vorliegenden langen Chatfolge ausgeführten bzw. durch Nutzer-Terminalausgaben reproduzierten DM-Experimenten bis zum 11.11.2026. Es soll ohne Verlust wichtiger Kontexte in einen neuen Chat übernommen werden. Es ersetzt nicht die Originaldaten, die Originalquellen oder den eingefrorenen Prüfbericht. Als höchstrangige technische Belege gelten die konkreten Python-Dateien, JSON-Ergebnisberichte, die gespeicherten SHA256-Hashes und die Original-Word-Dokumente A–D.
+Evidenzkennzeichen: [QUELLE] Originaldokument oder Literaturbefund; [CODE] direkt aus bereitgestelltem Implementierungsarchiv rekonstruiert; [TEST] mathematisch/synthetisch geprüft; [DM-CV] vierfache innere DM-Validierung, auf denselben acht Ringen mehrfach für explorative Entwicklung genutzt; [OUTER] einmalig vorab festgelegter äußerer Test; [OFFEN] nicht als erledigt ausgeben; [HYPOTHESE] zulässige künftige Forschungsrichtung.
+Arbeitsdateien des Nutzers: Windows/VS Code, Projektordner C:\Users\umutj\OneDrive\Dokumente\PA und BA\Implementierung_BA; Python-Venv \.venv\Scripts\python.exe, Python 3.11.9 laut Nutzer. Der py-Launcher ist auf dem Rechner nicht verfügbar; immer den expliziten Venv-Aufruf verwenden. Bibliotheks-/Archivkopien wurden hier untersucht; auf die aktuelle Dateiänderungshistorie des Nutzer-PCs besteht kein direkter Zugriff. Der Nutzer hat die zentralen Tests und Auswertungen anhand ihrer Terminalausgaben bestätigt.
+1. Forschungsauftrag und Weg von der Projektarbeit zur Bachelorarbeit
+Ziel ist direkte fully Bayesian formulierte Semi-Supervised Regression (SSR) für zwei ringweite Endqualitätskennzahlen im radial-axialen Ringwalzprozess. Prozessbeobachtungen sind vollständige Logger-Zeitreihen; pro Ring existiert genau ein Qualitätsvektor, nicht ein Label pro Zeitpunkt. Die Hauptidee: HMM-Zustandsfolgen plus zusätzliche echte Prozessmerkmale führen zu endqualitätsbezogenen Bayesian-Regressionen. Die ungelabelten Ringe nutzen die Prozesslikelihood ohne Pseudo-Label-Erzeugung.
+„Fully Bayesian“ bezieht sich im implementierten Modell auf die Verteilung der globalen HMM- und Regressionsparameter mit konjugierten Priors. Die praktische Inferenz ist strukturierte Variational Inference und daher nicht der exakte gemeinsame Posterior. Der Benutzer fordert fachlich fundierte, verständliche mathematische Herleitungen, keine bloße Ergebnisseite, und später die konsistente Überarbeitung der Bachelorarbeitsformulierungen. Termini: „Datenaufteilung“ statt „Datenpartitionierung“, prägnant, Zitierstil (vgl. Autor, Jahr, S. …) bei verifizierten Originalseiten.
+Die ältere SFA-Implementierung und ihre Proxy-Ziele waren eine frühere technische Entwicklungsphase. Sie dürfen niemals als empirischer Nachweis für den neuen DM-Datensatz ausgegeben werden. Die aktuelle empirische Arbeit bezieht sich ausschließlich auf DM. Die alte Bachelorarbeit und Projektarbeit enthalten noch teilweise SFA-Bezüge und alte Gleichungen – diese müssen beim späteren Manuskriptabgleich ausdrücklich angepasst werden.
+2. Datenbestand und Qualitätsdefinitionen
+2.1 Aktive und ausgeschlossene Ringe
+[CODE/DM] 17 vorhandene DM-Versuchsdateien; DM03 als regulärer Versuch nicht vorhanden; DM13 wurde abgebrochen und hat nur 6,7 Sekunden (68 Rohzeilen) → von der aktiven Modellierung ausgeschlossen. 16 aktive DM-Ringe mit 10.385 Zeitpunkten im Rohlogger. Jeder aktive Datensatz führt time plus 114 Loggerkanäle, somit 115 Spalten im Logger-Zeitachsenarray. Der zeitliche Rohabstand beträgt überwiegend 0,1 s. Es existieren zusätzliche Walzprotokoll- und Zielwerte-Informationen, die nicht pauschal als Eingangsmerkmale behandelt werden dürfen.
+Der maßgebliche modellseitige Pickle im Ordner input/DM_16_aktive_Ringe.pkl ist mit dem SHA256-Wert
+bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5
+registriert. Der Vergleich basiert auf den originalen DM-Daten; niemals mit SFA-Ringen oder künstlichen Qualitätslabels vermischen. Pickles nur aus vertrauenswürdigen Quellen laden.
+2.2 Exakt zwei Qualitätsspalten
+Außenunrundheit: ovality.ovality_radial_mm [mm]. Höhenschlag: planarity.height_deviation_mm [mm]. Der Datensatz enthält keine durch den Betreuer bestätigte dritte Qualitätsgröße „Innenunrundheit“. Einige frühere Dokumente A–D enthalten fälschlich J=3; für den neuen DM-Modellstand gilt J=2. Die übrigen Zielwerte des Produktqualitätsblatts sind für spätere Plausibilisierung zulässig, nicht für Modelleingänge (Leakage). Die Namen der Messspalten dürfen nicht stillschweigend als vollständig geklärte Messvorschrift interpretiert werden; die zugehörige Messdefinition ist vor Manuskriptabgabe aus dem Original zu belegen.
+2.3 Walzprotokolle und Konflikte
+Die Protokolle wurden mit den Logger-Sollwerten und Zielwerten abgeglichen. Bestätigte Auffälligkeiten: DM07 Korrektur des Soll-Außendurchmessers auf 692 mm in der originalen Papierquelle (abweichend von 652 mm in einer Transkription); DM17 Soll-Wandstärke 55 mm im Protokoll widerspricht der Soll-Geometrie von 46 mm aus Durchmesserdifferenz. Mehrere Sollgeometriegrößen sind im Logger bereits enthalten und würden keine neue unabhängige Information liefern. Das eingefrorene Abschlussmodell verwendet ausschließlich Loggerdaten und keine solchen Protokollspalten.
+3. Prozessfenster, Signale und Informationssperren
+3.1 Historisch untersuchte Prozessfenster
+Fenster
+Definition
+Gesamtzahl der Punkte aller 16 aktiven Ringe
+F0
+Gesamter gültiger Rohlogger
+10.385
+F1
+phase804 ∈ {1,2}
+9.847
+F2
+F1 + LaserOK=1 + MessEin=1
+9.292
+F2 wurde für die finalen Modelle gewählt; gültige Indizes müssen innerhalb jedes Rings zusammenhängend sein. F2 enthält im Trainingssatz der damaligen zwölf Entwicklungsringe 7.440 Zeitpunkte (explizit in der Emissionsdiagnose). Diese Zeitpunkte sind keine 7.440 unabhängigen gelabelten Qualitätsbeobachtungen.
+3.2 Tatsächlich ausgewählte sechs Kanäle
+F_rad63 (Radialkraft), F_ax64 (Axialkraft), Ist_D150 (Ist-Außendurchmesser), Ist_s151 (Ist-Wandstärke), Ist_h152 (Ist-Höhe), RWG55 (radiale Geschwindigkeit). Sie bilden V1_Kern_6. Andere Kandidaten: V2_Dynamik_10, V3_Zentrierung_12, V4_Umformung_10. Bei der Kanalprüfung wurden 13 globale Konstanten, redundante und teilweise exakt affine Signalpaare identifiziert; die Entscheidung für V1 ist ein methodischer Kompromiss aus Physik, Redundanz und kleiner Ringanzahl. Sie ist nicht durch neue äußere Tests beliebig neu selektierbar.
+3.3 Foldlokale Vorverarbeitung
+X-Scaler: Kanalweise Mittelwert und Standardabweichung über Loggerzeitpunkte nur der aktuellen Trainingsringe; daher werden lange Trainingsringe zeitpunktgewichtet. Kein Fit auf INNER-VAL oder OUTER-TEST.
+Y-Scaler: Mittelwert und SD pro Qualitätsgröße über nur die gelabelten Trainingsringe; ringweise, nicht zeitpunktweise.
+Descriptoren: Aus dem bereits X-skalierten vollständigen F2-Verlauf werden zwölf vordefinierte Prozesskennwerte gebildet. Aus diesen wählt jeder Zielkopf eine feste Teilmenge, für die ein zweiter StandardScaler ausschließlich auf Trainingsringen angepasst wird.
+U-Labels: In Entwicklungs-Pickles physisch vorhanden, im Training kontrolliert verborgen. Bei der finalen Vorhersageroutine werden Labels der U- und OUTER-Ringe nicht indiziert; die Pickle-Deserialisierung lädt technisch den gesamten Container, weshalb die Sicherung über expliziten X-only-Zugriff und Code-Hash erfolgt.
+4. Feste Datenaufteilung und innere Kreuzvalidierung
+L (acht gelabelte Entwicklungsringe): DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18. U (vier künstlich ungelabelte Trainingsringe): DM01, DM02, DM10, DM14. Äußere Testgruppe: DM07, DM08, DM11, DM15. Seed 20261111.
+Innerer Fold
+INNER-VAL
+TRAIN-L
+TRAIN-U
+1
+DM04, DM05
+DM06, DM09, DM12, DM16, DM17, DM18
+DM01, DM02, DM10, DM14
+2
+DM06, DM09
+DM04, DM05, DM12, DM16, DM17, DM18
+DM01, DM02, DM10, DM14
+3
+DM12, DM16
+DM04, DM05, DM06, DM09, DM17, DM18
+DM01, DM02, DM10, DM14
+4
+DM17, DM18
+DM04, DM05, DM06, DM09, DM12, DM16
+DM01, DM02, DM10, DM14
+Jeder der acht L-Ringe war einmal innere Validierungsbeobachtung; der Entwicklungsprozess untersuchte viele Modelle wiederholt an denselben acht Ringwerten. Diese wiederholte Nutzung führt zu indirekter Modellwahl-/Selektionsverzerrung. Der spätere äußere Test hat diese Problematik für die vorab eingefrorene Hauptarchitektur begrenzt, aber eine neue Forschungsrunde darf denselben äußeren Satz nicht erneut als unberührten Test bezeichnen.
+5. Alte Herleitungen und neu geschaffene A–D
+Dokument
+Original (Oktober)
+Neue dokumentierte Struktur
+A
+Ringfolge, HMM, diagonal-NIG, drei Ziele, hZ-Qualität
+Zwei Ziele, volle Normal-Wishart-Emission, zwei hZ;sjX-Qualitätsköpfe, Normierung und Leakage.
+B
+Strukturierte VI, γ,ξ,m,H, B1 über h
+Freie time-varying-Markov-Logits, beide augmentierten m/H-Blöcke, exakte Qualitätskomprimierung, gemeinsame lokale Rückkopplung.
+C
+ELBO, diagonal-NIG-Prozessupdates, gleicher Regressionskopf
+d×d-Normal-Wishart-Updates, je Ziel ein NIG-Faktor eigener Dimension, gewichtete U-Entropie, L-BFGS-B-Update, eingefrorenes Training.
+D
+P1/P2/P3-Ideen, drei Qualitätswerte, Student-t-Mischung
+Zwei Qualitätswerte, Prozess-Only-Zustandsinferenz, implementierte prädiktive Mittelwerte/Varianzen, keine vollständigen Mischungsquantile, gesicherter äußere Test.
+Die neuen Word-Herleitungen liegen im zugehörigen Übergabepaket und sind die mathematisch konsistente Dokumentationsfassung des abgeschlossenen Modells. Ihre Formulierungen sind vor endgültiger Manuskriptübernahme weiterhin mit dem aktuellen Bachelorarbeit-DOCX und den jeweiligen Originalpapierseiten abzugleichen. Die Originaldateien A–D bleiben unverändert archiviert. Die Entscheidung für einen Modellstand ist kein Verbot weiterer Forschung.
+6. Das vollständig formulierte Abschlussmodell
+Für Ring i sei Xi∈RTi×6, Zi=zi1:Ti, zit∈{1,2,3}. Global gelten π, A und die Zustands-Emissionsparameter μk,Λk mit vollen Präzisionsmatrizen. Die globalen Regressionen besitzen zwei unterschiedliche NIG-Parameterpaare βj,σj2, j=1,2.
+pZi∣π,A=πzi1t=2TiAzi,t−1,zit, xit∣zit=k∼N6μk,Λk−1.
+Λk∼WishartW0k,ν0k, μk∣Λk∼Nμ0k,κ0kΛk−1.
+hiZi=Ti−1t​onehotzit, uij=hisijXi.
+yij∣Zi,Xi,βj,σj2∼Nβj⊤uij,σj2, βj∣σj2∼N0,σj2V0j, σj2∼IG2,5,1,5.
+Kopf Außenunrundheit, sechs Merkmale: log_duration, avg_radial_force, std_radial_force, delta_outer_diameter, delta_wall_thickness, max_radial_force. Kopf Höhenschlag, fünf Merkmale: log_duration, avg_axial_force, std_axial_force, delta_height, max_axial_force. Beide Köpfe zusätzlich mit denselben drei Aufenthaltsanteilen (Dimensionswerte 9 und 8). Kein separater Intercept; k​hk=1.
+Priors der HMM-Starts: π∼Dir1; Übergangszeilen mit 0,5-Basis und +4 auf der Diagonale. Normal-Wishart-Standardparameter: μ0k=0, κ0k=0,2, ν0k=d+3=9, W0k=I/d+3. NIG-Qualitäts-V0: Zustandsanteile 2 auf der Diagonale, beobachtete Kopfdeskriptoren 0,25.
+Gemeinsame gelabelte und ungelabelte Likelihood: gelabelte i tragen sowohl Prozess- als auch beide Qualitätsfaktoren, ungelabelte nur Prozessfaktoren. Unbekannte yi wurden analytisch integriert, nicht mit Pseudo-Labels ersetzt. Gewicht C=1 im Abschlussmodell.
+7. Posteriorinferenz: Was exakt und was approximiert ist
+Das globale qΘ ist faktorisiert über Dirichlet-, Normal-Wishart- und NIG-Gruppen. Die lokalen qiZi sind vollständige zeitabhängige Markov-Ketten, kein Produkt unabhängiger Zeitzustände. FULL_JOINT optimiert für L-Ringe die initialen Logits und jede zeitabhängige Übergangszeile mit analytischen Gradienten und L-BFGS-B. Für U-Ringe erfolgt Forward-Backward anhand der erwarteten Prozesslogdichten. Ein gelabelter Qualitätswert beeinflusst so die lokalen Zustandswahrscheinlichkeiten (B1-Kopplung).
+Die exakten Momente innerhalb der gewählten lokalen qi sind mi=Eqhi und Hi=Eqhihi⊤. Für jeden Kopf sind augmentierte Momente mij=mi;sij und Hij=Himisij⊤sijmi⊤sijsij⊤ erforderlich. Kein Plug-in Hi≈mimi⊤ in den Qualitätsupdates. Die globale ELBO umfasst HMM, Emission, beide Qualitätsloglikelihoods, lokale Entropie und globalen KL. Ein beobachteter Anstieg der ELBO ist keine Garantie für niedrigeren Qualitäts-RMSE.
+Prädiktion: Ein bisher unbekannter Ring wird aus Prozess-X mit Forward-Backward inferiert. Für jedes Ziel j gilt yj=μj⊤mj und Varyj≈bj/aj−1 1+trVjHj+μj⊤Hj−mjmj⊤μj. Das ist die tatsächlich implementierte momentbasierte Approximation. Globale Prozessparameter werden nicht für jeden prädiktiven Sample neu gezogen; exakte Mischungsquantile werden nicht berechnet.
+8. Forschungsphase I: B1-Modellkern und FULL_JOINT-Inferenz
+Mathematische Prüfungen: ursprüngliche Tests test_math.py (exakte Enumeration kurzer Pfade, zweites Aufenthaltsmoment, globale KL-Werte, Qualitätsfeedback, C=0-Beiträge) 5/5; test_data.py 8/8 (F0 10.385, F1 9.847, F2 9.292, vier Merkmalssets und Leakage-/Train-Split); test_full_markov.py 3/3 (Markov-ELBO/Momente vs Enumeration, analytische Gradienten vs finite Differenzen mit ca. 3,98⋅10−7 Abweichung, lokale Qualitätsfeedback-Verbesserung). Alle beim Nutzer bestanden.
+Technische Läufe auf 12 Entwicklungsringen, 8 gelabelten, 4 U-Ringen, F2/V1, K3:
+Modus
+Epoche 1 ELBO
+Epoche 3 ELBO
+Besonderheit
+OFF
+−49.586,48
+−45.017,54
+Prozessbedingte lokale Inferenz
+TILT_JOINT
+−49.586,48
+−45.017,54
+Einschränkung auf konstanten Zustandstilt, Unterschiede ~10⁻⁴
+FULL_JOINT
+−49.585,83
+−45.017,12
+Frei Markov, kleiner Vorteil; keine belegte Qualitätsverbesserung daraus allein
+10-Epochen-Lauf: FULL_JOINT ELBO von −49.585,83 → −44.108,28, OFF von −49.586,48 → −44.108,31. Zustandmassen Epoche 10 ca. [0,484; 0,504; 0,012]. Zusätzliche lokale Schritte 8 → 16 änderten bei gleicher Initialisierung die ELBO höchstens um 1,4·10⁻⁸. Dies begründet die pragmatische Wahl von acht Schritten, keine mathematische Konvergenzgarantie.
+9. Forschungsphase II: Emissionskovarianz
+Die Diagonalannahme wurde anhand der DM-Daten bewusst hinterfragt. Eine einfache prozessbedingte Zustandsdiagnose auf 12 Trainingsringen / 7.440 F2-Zeitpunkten zeigte in einem stark belegten Zustand Ist_D150 vs. Ist_h152 r = −0,9137. Quelle: diagnose_emissions.py, Trainingsdaten; keine Testgüte. Eine getrennte joint-Diagnose wurde in der vom Nutzer gezeigten Terminalausgabe nicht belegt; dort stand explizit Inferenz: process.
+Volle Gauß-Wishart-Modellalternative: fullcov_b1.py ersetzt die diagonale NIG-Emission durch multivariate Normal-Wishart-Faktoren, bei ansonsten gleichem HMM/B1-Prinzip. Vier mathematische Tests erfolgreich: KL, Monte-Carlo-Dichtevergleich, gewichtet konjugiertes Update, Student-t-Prozessvorhersage. Vier innere, wiederverwendete Folds (K3, C1, 10 Epochen) ergaben:
+Modell
+Außen-RMSE [mm]
+Höhenschlag-RMSE [mm]
+Approx. X-Logscore je Zeit/Ring
+Trainingsmittelwert
+0,9775
+3,5503
+–
+Diagonal-NIG-HMM
+1,0784
+3,2868
+−6,2589
+Voll-Normal-Wishart-HMM
+1,0231
+3,4294
+−5,1734
+Die volle Kovarianz verbessert die Prozessbeschreibung im Mittel, aber nicht beide Endqualitätsfehler; in Fold 3 war ihr Prozess-Logscore schlechter als der des diagonalen Modells. Der Prozess-Logscore ist eine approximierte prädiktive Logdichte, nicht die genaue Integration über einen einzigen global gezogenen HMM-Parametersatz. ELBO-Werte verschiedener generativer Modellfamilien dürfen nicht ohne Evidenz als direkte Qualitätsrangfolge interpretiert werden.
+10. Forschungsphase III: Wishart-Priors und Kondition
+Prior-Präzisionsskalierung, vier innere Folds, alle Daten aus Trainingsringe:
+Prior-Präzisionsfaktor
+Außen-RMSE [mm]
+Höhe-RMSE [mm]
+Approx. X-Score
+Maximale Kondition
+0,25
+1,1756
+3,2204
+−5,5112
+84,7
+1
+1,0231
+3,4294
+−5,1734
+298,1
+4
+1,0275
+3,4402
+−5,1574
+924,7
+Kontrollierter Freiheitsgradtest bei festem Prior-EΛ=I, d=6:
+Wishart-Freiheitsgrad ν0
+Außen-RMSE
+Höhe-RMSE
+Approx. X-Score
+Max. Kondition
+d+2=8
+1,0218
+3,4306
+−5,1821
+329,7
+d+3=9
+1,0231
+3,4294
+−5,1734
+298,1
+d+10=16
+1,1737
+3,2189
+−5,6952
+179,5
+d+30=36
+1,1770
+3,2183
+−5,5325
+84,6
+Alle berichteten Matrizen positiv definit, aber volle Matrizen können schlecht konditioniert sein. Höhere Wishart-Konzentration verringerte die schlimmste Kondition; die Qualitätseffekte waren zielgrößenabhängig. „Konstanter erwarteter Präzisionswert“ bedeutet nicht konstanter erwarteter Kovarianzwert. Keine nachträgliche Priorwahl anhand der äußeren Testergebnisse zulässig.
+11. Forschungsphase IV: Zustandszahl, Residuen und Zeittrends
+K=2 gegen K=3, gleiche inneren Ringe:
+Modell
+Außen RMSE [mm]
+Höhe RMSE [mm]
+Diagonal K2
+1,1556
+3,2249
+Diagonal K3
+1,0784
+3,2868
+Voll K2
+1,2119
+3,1935
+Voll K3
+1,0231
+3,4294
+K3 ist für Außen im untersuchten Setup besser, K2 für Höhenschlag. Zustandsnummern und Massen sind zwischen Folds nicht identifizierbar; in Fold 4 wird der dritte Zustand teilweise stark belegt, obwohl er anderswo kaum genutzt wird.
+Ringzentrierte Zustandsdiagnose, Fold 1, K3, Kanalpaar Ist_D150/Ist_h152:
+Modell, Zustand
+Pooled r
+Nach Ringzentrierung r
+Nach linearer Trendkorrektur r
+Nach quadratischer Trendkorrektur r
+Diagonal, 1
+−0,7014
+−0,8192
+−0,3610
+−0,4851
+Diagonal, 2
+−0,9174
+−0,9172
++0,6681
++0,3923
+Voll, 1
+−0,6727
+−0,6948
+−0,6204
+−0,3458
+Voll, 2
+−0,9477
+−0,9460
++0,6128
++0,3841
+Im vollen Modell erwartete Emissionskorrelation Zustand 2 ca. −0,9401, beobachtete ringzentrierte −0,9460 (Trainingsdaten). Es handelt sich nicht um einen unabhängigen posterior-prädiktiven Validierungsbeleg. Der starke Vorzeichenwechsel nach Zeittrendentfernung zeigt, dass der Fortschritt im Walzprozess als Kovariation zu berücksichtigen ist. Ein naives Detrending der vorhandenen Daten ist nicht bereits eine korrekte probabilistische dynamische Emissionslikelihood.
+12. Forschungsphase V: neue dynamische Emissionsfunktion
+Mit temporal_b1.py wurde eine eigenständige Matrix-Normal-Wishart-Variante mit zeitabhängigem zustandsspezifischem Regressionsmittelwert μkt entwickelt. Linearer Zeitverlauf (Grad 1, volle Kovarianz, K3) reproduzierbar, fünf Tests bestanden; bei Grad 0 exakt identisch mit dem ursprünglichen stationären Normal-Wishart-Modell.
+Innere CV4: linear dynamisch 1,2058 mm Außen / 3,2542 mm Höhenschlag, approximierter Prozess-Logscore −6,3836. Damit leichte Höhenschlagverbesserung, deutliche Außenverschlechterung, schlechterer X-Logscore als stationäre voll besetzte Variante. Keine endgültige Entscheidung zugunsten dynamischer Emission. Die normalisierte Gesamtzeit eines Rings macht dies zu einer End-of-Batch-, nicht unmittelbar Online-Vorhersage.
+13. Forschungsphase VI: radikale Alternativen der Qualitätskopplung
+Der Benutzer verlangte bewusst stärker von den alten Herleitungen abweichende Hypothesen. Es wurden direkte, nicht vollständig gemeinsam SSR-trainierte Bayesian-/GP-Vergleiche aus beobachteten Ringdeskriptoren und Pfad-PCA entwickelt. Der reale Strukturbefund: Die Qualitätskopplung kann für die Endzielmetriken entscheidender sein als eine immer komplexere Prozess-Emissionsstruktur. Bei nur sechs Labels pro Fold ist die Regularisierung der ringweiten Regression besonders wichtig.
+Vergleichsregression
+Außen RMSE [mm]
+Höhe RMSE [mm]
+SSR-Status
+Direkte 12 Ringkennwerte + NIG (PHYS_NIG)
+0,4803
+4,3570
+Nur Bayesian-Regression, kein gemeinsames HMM-SSR
+STAT-PCA + GP
+0,8461
+4,0764
+GP mit fester Kernelstruktur, PCA-Punktschätzer
+PATH-PCA + GP
+0,8062
+4,3378
+Ebenfalls kein vollgemeinsames SSR
+PATH-PCA + NIG
+0,6378
+5,6501
+Nicht identisch zur direkten HMM-Likelihood
+HMM + sechs gemeinsame Ringkennwerte, FULL_JOINT
+0,5498
+3,9918
+Gemeinsames Bayesian-SSR
+Die 12 physikalischen Kennwerte: log(Walzdauer), Mittelwert/SD radialer und axialer Kraft, Änderung Außendurchmesser/Wandstärke/Höhe, mittlere/SD radiale Geschwindigkeit, maximale Radial- und Axialkraft. Sie werden aus skalierten Loggerkanälen berechnet und tragen keine Endqualitätslabelspalten. Der direkte NIG-Vergleich gewann stark bei Außen, war aber beim Höhenschlag schwach. Das motivierte zwei unterschiedliche Kopfstrukturen.
+14. Forschungsphase VII: Zwei unterschiedliche Bayesian-Qualitätsköpfe
+Implementierung: two_head_b1.py mit voller Normal-Wishart-Prozessemission, HMM K=3, zeitabhängiger freier Markov-VI, zwei NIG-Regressionsfaktoren unterschiedlicher Dimension. Qualitätskopf A nutzt Zustandsanteile plus sechs vorab physikalisch gewählte radiale/Umform-Kennwerte. Qualitätskopf B nutzt Zustandsanteile plus fünf axiale/Höhen-Kennwerte. Beide wirken gemeinsam über die exakten augmentierten ersten/zweiten Markov-Momente auf qiZi zurück. Fünf neue mathematische Tests bestanden, darunter exakte Qualitäts-Kompression, Unterschiede beider Kopfdimensionen, Einfluss beider Labels auf q und die Rückführung auf den alten gemeinsamen Hybrid bei identischen Merkmalen.
+Modell, inneres CV4
+Außen-RMSE [mm]
+Höhe-RMSE [mm]
+NRMSE Außen/Höhe
+Gemeinsamer Hybrid, sechs Ringkennwerte
+0,5498
+3,9918
+–
+Zweikopf HEIGHT_STATE_ONLY
+0,5529
+3,4297
+0,6682 / 1,3511
+Zweikopf SEPARATE_AXIAL
+0,5529
+3,2026
+0,6682 / 1,2261
+Die Verbesserung gegenüber einem gemeinsamen Kopf ist besonders beim Höhenschlag zu sehen, aber nicht bei allen acht Ringen. Die Architektur wurde nach vielen explorativen Vergleichen ausgewählt. Kein neues Ergebnis dieser inneren CV ist ein unabhängiger Generalisierungsnachweis.
+15. Forschungsphase VIII: Werden ungelabelte Daten tatsächlich genutzt?
+Untersuchte Modi:
+SUP_L_ONLY: Striktes supervised Training; X-Scaler, Deskriptor-Scaler und K-Means nur auf gelabelten Trainingsringen. Kein U-Likelihood-Term.
+C0_SHARED_PREPROC: U-Ringe dürfen die X-Skalierung/Initialisierung beeinflussen; in der globalen U-ELBO ist C=0.
+SSL_U_C1: U-Ringe bei Skalierung/Initialisierung und zusätzlich volle U-Prozess-/Entropie-Beiträge mit C=1.
+Originalzustands-HMM: RMSE Außen/Höhe für SUP 0,8719 / 3,7098; C0 0,9738 / 3,6330; C1 1,0231 / 3,4294. U-Training verbessert Höhe, verschlechtert Außen.
+Hybrid sechs Kennwerte: SUP 0,7439 / 5,2582; C0 0,5680 / 4,0853; C1 0,5498 / 3,9918. Zusätzliche U-ELBO-Beiträge verbessern beide Fehler leicht; für beide Ziele bei jeweils sechs von acht Ringen. Der große SUP→C0-Gewinn wird überwiegend von DM09 getragen (knapp 98 % der MSE-Änderung laut paarweiser Auswertung).
+Direkte PHYS_NIG_TWELVE: SUP 0,6752 / 3,7535; C0 = C1 0,4803 / 4,3570. Der weitere U-ELBO-Effekt ist exakt null, weil dieses Modell kein gemeinsames U-Prozessposterior trainiert.
+Finaler Zweikopf SEPARATE_AXIAL:
+Trainingsmodus
+Außen-RMSE [mm]
+Höhe-RMSE [mm]
+SUP_L_ONLY
+0,6559
+3,0841
+C0_SHARED_PREPROC
+0,5609
+3,2165
+SSL_U_C1
+0,5529
+3,2026
+Die U-ELBO-Beiträge allein (C0→C1) ergeben ΔMSESSR−C0=−0,008947,−0,089423 mm²; Außen verbessert sich bei 6/8, Höhe bei 4/8 inneren Validierungsringen. Die nachträgliche Einzelring-Auslassung belässt das Vorzeichen bei Außen, nicht bei Höhe stabil. Der Gesamtvergleich SUP→C1 verbessert Außen, verschlechtert Höhe. Dieser differenzierte Befund ist Pflicht in Bachelorarbeit und Handover; SSR hat keinen universell bestätigten Vorteil für jede Zielgröße.
+16. Zusatzdiagnose: Paired-Fehler, LOO-Auswertung, Unsicherheit
+Die ringweise Robustheitsdiagnose liest nur bestehende Ergebnisberichte; sie trainiert nicht neu. Leave-one-ring-out in diesem Kontext ist eine nachträgliche Auslassung aus der Auswertung, keine neu trainierte Leave-one-out-CV. test_ssr_robustness.py 4/4 und test_two_head_ssr.py 4/4 bestanden.
+Für das finale Zweikopf-SSL-Modell erreichten die approximierten Intervalle y±1,96SD auf den acht inneren Validierungsringen bei Außen eine nominale Abdeckung 8/8 und bei Höhenschlag 7/8. Sie sind jedoch keine exakten Student-t-Mischungsquantile und angesichts N=8 nicht ausreichend kalibriert. Beim äußeren Satz 4/4 je Qualitätsgröße, ebenfalls rein deskriptiv. Ein vollständiger posterior-predictiver Simulationsalgorithmus war geplant, wurde aber nicht als finale P2-Auswertung implementiert.
+17. Experiment-Freeze und Sicherheit
+Die Modellkonfiguration wurde vor dem äußeren Test fixiert und mit freeze_dm_protocol.py in results/experiment_freeze/DM_TWO_HEAD_PROTOCOL_FREEZE.json dokumentiert. Im Nutzer-Terminal bestanden 5/5 Freeze-Tests: registrierte CV4 und Kopfstruktur, Ausschluss Test- und INNER-VAL-Leakage, Hyperparameter- und Referenzmismatch-Prüfung. Der Freeze überprüft den Originaldatenhash sowie neun relevante Python-Dateihashes und zwei Referenzberichthashes.
+preflight_outer_test.py und test_preflight_outer_test.py bestanden 4/4 synthetische Schutztests: Labels bleiben bis zur Abgabe vollständiger Vorhersagen versiegelt; unvollständige/NaN-Vorhersagen abgelehnt, RMSE/MAE ringweise. Hier fand noch kein echtes Training und keine Testbewertung statt.
+test_outer_prediction_contract.py 6/6: X-only-Ausgabe, kein expliziter U- oder OUTER-Labelzugriff, identische Frozen-Train-Grenzen, SHA-/Tamper-Erkennung, Score-nach-Commit und einmalige Freigabe mit künstlichen Daten. outer_predict_frozen.py trainierte danach drei fest vorgegebene Vorhersagemodelle und speicherte Vorhersagen für vier Test-Ringe ohne Testlabels.
+Die Vorhersagen wurden gesichert unter results/experiment_freeze/OUTER_FROZEN_PREDICTIONS_V1/OUTER_PREDICTIONS.json mit zugehörigem PREDICTIONS_COMMITTED.json. Hash:
+fcaf3cf7874070845641e6f46c5e9dcafe77dde5812427caa3dde87a8178ab26.
+Die einmalige Bewertung wurde danach mit outer_score_frozen.py ausgeführt und im Nutzer-Upload OUTER_FINAL_SCORE_V1.json dokumentiert. Der eingefrorene Protokoll-Hash lautet
+ff964627da5c4e04308659d2f7681338966fa834f48049c818ef9b2b5b6ef0b8.
+WICHTIG: AM 11.11.2026 IST DER ÄUSSERE TEST ABGESCHLOSSEN. Keine weitere Nutzung der vier Ringe zur Modellsuche, Featureauswahl oder Prioroptimierung. Nicht erneut „Testsatz gesperrt“ sagen, als wäre die Wahrheit unbekannt. Ein Entwickler kann neue Modelle erforschen; für einen erneut unabhängigen Nachweis braucht er neue, wirklich unbekannte Prüfbeobachtungen.
+18. Einmalige äußere Bewertung – unveränderter Befund [OUTER]
+Quelle ist die vom Nutzer tatsächlich hochgeladene Datei OUTER_FINAL_SCORE_V1.json (245 Zeilen). Die vier Ringe wurden gleich gewichtet; keine zeitpunktgewichtete Gesamtkennzahl.
+Modell
+Außen-RMSE [mm]
+Höhe-RMSE [mm]
+Außen-MAE [mm]
+Höhe-MAE [mm]
+primary_ssl (voll SSR)
+0,3887619
+3,2063978
+0,3563890
+2,8053348
+strict_supervised
+0,5528856
+3,3578797
+0,4834406
+3,1091908
+mean_baseline
+0,4952647
+2,9784528
+0,4474163
+2,5937455
+Gegen den kontrollierten streng überwachten Kopf sinkt der RMSE bei SSR um etwa 29,7 % (Außen) bzw. 4,5 % (Höhenschlag). Gegen die Trainingsmittelwert-Baseline sinkt er bei Außen um ca. 21,5 %, steigt bei Höhe aber um ca. 7,7 %. Der Vergleich primary_ssl vs strict_supervised umfasst sowohl die andere X-Vorverarbeitung/Initialisierung als auch die U-ELBO-Beiträge; er identifiziert nicht isoliert den reinen C-Effekt. Die innere C0-Kontrolle erfüllt nur die explorative Einordnung.
+18.1 Einzelringwahrheiten, Vorhersagen und Fehler – äußeres Hauptmodell
+Ring
+Außen Wahrheit
+Außen SSR
+Außen Residuum (Vorh.-Ist)
+Höhe Wahrheit
+Höhe SSR
+Höhe Residuum
+SD Außen/Höhe
+DM07
+2,5444
+2,1491
+−0,3953
+16,7152
+15,4342
+−1,2810
+0,8553 / 3,5650
+DM08
+2,7078
+2,2471
+−0,4608
+13,6179
+18,7056
++5,0877
+0,8513 / 3,8578
+DM11
+2,3657
+1,8889
+−0,4768
+16,5130
+13,1317
+−3,3813
+0,6472 / 2,8221
+DM15
+1,8461
+1,9387
++0,0926
+17,4662
+18,9375
++1,4714
+0,8464 / 4,0325
+Bei Außenunrundheit werden drei von vier Ringwerten unterschätzt, ohne dass N=4 eine allgemeine Bias-Behauptung trägt. DM08 dominiert einen Teil des Höhenschlagfehlers des Hauptmodells; dort ist die Mittelwert-Baseline nahezu exakt. Diese konkreten Fehler sind Analysegegenstand der abgeschlossenen Bewertung, nicht Anlass zu späterer Anpassung an DM08.
+18.2 Unsicherheitsbericht
+Der Bericht coverage_95_moment_normal_approx zeigt 1,0/1,0 für beide Bayesian-Varianten. Das sind lediglich 4/4 abgedeckte Werte je Ziel unter Intervallen y±1,96SD, keine validierte 95-%-Kalibrierung. Höhenschlag-SD im Hauptmodell liegt bei rund 2,82–4,03 mm; prädiktive Halbbreiten sind entsprechend groß. Der Mittelwert-Baseline wurde im Abschlussreport keine vergleichbare prädiktive Standardabweichung zugewiesen.
+19. Wichtigste wissenschaftliche Ergebnisse und Negativbefunde
+Die ursprüngliche Diagonalannahme war eine Vereinfachung, nicht in Shao et al. (2022) vorgeschrieben. Im DM-Bestand zeigen sich starke Zustand-/Zeit-Trend-Korrelationen.
+Volle Normal-Wishart-Emissionen passen Prozesssignale teils besser, erzeugen aber keine automatisch besseren Qualitätsprognosen.
+Wishart-Regularisierung verbessert Matrixkondition, aber der erwartete Prior-Präzisionswert und die erwartete Kovarianz sind nicht gleichzusetzen; Qualitätsziele reagieren unterschiedlich.
+Dynamische HMM-Emissionen können Zeitabhängigkeit abbilden, erwiesen sich mit linearer Trendstruktur im untersuchten CV4 nicht generell als besser.
+Die größte explorative Verbesserung bei Außenunrundheit kam durch direkte, physikalische Ringdeskriptoren bzw. deren Integration in die Qualitätskopplung.
+Die Qualitätsziele Außenunrundheit und Höhenschlag benötigen vermutlich unterschiedliche Regressionsmerkmale; deshalb zwei Köpfe.
+U-Ringe verbessern nicht jede Zielgröße und Modellstruktur; echte U-ELBO-Effekte sind teilweise klein. Vorverarbeitungs-/Initialisierungseffekte getrennt berichten.
+Die äußere Testbewertung stützt die vorab eingefrorene Zweikopf-SSR bei Außen; bei Höhe schlägt die einfache Baseline den SSR-Kandidaten.
+Keine pauschale Behauptung statistischer Signifikanz: N=4 äußere Ringe, N=8 explorativ innere CV. Keine Kausalitätsbehauptung aus Modellkorrelationen.
+Mathematische Ableitungen und Code reichen weiter als die ältere Manuskriptbeschreibung; A–D müssen konsistent neu geschrieben werden. Die vorliegenden separaten Neufassungen liefern dafür die Grundlage.
+20. Softwarearchitektur und Verantwortlichkeiten
+Datei
+Bedeutung und Status
+dm_data.py
+Pickle-/F2-/V1-Zugriff, Ring-Split, train-only Skalierung; frühere interne Funktion view materialisiert Labels auch für U-Records, verwendet sie aber nicht als Trainings-Y.
+vb_b1.py
+HMM-Forward-Backward, erste/zweite Aufenthaltsmomente, Dirichlet- und NIG-KL; anfänglich diagonales Modell.
+full_markov_b1.py
+Frei zeitabhängige lokale Markov-Logits, exakter Zählmomentenbeitrag, analytischer Gradient, L-BFGS-B.
+fullcov_b1.py
+Multivariate Normal-Wishart-Emissionen, konjugierte Updates, erwartete Logdichte, prädiktiver Prozess-Logscore.
+fullcov_b1_df.py
+Experimentelle Variation Wishart-Freiheitsgrade bei konstantem EΛ.
+temporal_b1.py
+Explorative zeitabhängige Matrix-Normal-Wishart-Emission.
+quality_link_challenge.py
+Direkte NIG-/GP-Vergleichsregression auf 12/Path/Stats-Ringfeatures.
+hybrid_b1.py
+Gemeinsame HMM-/Qualitätskopplung mit sechs beobachteten Ringkennwerten.
+two_head_b1.py
+Eingefrorener finaler Zweikopf-HMM-Hauptmodellkern.
+compare_two_head_cv4.py
+Innere CV4 für SEPARATE_AXIAL / HEIGHT_STATE_ONLY; Descriptor-Auswahl.
+audit_unlabeled_ablation.py
+Getrennter SUP/C0/C1-Vergleich ursprünglicher, Hybrid- und direkter Kopplung.
+audit_two_head_ssr.py
+Getrennter SUP/C0/C1-Vergleich des zweiköpfigen Modells.
+freeze_dm_protocol.py
+Prüft registrierte Modellstände/Hochrechnungen und erzeugt Protokoll-Freeze.
+preflight_outer_test.py
+Synthetische Schutztests, Source-/Report-/Protocol-Hashes.
+outer_predict_frozen.py
+Trainiert festgelegte drei Modelle mit L/U/X only und schreibt vor Testöffnung Vorhersagen/Commit.
+outer_score_frozen.py
+Einmalige, separat abgesicherte Testlabel-Freigabe und Ringmetriken. Nicht erneut ausführen.
+Weitere Skripte für Diagnose: diagnose_emissions.py, audit_fullcov_stability.py, audit_fullcov_df.py, audit_state_residuals.py, audit_temporal_state.py, audit_ssr_robustness.py und mathematische test_*.py-Pakete. Es wurde bewusst jeweils ein neues isoliertes Python-Modul ergänzt und nicht der Nutzerbestand überschrieben; eingefrorene Modellhashes nach der Testfreigabe nicht verändern, ohne expliziten neuen Forschungszweig zu versionieren.
+21. Chronologische Softwarepakete – Projektinventar
+Die während der Chatentwicklung erzeugten ZIPs (mit Datumsstand 11.11.2026) dokumentieren voneinander unabhängige Stufen; die wesentlichen gehören mit ins Archiv:
+Bayesian_Bachelor_DM_B1_Modellkern_V0_1_2026-11-11.zip – ursprünglicher B1-Lernkern, Tests, Ring-Split.
+Bayesian_Bachelor_B1_FULL_JOINT_Update_Implementierung_BA_2026-11-11.zip – freie Markov-VI.
+Bayesian_Bachelor_Emissionsdiagnostik_Update_Implementierung_BA_2026-11-11.zip – state-konditionierte Korrelationen.
+Bayesian_Bachelor_DM_Kovarianzvergleich_Full_Gauss_Wishart_2026-11-11.zip – volle Emissionen/CV4.
+Bayesian_Bachelor_DM_Prior_und_Kovarianzstabilitaet_Update_2026-11-11.zip – Präzisionsskalen-Ablation.
+Bayesian_Bachelor_DM_Wishart_Prior_Konzentration_Update_2026-11-11.zip – ν0-Test.
+Bayesian_Bachelor_DM_Zustandsresiduen_K2_Vergleich_2026-11-11.zip – K2, Ringzentrierung.
+Bayesian_Bachelor_DM_Zeittrend_Emissionsdiagnostik_Update_2026-11-11.zip – Zeittrend-Korrelationen.
+Bayesian_Bachelor_DM_Zeitabhaengige_Bayesian_Emission_CV4_2026-11-11.zip – Matrix-Normal-Wishart mit Zeitbasis.
+Bayesian_Bachelor_DM_Grosser_Qualitaetskopplungs_Strukturvergleich_2026-11-11.zip – direkte NIG-/GP-/Hybrid-Alternativen.
+Bayesian_Bachelor_DM_SSR_Ungelabelt_Ablation_2026-11-11.zip – SUP/C0/C1-Abgrenzung.
+Bayesian_Bachelor_DM_SSR_Ringrobustheit_Update_2026-11-11.zip – Paired/LOO-Analyse.
+Bayesian_Bachelor_DM_TwoHead_Bayesian_Qualitaetskopplung_2026-11-11.zip – finaler Kopftyp und Mathematiktests.
+Bayesian_Bachelor_DM_Zweikopf_SSR_Ablation_Update_2026-11-11.zip – SSR-Effekte zweiköpfig.
+Bayesian_Bachelor_DM_Protokoll_Freeze_2026-11-11.zip – registrierte Vorabfestlegung.
+Bayesian_Bachelor_DM_OuterTest_Preflight_Synthetisch_2026-11-11.zip – Testschutz.
+Bayesian_Bachelor_DM_Final_Prediction_und_Score_Gate_2026-11-11.zip – Vorhersage-Commit und Einmal-Score.
+Zusätzliche Vorarbeiten vom 10.11.2026: Original-DM-Bestands-/Walzprotokoll-/Pickle-Audit, vollständige neuen DM-Pickles, 114-Kanal-Prüfung, originalquellengebundener A–D-Neustart. Keines dieser Dateien repräsentiert einen neuen äußeren Test. Eine vollständige Dateiliste mit SHA256 liegt im Anhang/Dateimanifest dieses Übergabepakets.
+22. Numerische Tests nach Baustein
+Prüfbereich
+Relevante Testdatei
+Beobachtung
+Mathematischer B1-Kern
+test_math.py
+5 PASS
+DM-Preprocessing
+test_data.py
+8 PASS
+Freie lokale Markov-VI
+test_full_markov.py
+3 PASS, Gradiententest ca. 3,98e−7
+Volle Normal-Wishart-Emission
+test_fullcov_b1.py
+4 PASS
+Volle Emissionsdiagnose
+test_diagnose_emissions.py
+4 PASS
+Wishart-Freiheitsgrad
+test_fullcov_df.py
+4 PASS
+Ringzentrierte Korrelation
+test_state_residuals.py
+3 PASS
+Zeittrendkorrelation
+test_temporal_state.py
+4 PASS
+Zeitabhängige Emission
+test_temporal_b1.py
+5 PASS
+Direkte/Hybrid-Qualitätskopplung
+test_quality_link_challenge.py
+5 PASS
+SSR-Abgrenzung
+test_unlabeled_ablation.py
+5 PASS
+Ringrobustheit
+test_ssr_robustness.py
+4 PASS
+Zweikopf-Mathematik
+test_two_head_b1.py
+5 PASS
+Zweikopf-SSR-Ablation
+test_two_head_ssr.py
+4 PASS
+Freeze
+test_freeze_dm_protocol.py
+5 PASS
+Synthetische Freigabe
+test_preflight_outer_test.py
+4 PASS
+Finaler Vorhersagevertrag
+test_outer_prediction_contract.py
+6 PASS
+Alle PASS-Angaben stammen aus dem hier dokumentierten Nutzerterminal bzw. den dazu passenden überprüften Referenzläufen. Kein einzelner PASS ist ein Beweis für die allgemeine Korrektheit aller Codes oder unabhängige wissenschaftliche Validierung.
+23. Wichtige Befehle zur nur lesenden Weiterarbeit
+Nicht erneut starten: outer_score_frozen.py und nicht denselben äußeren Test zum Tuning verwenden. Für das Dokumentations-Audit nur die schon vorhandenen Berichte lesen:
+Get-Content .\results\experiment_freeze\DM_TWO_HEAD_PROTOCOL_FREEZE.json -RawGet-Content .\results\experiment_freeze\OUTER_FROZEN_PREDICTIONS_V1\PREDICTIONS_COMMITTED.json -RawGet-Content .\results\experiment_freeze\OUTER_FINAL_SCORE_V1.json -RawGet-Content .\results\two_head_ssr_ablation_cv4\TWO_HEAD_SSR_ABLATION_CV4.json -Raw
+Für eine mögliche separate neue Forschungsrunde nur in einem neuen, explizit explorativen Projektzweig arbeiten. Vor einem späteren neuen unabhängigen Test neuen Rohbestand, Quellenstatus und Zeitfenster, exakte Zieldefinition, neue Split-/Label-Strategie und ein neues Freeze-Protokoll sichern.
+24. Quellenstatus für die neue wissenschaftliche Darstellung
+[ORIGINAL VOLLSTÄNDIG VERFÜGBAR] Bayesian_SSR_Ringwalzen_Entscheidungen_Herleitung_A.docx, Herleitung_B_Strukturierte_Variationsverteilung_Bayesian_SSR.docx, Herleitung_C_Vollstaendiger_Trainingsalgorithmus_Bayesian_SSR.docx, Herleitung_D_Posterior_Predictive_Bayesian_SSR.docx. Die gelieferten Originale wurden zur Neufassung vollständig als DOCX/Markdown zugänglich gemacht. Alte Formulierung J=3/Diagonal ist historisch und wird nicht als aktueller Modellstand behandelt.
+[CODE GEPRÜFT] Python-Archivversionen für volle NW-Emissionen, Markov-Rekursion, zwei Qualitätsköpfe, Vorhersage und Once-only-Score, ergänzende Ablationen. Nutzermaschinenstand nur durch ausgeführte Tests/Hashes belegt, nicht durch Live-Dateibrowserzugriff.
+[NUTZERERGEBNISSE BELEGT] Alle in dieser Chatfolge geposteten Terminalausgaben und der hochgeladene OUTER_FINAL_SCORE_V1.json.
+[LITERATURBEFUND AUS BESTAND] Shao et al. 2022 SsBHMM mit multivariatem Normal-Wishart, im Original dokumentiert Normal-Wishart-Prior/Posterior um Gl. (24)/(28)/(40); Warnung vor hochdimensional schlechter Konditionierung; Mowbray et al. 2022 zu Batchdaten und Redundanz; Beal 2003 zu VI-HMM; Shao, Ge & Song 2021 zu Weighted VI; Rabiner 1989 zu HMM. Vor seitenexakten Bachelorarbeitszitaten jeweils die konkreten Originalseiten verifizieren; dies ist keine neue vollständige Supplementprüfung.
+[EIGENE METHODE] Zweikopf-SSR, augmentierte Qualitätsmomente, Qualitätskopplungs-Komprimierung, freie FULL_JOINT-Optimierung in Kombination mit vollen Emissionen, Data-Gating/Freeze. Keine Quelle belegt exakt diese Gesamtmodellkombination.
+[NOCH OFFEN] Neuheitsprüfung in umfassender Literatur, identifizierbare physikalische Zustandssemantik, voll integrierte prädiktive Parameterunsicherheit/P2, exakte prädiktive Mischungsquantile und Kalibrierung, größere unabhängige Ringdaten für bestätigende neue Forschung.
+25. Bachelorarbeitsabgleich und Schreibregeln
+Die Neufassungen A–D sind mathematische Arbeitsdokumente, keine fertige sprachlich gekürzte BA-Methodik. Der spätere Fließtext benötigt klare Trennung zwischen wissenschaftlichem Grundmodell und eigenen Erweiterungen. Vorgeschlagener Ablauf: Methodik-Kapitel Datenbasis DM statt SFA → sechs Kanäle/F2 und Leakage-Regeln → generatives Bayesian-HMM mit vollen Emissionen → zwei NIG-Köpfe und skalierte Ringkennwerte → strukturierte VI und exakte Zustandsmomente → Konvergenz-/Synthetiktests → Versuchsdesign/CV4/Ablationen → eingefrorener äußerer Test → differenzierte Diskussion von Außen und Höhe.
+Verbindliche Darstellung: Kein Text „SFA16 ausgeschlossen“ in der DM-Methodik; dort ist DM13 ausgeschlossen. Keine dritte Innenunrundheit behaupten. Keine Gleichsetzung „fully Bayesian“ mit exakter posteriorer Integration. Kein „die Testgruppe ist noch versiegelt“ nach dem 11.11.; korrekt ist: vorhersage-vorher versiegelt, Test einmalig abgeschlossen. Keine unbewiesene Literaturquelle als Beleg für die eigene gesamte zweiköpfige Endqualitätslikelihood. Keine exakten Mischungsquantile behaupten, wenn nur Normal-Momentenintervalle gespeichert wurden. Keine besseren Gesamtprognosen beider Ziele gegenüber Baseline behaupten, weil Höhe hinter Baseline liegt.
+Die ursprüngliche Projektarbeit ordnet SSL-, Bayesian- und Ringwalzgrundlagen literaturbezogen ein; sie ist nicht mit dem neuen empirischen Ergebniskapitel zu verwechseln. Die Bachelorarbeit soll anhand ihrer aktuellen Word-Fassung abschnittsweise überarbeitet werden. Die neue Dokumentation ersetzt nicht automatisch bereits vorhandene, separat gestaltete BA-Kapitel.
+26. Vorhaben für die nächste Forschung – ohne Missbrauch des äußeren Tests
+Wichtige epistemische Grenze: Die vier äußeren Testlabels wurden am 11.11.2026 tatsächlich offenbart. Selbst wenn man sie nicht aktiv als Loss oder Optuna-Wert verwendet, sind sie bekannt und können Hypothesen motivieren. Jede neue Iteration nach dieser Offenbarung ist daher erneut explorativ und darf den identischen Test nicht als neuen unabhängigen Bestätigungsbeleg ausweisen.
+Mögliche fachlich begründete Forschungszweige, in einem neuen Entwicklungsprotokoll ohne erneuten alten Outer-Score:
+Qualitätskopplung: Alternative Sequenzstatistiken, Übergangszahlen, Reihenfolge und tatsächliche Phasendauer, sequentielle Encoder mit Bayesian-Schrumpfung, separater Physik-/Sensorkanalwahl pro Ziel. Der Zustandsträger muss nicht zwingend auf hZ begrenzt bleiben.
+Prozessmodellierung: robustere Student-t-Emission, reguläre/strukturierte Kovarianzmatrizen, explizite dynamische Emissionsmodelle, Hidden-Semi-Markov-Modelle; jeweils echte neue Prior-/Posteriorherleitungen statt stiller Codewechsel.
+Klein-N-Regression: Mehrstufige/hierarchische Shrinkage-Priors, zielgrößenspezifische Modellkomplexität, prior-prädiktive Plausibilität, Identifizierbarkeit und robuste Priors bei sechs bis zwölf L-Ringen.
+Unlabeled-Nutzen: C- und Labelanteils-Ablation mit striktem SUP_L_ONLY-Gegenmodell und separates C0_SHARED_PREPROC; keine künstlichen Pseudo-Labels im Hauptpfad. Ein C-Gewicht ist nicht gleich einem Label.
+Prädiktive Unsicherheit: echter Vergleich mit Samples aus NIG + Zustandsmischung, Posterior über HMM-Parameter durch Monte Carlo, effektive Samplegröße und Importance-Weighing; Bewertung mit proper scoring rules und Kalibrierung, sofern ausreichend unabhängige Ringe.
+Wissenschaftliches Design: Präregistrierte kleine Kandidatenmenge, nicht übermäßig viele Freiheitsgrade auf den acht Entwicklungsringen, mehrere Seeds und state-label-invariante Diagnosen, idealerweise neu erhobene unabhängige Ringe für eine zweite confirmatory evaluation.
+Die negative Höhenschlag-Baseline-Differenz des abgeschlossenen Tests ist ein Diskussionsbefund, aber kein Freibrief, nachträglich die alten äußeren vier Ringe zu einem Hyperparameterziel umzufunktionieren. Neue Ringmessungen oder ein völlig neuer, vorab unangetasteter Datensatz sind der saubere Weg zur nächsten unabhängigen Hypothesenprüfung.
+27. Handover-Anweisung für eine Chatfortsetzung
+Projekt „Bayesian Bachelor“, DM-Stand 11.11.2026. Bitte dieses Master-Handover, die neuen Word-Herleitungen A–D, OUTER_FINAL_SCORE_V1.json, DM_TWO_HEAD_PROTOCOL_FREEZE.json und die tatsächlich benutzten Python-Quellarchive als aktuelle Grundlage behandeln. Die alten A–D-Word-Dokumente dienen als Original-/Änderungshistorie. Das am 11.11.2026 abgeschlossene Outer-Testresultat darf nicht für neue Modelloptimierung oder als neuer unangetasteter Test verwendet werden. Primärziel: Neufassungen der Mathematik und Bachelorarbeit konsistent fertigstellen, danach neue separat explorative Modellforschung. Niemals DM und SFA mischen oder eine dritte Zielgröße erfinden. Vor mathematischen Aussagen den Code abgleichen und vor Quellenzitaten Originalseiten prüfen.
+28. Übergabe-Checkliste
+☒ Original-Word A–D verfügbar; wesentliche Unterschiede zum eingefrorenen Code abgeglichen.
+☒ Vier neue zusammenhängende A–D-Herleitungen als separate Word- und Markdown-Dateien erstellt.
+☒ DM-Datensatz und exakt zwei Endqualitätsgrößen festgehalten.
+☒ V1/F2, Trainings-L/U/OUTER-Aufteilung sowie Qualitäts- und Descriptor-Scaler dokumentiert.
+☒ Unterschiede Diagonal → volle Normal-Wishart-Kovarianz und gemeinsamer → zwei Köpfe hergeleitet.
+☒ Mathematische Tests und bekannte CV4-Ergebnisse mit Negativbefunden dokumentiert.
+☒ SSR-Vorverarbeitungs- vs. echte U-ELBO-Effekte getrennt.
+☒ Einmalige äußere Testauswertung inklusive Vorhersage-/Protokollhash und vier Einzelringbeobachtungen gesichert.
+☒ Neue Forschungsphase ohne Wiederverwendung des alten Outer-Tests als unberührt erläutert.
+☐ Die aktuelle Bachelorarbeits-DOCX abschnittsweise mit A–D neu synchronisieren; existierende Manuskriptabschnitte nicht ungefragt überschreiben.
+☐ Vor wissenschaftlichen Seitenzitaten jede Quellseite im Original verifizieren.
+☐ Neue unabhängige Ringdaten für künftige bestätigende Modelltests beschaffen.
+Letzter dokumentierter Projektstatus: 11.11.2026 – äußere Bewertung abgeschlossen; Neuherleitungen A–D und umfassendes Master-Handover erstellt; neue Modellentwicklung als getrennte, explorative Phase offen.

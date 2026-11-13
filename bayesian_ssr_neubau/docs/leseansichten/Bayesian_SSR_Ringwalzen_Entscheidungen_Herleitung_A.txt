@@ -1,0 +1,362 @@
+Bayesian Semi-Supervised Regression am Ringwalzprozess
+Chronologisches Entscheidungsprotokoll und Herleitung A – vollständige probabilistische Modellstruktur
+Arbeitsstand: 27. Oktober 2026 · Modellkonstruktion B1 · Dokumentationsfassung für Projekt- und Bachelorarbeit
+Zweck dieses Dokuments. Dieses Arbeitsdokument hält die von uns bisher gemeinsam festgelegte Modellarchitektur und anschließend die ausführliche Herleitung A in ihrer Reihenfolge fest. Es ist noch kein fertig ausformulierter Kapitel-4-Text für die Projektarbeit. Die mathematisch offenen Punkte werden ausdrücklich als offen gekennzeichnet. Die Herleitung A basiert auf der bisherigen Ausarbeitung im Chat und übernimmt deren Erklärungen, Gleichungen und Ergebnisse; vorangestellt ist eine chronologische Übersicht unserer Entscheidungen.
+Teil I – Bisherige Modellentscheidungen und offene Entwicklungswege
+1. Entstehung des Modellpfads
+Die Projektarbeit behandelt in Kapitel 3 die verschiedenen Methoden der Semi-Supervised Regression im Überblick. Kapitel 4 konzentriert sich anschließend auf die Bayesian-Modellierung, die Grundlagen von Priors, Likelihood, Posterior und Variational Inference und die schrittweise Entwicklung von Markov-Ketten über Hidden Markov Models zum eigenen Ringwalzmodell. Die spätere Bachelorarbeit soll den gewählten Hauptpfad implementieren.
+Wir verfolgen direkte fully Bayesian Semi-Supervised Regression ohne Pseudo-Labeling. Die unlabeled Daten werden nicht mit künstlichen Endqualitätswerten versehen, sondern gehen über eine gemeinsame generative Prozess- und Zustandsstruktur in das Training ein. Für die Projektarbeit wird das Modell von Grund auf mathematisch entwickelt und erst nach Erklärung seiner Bestandteile zum vollständigen Blockschaltbild zusammengeführt.
+2. Chronologisch getroffene Festlegungen
+1 – Datenbasis: Festgelegt: Jeder Ring ist eine eigenständige vollständige Prozesssequenz. Pro gelabeltem Ring liegt ein einziger Qualitätsvektor aus drei kontinuierlichen Zielgrößen vor..  Offen: Reale Zahl der Ringe, Merkmalszahl und Sequenzlängen noch anhand der Rohdaten zu prüfen.
+2 – Zeitrepräsentation: Festgelegt: Originalsequenzen beibehalten. Keine erzwungene einheitliche Ringlänge; zeitliche Struktur erhalten..  Offen: Abtastraten, kontrolliertes Resampling, Merkmalsreduktion und Prozessereignisse prüfen.
+2 – Trainingsdaten: Festgelegt: Ringweiser Split für  in Training, Validierung und Test. Zulässiges  wird für das semi-supervised Training genutzt, ohne dass hierfür ein eigener überwachter Testsplit zwingend nötig ist..  Offen: Identische Ringe dürfen nicht als „unlabeled“ in das Training gelangen, wenn sie für Validierung/Test zurückgehalten wurden.
+3 – Zustände: Festgelegt: Standard-HMM erster Ordnung. Jeder Ring besitzt seine eigene latente Zustandsfolge, globale Parameter werden geteilt..  Offen: Anzahl  der Zustände und mögliche Übergangsrestriktionen.
+4 – Prozessemissionen: Festgelegt: Gaußverteilungen mit diagonaler Kovarianz..  Offen: Student-t als bewusste, vorerst nicht gewählte Robustheitserweiterung; volle Kovarianz nur als Vergleichsoption.
+5 – Qualitätsmodell: Festgelegt: Variante B: Die Qualitätsvorhersage soll sich auf den gesamten verborgenen Zustandsverlauf stützen, nicht nur auf den Endzustand..  Offen: Welche Statistik der vollständigen Folge wird verwendet und welche Informationen gehen dadurch verloren?
+5 – Gemeinsame Kopplung: Festgelegt: B1: Vollständig gemeinsame probabilistische Zustands- und Qualitätsmodellierung..  Offen: Die strukturierte VI muss für den globalen Qualitätsterm tatsächlich hergeleitet werden.
+5 – Multi-Output: Festgelegt: Drei Qualitätsgrößen und bedingt diagonale Qualitätskovarianz..  Offen: Bedingungen zur bedingten Fehlerunabhängigkeit später prüfen.
+6 – Priors: Festgelegt: Konjugierte beziehungsweise zunächst schwach informative Priors, abgestimmt auf die Daten und durch Prior-Predictive Checks überprüft..  Offen: Konkrete Prior-Hyperparameter und eventuell begründetes Prozesswissen.
+7 – Unlabeled-Nutzung: Festgelegt: Direkte Marginalisierung und ungewichtete gemeinsame Likelihood als Hauptfall (). Kein Pseudo-Labeling..  Offen: Optionale gewichtete VI mit Faktor  für gezielte Experimente.
+8 – Posterior-Inferenz: Festgelegt: Strukturierte Variational Inference als Entwicklungsziel..  Offen: Vollständige B1-ELBO und benötigte Momentberechnungen noch zu entwickeln.
+8 – Rückfallpfad: Festgelegt: B2: Vereinfachte Kopplung über erwartete Zustandsmerkmale – nur wenn B1 nicht sinnvoll umsetzbar ist..  Offen: Die Vereinfachung darf nicht fälschlich als exakte gemeinsame B1-Inferenz bezeichnet werden.
+9 – Evaluation: Festgelegt: Gezielte Untersuchungen innerhalb unseres Bayesian-HMM-Verfahrens statt eines umfangreichen Vergleichs fremder Algorithmusfamilien..  Offen: , , gelabelter/unlabelter Datenanteil, Priors, Kalibrierung, ELBO und Zustandsmerkmale konkret planen.
+3. Bewusst erhaltene Alternativen
+Variante A der Endqualität: Der letzte latente Zustand ZiTi zusammen mit fest berechneten beobachteten Sequenzmerkmalen sXi beeinflusst die Endqualität. Das wäre bei einer zusätzlichen Qualitätsbeobachtung am Sequenzende inferenztechnisch einfacher. Wir haben diese Variante zugunsten von B zurückgestellt.
+Variante B1 (Hauptpfad): Die Qualitätslikelihood hängt von einem aus der gesamten verborgenen Zustandsfolge gebildeten Merkmalsvektor ab. Der Zustandsverlauf ist unsicher; diese Unsicherheit soll erhalten bleiben und gemeinsam mit den Bayesian-Parametern gelernt werden.
+Variante B2 (Rückfallpfad): Erwartete Zustandsaufenthalte aus einem HMM werden in eine nachgelagerte Regression eingesetzt. Einfacher, aber keine unveränderte B1-Inferenz, wenn die Unsicherheit durch Einsetzen von Erwartungswerten verloren geht oder die Teile getrennt optimiert werden.
+Weitere zurückgestellte Optionen: Student-t-Emissionen zur Robustheit gegenüber Ausreißern, HSMM zur expliziten Modellierung unterschiedlicher Zustandsdauern, volle Kovarianzmatrizen für Prozessdaten oder Qualitätsziele sowie nichtlineare Regressions- beziehungsweise Emissionsmodelle. Diese Optionen sollen bei nachvollziehbarem Anlass erneut geprüft werden, nicht ohne Datenbegründung zur Standardarchitektur werden.
+4. Geplante, gezielte Experimente innerhalb der Methode
+Wir wollen innerhalb unseres Verfahrens insbesondere das Gewicht C der ungelabelten Daten, die Zustandszahl K, den verfügbaren Anteil gelabelter Ringe, die Priorstärke und die Art der verwendeten Sequenzmerkmale untersuchen. Dazu kommen die Konvergenz von Variational Inference und die prädiktive Unsicherheit. Für die drei Qualitätsgrößen planen wir getrennte Auswertungen mit MAE, RMSE, R2, Scatter-Plots, Kalibrierung, Intervallabdeckung und prädiktiver Log-Likelihood. Unterschiedliche Seeds und identische Datensplits sichern die Vergleichbarkeit.
+Die Untersuchungen dienen der Prüfung wissenschaftlicher Hypothesen. Wir legen keine gewünschten Resultate im Voraus fest. Ein Faktor C=0 beschreibt innerhalb derselben Bayesian-Architektur einen supervised Grenzfall; C=1 entspricht der ungewichteten Einbindung von DU. Werte dazwischen sind mögliche gewichtete Lernziele nach dem Prinzip von Shao, Ge und Song (2021).
+Teil II – Herleitung A: Vollständige probabilistische Modellstruktur
+Mathematische Modellentwicklung · Arbeitsstand A.1 · Ringwalzprozess
+Wir beginnen jetzt mit der eigentlichen mathematischen Konstruktion unseres Modells. Ziel dieser Herleitung ist, dass wir am Ende eine vollständige gemeinsame Wahrscheinlichkeitsverteilung besitzen, aus der sich später die Variational Inference, die Trainingsschritte und die Qualitätsvorhersage ableiten lassen.
+Dabei unterscheiden wir konsequent zwischen drei Ebenen:
+Quellenbasierte Grundlagen: Mathematische Bausteine, die in Beal (2003), Shao et al. (2022), Chen et al. (2010) und den weiteren Originalarbeiten beschrieben werden.
+Unsere Modelladaption: Die konkrete Verbindung einer vollständigen latenten Ringsequenz mit einem einzigen dreidimensionalen Qualitätsvektor.
+Noch offene Implementierungsfragen: Insbesondere die effiziente gemeinsame Inferenz über alle verborgenen Zustände unter Berücksichtigung der Endqualität.
+Wir werden hier noch nicht die vollständige Variational Inference herleiten. Das gehört zu Herleitung B und C. Zuerst müssen wir genau wissen, welche Verteilungen überhaupt in unserem Modell vorkommen und wie sie zusammenhängen.
+A.1 Die vollständige mathematische Aufgabenstellung
+Wir betrachten jeden Ring als einen eigenständigen Produktionsvorgang.
+Für Ring i liegen Ti aufeinanderfolgende Messzeitpunkte vor. An jedem Zeitpunkt werden d Prozessmerkmale erfasst.
+Damit ist die Prozesssequenz:
+Xi=xi1,…,xiTi⊤∈RTi×d.
+Dabei gilt:
+i: Index eines Rings
+t: Index eines Messzeitpunkts
+Ti: Anzahl der Messzeitpunkte des Rings
+d: Anzahl der verwendeten Loggermerkmale
+xit: Vektor aller Prozessmerkmale zum Zeitpunkt t
+Für jeden gelabelten Ring besitzen wir außerdem einen Qualitätsvektor:
+yi=yi1yi2yi3∈R3.
+Dessen Komponenten sind unsere drei kontinuierlichen Qualitätsgrößen: äußere Unrundheit, innere Unrundheit und Höhenschlag.
+Die Trainingsdaten teilen wir in zwei Mengen auf:
+DLtrain={Xi,yi}i∈IL
+DUtrain={Xj}j∈IU.
+Hier sind IL und IU die Indexmengen der gelabelten beziehungsweise ungelabelten Trainingsringe.
+Diese Struktur entspricht grundsätzlich der Batch-Endqualitätsaufgabe von Mowbray et al. (2022). Dort wird ausdrücklich zwischen vollständigen Prozessverläufen und den dazugehörigen Endqualitätsmessungen unterschieden.
+A.2 Die erste Modellannahme: Jeder Ring besitzt eine verborgene Zustandsfolge
+Wir haben uns für ein Standard-HMM erster Ordnung entschieden.
+Für jeden Ring führen wir daher zusätzlich zu den beobachteten Prozesswerten eine Folge verborgener Zustände ein:
+Zi=Zi1,Zi2,…,ZiTi.
+Dabei gilt:
+Zit∈{1,…,K},
+wobei K die Anzahl möglicher HMM-Zustände bezeichnet.
+Diese Zustände sollen unterschiedliche statistische Prozessregime beschreiben. Es ist denkbar, dass solche Zustände später bestimmten Phasen des Ringwalzprozesses zugeordnet werden können. Diese physikalische Interpretation ist allerdings nicht automatisch garantiert.
+A.2.1 Anfangsverteilung
+Für den ersten Zustand eines Rings benötigen wir eine Anfangsverteilung:
+PZi1=k∣π=πk.
+Dabei bezeichnet πk die Wahrscheinlichkeit, dass ein neuer Ring im Zustand k beginnt.
+Für die Anfangswahrscheinlichkeiten gilt:
+k=1Kπk=1.
+Alle Ringe teilen sich dieselben globalen Anfangswahrscheinlichkeiten, besitzen aber jeweils einen eigenen ersten Zustand.
+A.2.2 Übergangsverteilung
+Für jeden folgenden Zeitpunkt gilt die Markov-Eigenschaft erster Ordnung:
+PZit=k∣Zi,t−1=j,A=Ajk.
+Die Matrix
+A∈0,1K×K
+enthält die Übergangswahrscheinlichkeiten zwischen den verborgenen Zuständen.
+Auch hier muss jede Zeile eine Wahrscheinlichkeitsverteilung bilden:
+k=1KAjk=1  ∀j.
+Unsere Annahme ist zunächst eine zeitlich homogene Übergangsmatrix. Die Übergangswahrscheinlichkeiten ändern sich also nicht ausdrücklich mit dem Zeitpunkt oder Ringindex.
+A.2.3 Wahrscheinlichkeit einer vollständigen Zustandsfolge
+Aus diesen beiden Bestandteilen ergibt sich:
+pZi∣π,A=πZi1t=2TiAZi,t−1,Zit.
+(A.1)
+Diese Gleichung beschreibt die Wahrscheinlichkeit einer vollständigen Zustandsfolge eines Rings.
+Der erste Faktor gibt an, wie wahrscheinlich sein Anfangszustand ist. Das Produkt berücksichtigt anschließend jeden Übergang zum nächsten Zustand.
+Die zugrunde liegende HMM-Faktorisierung ist durch Rabiner (1989) und Beal (2003) belegt.
+Erstes Ergebnis: Wir besitzen nun ein probabilistisches Modell für die verborgene Dynamik eines einzelnen Ringwalzvorgangs. Noch ist nicht beschrieben, wie die gemessenen Loggerwerte oder die Qualitätsgrößen entstehen.
+A.3 Zweite Modellannahme: Die Loggerwerte werden durch zustandsabhängige Gaußverteilungen beschrieben
+Wir haben uns bewusst gegen eine Student-t-Verteilung und zunächst für eine Gaußverteilung mit diagonaler Kovarianz entschieden.
+Damit lautet unsere Emissionsannahme:
+xit∣Zit=k,Φ∼Ndμk,Σx,k.
+(A.2)
+mit
+Σx,k=diagσx,k12,…,σx,kd2.
+Die Parameter besitzen folgende Bedeutung:
+μ_k: Mittelwert der Prozessmerkmale im Zustand k; Dimension: R^d
+Σ_{x,k}: Kovarianzmatrix der Prozessmerkmale im Zustand k; Dimension: R^{d×d}
+σ²_{x,kj}: Varianz des Prozessmerkmals j im Zustand k; Dimension: Positiver Skalar
+Φ: Gesamtheit aller Emissionsparameter; Dimension: Parametergruppe
+Weshalb benötigen wir diese Verteilung?
+Stellen wir uns vor, dass ein verborgener Zustand eine bestimmte Art von Walzbelastung beschreibt. Dann werden die gemessenen Prozesskräfte, Geschwindigkeiten und weiteren Merkmale innerhalb dieses Zustands nicht immer exakt dieselben Werte besitzen.
+Die Gaußverteilung erlaubt es, diese natürliche Streuung statistisch zu beschreiben.
+A.3.1 Bedeutung der diagonalen Kovarianz
+Durch unsere Wahl einer diagonalen Kovarianz lässt sich die multivariate Emissionsverteilung in univariate Normalverteilungen zerlegen:
+pxit∣Zit=k,Φ=j=1dNxitj∣μkj,σx,kj2.
+Das bedeutet, dass die Prozessmerkmale bei gegebenem Zustand bedingt unabhängig modelliert werden.
+Wir behaupten damit nicht, dass die Merkmale im realen Ringwalzprozess grundsätzlich unabhängig sind. Abhängigkeiten können bereits durch die gemeinsam wirkenden verborgenen Zustände entstehen.
+Allerdings können unmittelbare Zusammenhänge zwischen verschiedenen Prozessmerkmalen innerhalb eines einzelnen Zustands mit dieser vereinfachten Kovarianzstruktur nicht vollständig abgebildet werden.
+Die Entscheidung reduziert dafür die Anzahl der Kovarianzparameter erheblich und ermöglicht einfachere konjugierte Priorverteilungen.
+A.3.2 Wahrscheinlichkeit der gesamten beobachteten Ringsequenz
+Wenn wir die vollständige verborgene Zustandsfolge Zi kennen würden, lässt sich die bedingte Wahrscheinlichkeit der Prozesssequenz schreiben als:
+pXi∣Zi,Φ=t=1TiNdxit∣μZit,Σx,Zit.
+(A.3)
+Hier ist besonders wichtig: Jeder Zeitpunkt besitzt zwar eine eigene Beobachtungsverteilung, aber deren Parameter werden durch den jeweiligen verborgenen Zustand ausgewählt.
+Die zeitliche Abhängigkeit entsteht über die Zustandsfolge.
+A.3.3 Kombination mit der Zustandsdynamik
+Wir kombinieren jetzt die Gleichungen (A.1) und (A.3):
+pXi,Zi∣π,A,Φ=pZi∣π,A pXi∣Zi,Φ.
+(A.4)
+Damit besitzen wir bereits ein vollständiges generatives HMM für die Prozesssequenzen.
+Zweites Ergebnis: Dieses Modell kann die Dynamik der beobachteten Prozessdaten beschreiben, auch wenn überhaupt keine Qualitätsmessungen vorliegen.
+Das wird später der entscheidende Mechanismus sein, über den unsere ungelabelten Ringe in das gemeinsame Training eingehen.
+Die generative HMM-Modellierung und die Verwendung fehlender Qualitätsmessungen sind zentrale Bestandteile von P112. Unsere konkrete diagonale Parametrisierung ist eine vereinfachte Anpassung daran.
+
+A.4 Dritte Modellannahme: Die gesamte verborgene Zustandsfolge beeinflusst die Endqualität
+Jetzt erreichen wir den Teil, der unser Modell von den klassischen Semi-Supervised-HMM-Arbeiten unterscheidet.
+In P112 von Shao et al. (2022) wird die Qualität zeitpunktbezogen modelliert: Zu bestimmten Zeitpunkten liegen Prozessvariablen und möglicherweise eine zugehörige Qualitätsmessung vor.
+Bei uns sieht die Situation anders aus.
+Wir besitzen eine vollständige Ringsequenz mit möglicherweise vielen tausend Prozessmessungen, aber nur einen dreidimensionalen Qualitätsvektor am Ende des Walzvorgangs.
+Chen et al. (2010) behandeln eine vergleichbare Batch-Endqualitätsstruktur. Ihre Qualitätskopplung erfolgt jedoch über ein asynchrones IOHMM und nicht über die von uns gewählte gesamte latente Zustandsfolge.
+Unsere mathematische Anpassung beginnt deshalb genau hier.
+A.4.1 Wie beschreiben wir die gesamte Zustandsfolge mathematisch?
+Wir haben uns für Variante B1 entschieden.
+Dazu benötigen wir zunächst eine Funktion, welche die verborgene Zustandsfolge in eine für die Qualitätsregression verwendbare Form bringt.
+Als einfachstes Ausgangsmodell verwenden wir die relativen Aufenthaltsanteile in den verschiedenen Zuständen:
+hikZi=1Tit=1Ti1Zit=k.
+(A.5)
+Die Indikatorfunktion 1 ergibt den Wert 1, wenn sich der Ring zum Zeitpunkt t im Zustand k befindet, und sonst den Wert 0.
+Damit beschreibt hik, welchen Anteil der beobachteten Zeitpositionen Ring i im Zustand k verbracht hat.
+Aus allen K Anteilen entsteht:
+hiZi=hi1hi2⋮hiK∈RK.
+Da sich der Ring zu jedem Zeitpunkt genau in einem Zustand befindet, gilt:
+k=1Khik=1.
+Nehmen wir ein Beispiel mit drei Zuständen und sechs Zeitpunkten:
+Zi=1,1,2,2,2,3.
+Dann ergibt sich:
+hi=2/63/61/6.
+So wird aus der verborgenen Zustandsfolge zunächst ein Vektor mit K Komponenten.
+Wichtig: Die Zustandsfolge ist unbekannt. Daher ist auch hiZi keine fest beobachtete Eingangsgröße, sondern eine aus den latenten Zuständen abgeleitete Zufallsgröße.
+Genau diese Unsicherheit wollen wir bei B1 erhalten.
+A.4.2 Die Bayesian-Qualitätsregression
+Für unsere drei Zielgrößen führen wir eine Koeffizientenmatrix ein:
+B=β11⋯β1Kβ21⋯β2Kβ31⋯β3K∈R3×K.
+Die Koeffizienten βrk beschreiben, welchen Beitrag der Zustandsanteil k zum erwarteten Wert der Qualitätsgröße r liefert.
+Wir wählen zunächst die folgende bedingte Qualitätsverteilung:
+yi∣Zi,B,Σy∼N3BhiZi,Σy.
+(A.6)
+mit der von uns festgelegten diagonalen Qualitätskovarianz:
+Σy=diagσy,12,σy,22,σy,32.
+Damit lässt sich jede Qualitätsgröße einzeln schreiben:
+yir∣Zi,βr,σy,r2∼Nβr⊤hiZi,σy,r2,
+wobei βr∈RK die Koeffizienten der Qualitätsgröße r enthält.
+Da die Kovarianz diagonal ist, ergibt sich:
+pyi∣Zi,B,Σy=r=13Nyir∣βr⊤hiZi,σy,r2.
+Das ist unsere erste vollständig formulierte Multi-Output-Qualitätslikelihood.
+Sie besitzt drei wichtige Eigenschaften.
+Erstens erhalten wir für jeden Ring genau einen Qualitätsvektor. Wir behandeln die eine Endqualitätsmessung also nicht fälschlicherweise als eine Vielzahl unabhängiger Messungen an jedem Zeitpunkt.
+Zweitens verwenden alle drei Qualitätsgrößen dieselbe verborgene Zustandsfolge.
+Drittens bleiben sowohl die verborgenen Zustände als auch die Regressionsparameter im Bayesian-Modell unsicher.
+A.4.3 Warum wir keinen zusätzlichen Achsenabschnitt verwenden
+Eine kleine, aber mathematisch wichtige Entscheidung betrifft den Achsenabschnitt.
+In einer gewöhnlichen linearen Regression schreiben wir häufig:
+y=β0+β⊤x.
+Bei unserem Modell summieren sich die Zustandsanteile jedoch bereits zu eins.
+Damit wäre ein freier Achsenabschnitt zusammen mit allen K Zustandskoeffizienten redundant: Eine gemeinsame Verschiebung aller Koeffizienten könnte durch eine entgegengesetzte Verschiebung des Achsenabschnitts ausgeglichen werden.
+Deshalb verwenden wir in der ersten Modellversion:
+Eyi∣Zi,B=BhiZi.
+Das vermeidet diese spezielle Parameterredundanz.
+A.4.4 Eine wichtige Einschränkung unserer bisherigen Qualitätskopplung
+Hier müssen wir wissenschaftlich sehr genau bleiben.
+Wir sagen bisher, dass wir den gesamten verborgenen Zustandsverlauf nutzen. Tatsächlich berechnen wir aus diesem Verlauf aber zunächst nur die relativen Zustandsaufenthalte.
+Damit verwenden wir zwar jeden Zeitpunkt, verlieren aber bestimmte Informationen über die Reihenfolge.
+Betrachten wir zwei Zustandsfolgen:
+ZA=1,1,2,2,3,3
+ZB=1,2,3,1,2,3.
+Beide besitzen die gleichen Aufenthaltsanteile:
+hA=hB=1/31/31/3.
+Unser derzeitiger Qualitätsfaktor würde bei identischen Regressionsparametern deshalb für beide Zustandsfolgen denselben bedingten Erwartungswert liefern.
+Die unterschiedliche Reihenfolge wird nicht ausdrücklich berücksichtigt.
+Das bedeutet:
+Unser gewähltes B1-Modell ist vollständig gemeinsam probabilistisch, aber seine derzeitige Qualitätskopplung ist eine zeitlich zusammenfassende Funktion der gesamten Zustandsfolge.
+Wenn wir später auch Übergangshäufigkeiten, Phasenreihenfolge oder absolute Verweildauern einbeziehen möchten, muss die Funktion hiZi erweitert werden.
+Ebenso berücksichtigt diese erste Regression die Höhe von Kräften oder anderen Prozesswerten nicht direkt, sobald die Zustandsfolge gegeben ist. Zwei Ringe mit derselben Zustandsfolge erhalten denselben bedingten Qualitätsmittelwert, selbst wenn sich ihre konkreten Loggerwerte unterscheiden. Diese können die Vorhersage allerdings indirekt beeinflussen, weil sie die Wahrscheinlichkeiten möglicher Zustandsfolgen verändern.
+Meine Empfehlung für Herleitung A: Wir behalten die einfachen Aufenthaltsanteile vorläufig als Basis. Sie erlauben uns eine gut nachvollziehbare Qualitätsgleichung. Ob eine erweiterte Sequenzrepräsentation notwendig ist, untersuchen wir anschließend gezielt, ohne die festgelegte B1-Grundidee aufzugeben.
+
+A.5 Unsere erste vollständige gemeinsame Modellgleichung
+Jetzt besitzen wir die drei zentralen Bestandteile:
+Die Verteilung der verborgenen Zustandsfolge.
+Die Verteilung der beobachteten Prozesswerte bei gegebenen Zuständen.
+Die Verteilung der drei Endqualitätsgrößen bei gegebener Zustandsfolge.
+Diese drei Bestandteile können wir zu einer vollständigen gemeinsamen Verteilung zusammenführen.
+Für einen gelabelten Ring lautet sie:
+pXi,yi,Zi∣Θ=pZi∣π,A pXi∣Zi,Φ pyi∣Zi,Ψ.
+(A.7)
+Die gesamte globale Parametergruppe lautet:
+Θ=π,A,{μk,Σx,k}k=1K,B,Σy.
+Drittes Ergebnis: Wir haben nun eine mathematisch definierte gemeinsame Modellstruktur für einen gelabelten Ring.
+Sie ist eine eigenständige Kombination der HMM-Modellierung von P112 mit einer ringweisen Endqualitätsregression. Sie ist nicht bereits als Gesamtverfahren durch eine der Quellen experimentell validiert.
+Entscheidend ist noch die Frage, welche Priors wir für die unbekannten Parameter benötigen. Erst dann besitzen wir ein vollständig formuliertes Bayesian-Modell.
+
+A.6 Vierte Modellannahme: Die unbekannten Parameter erhalten Priorverteilungen
+Bis hierhin haben wir ein probabilistisches HMM mit einer Qualitätsregression formuliert. Allerdings könnten die Parameter bislang auch als unbekannte, aber feste Größen behandelt werden.
+Damit es sich um unser gewünschtes fully Bayesian Modell handelt, legen wir jetzt Wahrscheinlichkeitsverteilungen über diese unbekannten Parameter fest.
+Wir haben uns für möglichst einfache, konjugierte und zunächst schwach informative Priors entschieden.
+Konjugiert bedeutet in diesem Zusammenhang, dass die gewählte Priorfamilie mit der entsprechenden Likelihood mathematisch so zusammenpasst, dass die zugehörige Posteriorverteilung bei bekannten beziehungsweise passend approximierten latenten Größen in derselben Verteilungsfamilie bleibt.
+Diese Eigenschaft ist für die spätere Variational Inference besonders interessant.
+A.6.1 Priors für Anfangs- und Übergangswahrscheinlichkeiten
+Unsere Anfangsverteilung erhält einen Dirichlet-Prior:
+π∼Dirα0π.
+Für jede Zeile der Übergangsmatrix legen wir ebenfalls einen Dirichlet-Prior fest:
+Ak,:∼Dirα0,kA.
+Die Hyperparameter α0π und α0,kA bestimmen unsere Vorannahmen über die jeweiligen Wahrscheinlichkeiten.
+Damit können wir zunächst schwach informative Priors verwenden. Ob Selbstübergänge bereits durch den Prior bevorzugt werden sollen, können wir später anhand der Prozessdaten begründen und als gezielte Modellvariation untersuchen.
+Beal (2003) entwickelt Dirichlet-Priors für HMM-Parameter und zeigt, wie diese in die Bayesian-Inferenz eingehen.
+A.6.2 Priors für die Gauß-Emissionen
+Unsere diagonale Kovarianz erlaubt es uns, für jedes Prozessmerkmal und jeden Zustand einen Normal-Invers-Gamma-Prior zu verwenden.
+Zur Vereinfachung definieren wir:
+vkj=σx,kj2.
+Für die Varianz gilt:
+vkj∼InvGammaa0,jx,b0,jx.
+Der zugehörige Mittelwert erhält bedingt auf diese Varianz eine Normalverteilung:
+μkj∣vkj∼Nm0,jx,vkj/κ0,jx.
+Damit werden für jedes Merkmal zwei Dinge probabilistisch gelernt: sein zustandsspezifischer Mittelwert und seine zustandsspezifische Streuung.
+Die Normal-Invers-Gamma-Familie ist hier unsere konjugierte Vereinfachung für diagonale Gauß-Emissionen. P112 verwendet eine allgemeinere Normal-Wishart-Formulierung für multivariate Emissionen.
+A.6.3 Priors für die Qualitätsregression
+Unsere Qualitätsregression besitzt für jede Zielgröße r einen Koeffizientenvektor:
+βr∈RK.
+Auch die Regressionskoeffizienten sollen nicht als feste Werte gelernt werden.
+Daher wählen wir für jede Qualitätsgröße eine Bayesian lineare Regression mit Normal-Invers-Gamma-Prior.
+Für die Qualitätsfehlervarianz:
+σy,r2∼InvGammaa0,ry,b0,ry.
+Für die Regressionskoeffizienten:
+βr∣σy,r2∼NKm0,rβ,σy,r2V0,rβ.
+Dabei ist V0,rβ eine positiv definite Prior-Kovarianzmatrix.
+Eine einfache mögliche Wahl wäre eine skalierte Einheitsmatrix. Das würde die Koeffizienten zunächst unabhängig und mit gleicher grundsätzlicher Regularisierungsstärke behandeln.
+Die konkreten Hyperparameter bestimmen wir erst nach der Datenprüfung und nach Prior-Predictive Checks.
+A.6.4 Unser gesamter Modellprior
+Damit lässt sich die Priorstruktur folgendermaßen zusammenfassen:
+pΘ=pπ pA pΦ pΨ.
+(A.8)
+Hiermit nehmen wir eine anfängliche Unabhängigkeit der vier globalen Parametergruppen an. Innerhalb einzelner Gruppen sind durch die bedingten Priorverteilungen weiterhin Abhängigkeiten möglich, etwa zwischen einem Mittelwert und seiner Varianz.
+Das ist eine bewusste Vereinfachung unserer Modellstruktur.
+Viertes Ergebnis: Wir haben nicht mehr nur ein HMM mit unbekannten festen Parametern, sondern eine vollständig spezifizierbare Bayesian-Modellfamilie.
+Die mathematische Struktur der Priors ist festgelegt. Ihre konkreten Hyperparameter sind noch offen.
+
+A.7 Wie bilden wir daraus die Semi-Supervised Regression?
+Jetzt setzen wir die bisherigen Gleichungen für alle Trainingsringe zusammen.
+Dieser Schritt ist besonders wichtig, weil wir hier genau sehen können, wo die ungelabelten Daten in das Training eingehen und weshalb keine Pseudo-Labels benötigt werden.
+A.7.1 Gelabelter Ring
+Bei einem gelabelten Ring besitzen wir sowohl Xi als auch yi.
+Die Zustandsfolge ist dagegen nicht beobachtet. Wir müssen deshalb über sämtliche möglichen Zustandsfolgen summieren:
+pXi,yi∣Θ=Zi​pZi∣π,A pXi∣Zi,Φ pyi∣Zi,Ψ.
+(A.9)
+Die Summe läuft über alle KTi möglichen Zustandsfolgen der Länge Ti.
+Diese Gleichung zeigt: Wir behandeln keine einzelne geschätzte Zustandsfolge als sicher. Vielmehr berücksichtigen wir grundsätzlich alle möglichen Zustandsfolgen entsprechend ihrer Wahrscheinlichkeit.
+Genau darin besteht der probabilistische Charakter unserer Qualitätskopplung.
+A.7.2 Ungelabelter Ring
+Für einen ungelabelten Ring besitzen wir nur Xj.
+Hier wird der unbekannte Qualitätsvektor über seinen gesamten möglichen Wertebereich integriert:
+pXj∣Θ=Zj​R3​pXj,yj,Zj∣Θ dyj.
+Setzen wir unsere gemeinsame Modellfaktorisierung ein, können wir die bedingte Qualitätsverteilung integrieren.
+Da sie eine normierte Wahrscheinlichkeitsdichte ist, gilt:
+R3​pyj∣Zj,Ψ dyj=1.
+Damit erhalten wir:
+pXj∣Θ=Zj​pZj∣π,ApXj∣Zj,Φ.
+(A.10)
+Das ist die zentrale ungelabelte Likelihood unseres Modells.
+Wir müssen für diesen Ring also überhaupt keinen künstlichen Qualitätswert erzeugen.
+Die gesamte beobachtete Prozesssequenz liefert dennoch Informationen über die verborgenen Zustände, die Übergänge und die Prozessemissionen.
+Dies entspricht dem grundlegenden generativen Lernmechanismus von P112. Dort wird bei fehlender Qualitätsmessung der Beitrag der Prozessbeobachtung berücksichtigt, ohne einen Qualitätswert vorauszusetzen.
+A.7.3 Kombination aller gelabelten und ungelabelten Ringe
+Unter unserer Annahme, dass die einzelnen Ringsequenzen bei gegebenen globalen Parametern unabhängig sind, ergibt sich:
+pDL,DU∣Θ=i∈IL​pXi,yi∣Θj∈IU​pXj∣Θ.
+(A.11)
+Das ist unsere vollständige beobachtete Datenlikelihood für die direkte Semi-Supervised Regression.
+Nun kombinieren wir sie mit unserem Modellprior.
+Damit folgt durch das Bayes-Theorem:
+pΘ∣DL,DU=pΘ pDL,DU∣ΘpDL,DU.
+(A.12)
+Der Nenner ist die Modellevidenz, also die über sämtliche möglichen globalen Parameterwerte integrierte Wahrscheinlichkeit der beobachteten Daten.
+Da wir später die gesamten Zustandsfolgen ebenfalls probabilistisch behandeln müssen, interessiert uns darüber hinaus die gemeinsame Posteriorverteilung
+pΘ,Z∣DL,DU.
+Die exakte Berechnung dieses Posteriors wird aufgrund der unbekannten globalen Parameter, der zahlreichen möglichen Zustandsfolgen und unserer zeitübergreifenden Qualitätskopplung schwierig.
+An dieser Stelle setzt später unsere strukturierte Variational Inference an.
+A.7.4 Was lernen die ungelabelten Ringe tatsächlich?
+Hier sollten wir einen Punkt sehr deutlich festhalten.
+Die ungelabelten Ringe aktualisieren nicht unmittelbar die Regressionskoeffizienten B, da für sie keine Qualitätsmessungen vorhanden sind.
+Sie können jedoch die Schätzung der globalen HMM-Parameter und der Zustandsstruktur verbessern. Da die gelabelten und ungelabelten Ringe dieselben Prozessmodellparameter verwenden, kann sich dies mittelbar auf die Qualitätsregression auswirken.
+Wir erwarten also nicht automatisch eine Verbesserung, nur weil mehr Prozesssequenzen zur Verfügung stehen.
+Vielmehr müssen wir in den späteren Experimenten überprüfen, ob die aus DU zusätzlich gelernte Struktur für die Vorhersage unserer Qualitätsgrößen tatsächlich hilfreich ist.
+
+A.8 Die vollständige Bayesian-Gesamtstruktur
+Wir können nun die gesamte gemeinsame Verteilung unseres Trainingsmodells zusammenfassen.
+Sei
+Z={Zi:i∈IL∪IU}
+die Gesamtheit der verborgenen Zustandsfolgen.
+Dann lautet unser vollständiges Modell:
+Ri=pZi∣π,A pXi∣Zi,Φ pyi∣Zi,Ψ
+Uj=pZj∣π,A pXj∣Zj,Φ
+pΘ,Z,DL,DU=pΘi∈IL​Rij∈IU​Uj.
+(A.13)
+Hierbei sind Ri und Uj lediglich Abkürzungen für die vollständig ausgeschriebenen gelabelten beziehungsweise ungelabelten Ringfaktoren. Die Aussage ist mathematisch dieselbe wie die Produktfaktorisierung mit allen drei beziehungsweise zwei Wahrscheinlichkeitsfaktoren pro Ring.
+Diese Gleichung ist unser wichtigstes erstes Ergebnis aus Herleitung A.
+Sie enthält sämtliche Teile, die wir bisher festgelegt haben:
+p(Θ): Bayesian-Priors für alle globalen Parameter; Grundlage: Beal (2003), P112, P114
+p(Z_i | π,A): Dynamische Markov-Zustandsstruktur; Grundlage: Rabiner (1989), Beal (2003)
+p(X_i | Z_i, Φ): Zustandsabhängige Gauß-Emissionen; Grundlage: P112, hier diagonal vereinfacht
+p(y_i | Z_i, Ψ): Eine Endqualität aus dem gesamten verborgenen Zustandsverlauf; Grundlage: Eigene B1-Adaption, Batch-Endqualitätsliteratur
+Beiträge aus D_U: Direkte Nutzung ungelabelter Prozesssequenzen; Grundlage: P112
+Die Gleichung ist eine wohldefinierte gemeinsame probabilistische Modellstruktur, sofern die gewählten Prior- und bedingten Verteilungen ordnungsgemäß normiert sind.
+Sie beweist aber noch nicht, dass unser bevorzugtes strukturierte-VI-Verfahren alle benötigten Posteriorfaktoren effizient approximieren kann.
+Das ist die entscheidende Grenze unserer bisherigen Herleitung.
+
+Ergebnisse der Herleitung A
+Wir haben jetzt einen klaren mathematischen Ausgangspunkt erreicht.
+Erreichte Modellergebnisse:
+Ein vollständiger Ring wird als eigenständige HMM-Sequenz beschrieben.
+Die Prozessdynamik und die Gauß-Emissionen sind probabilistisch formuliert.
+Die B1-Qualitätslikelihood verwendet latente Zustandsanteile aus allen Zeitpunkten und einen dreidimensionalen Zielvektor.
+Alle unbekannten globalen Modellparameter besitzen vorgesehene Bayesian-Priors.
+Die gemeinsame Likelihood für gelabelte und ungelabelte Ringsequenzen ist hergeleitet.
+Noch nicht gelöst:
+Effiziente Berechnung der B1-Zustandsposterioren unter dem globalen Qualitätsterm.
+Vollständige strukturierte Variational-Inference-Updates und ELBO.
+Festlegung von K, konkreten Prior-Hyperparametern und weiterer Sequenzinformation für die Qualitätsregression.
+Ein entscheidender Punkt vor Herleitung B
+Aus der Qualitätsgleichung
+yi∣Zi,B,Σy∼N3BhiZi,Σy
+entsteht bei der Optimierung eine quadratische Funktion der Zustandsaufenthalte.
+Das bedeutet, dass wir später nicht nur die erwarteten Aufenthaltsanteile
+Eqhi
+benötigen, sondern auch ihre zweiten Momente:
+Eqhihi⊤.
+Diese zweiten Momente enthalten Informationen über die gemeinsame Unsicherheit der Zustandsaufenthalte.
+Genau hier liegt die Verbindung zur strukturierten Variational Inference, die wir entwickeln wollen.
+Unsere Schlussfolgerung für die Modellplanung: Wir behalten B1 bei. Die gemeinsame probabilistische Modellstruktur ist jetzt hinreichend konkret, um ihre Inferenz systematisch zu untersuchen.
+Als Nächstes folgt daher Herleitung B – Strukturierte Variationsverteilung. Dort müssen wir mathematisch prüfen, wie sich die erste und zweite Momentenstruktur der Aufenthaltsanteile aus dem HMM berechnen lässt und wie die Endqualitätslikelihood in eine optimierbare Variational-Inference-Struktur eingebunden werden kann.
+Dabei bleibt unser vereinbarter Rückfallpfad B2 bestehen. Wir nutzen ihn aber erst, falls die vollständige B1-Inferenz mathematisch oder rechnerisch nicht vertretbar ist – nicht als vorschnelle Vereinfachung.
+Quellenstatus und wissenschaftliche Grenzen
+Für die Herleitung A wurden zentrale Originale geprüft. Die allgemeinen HMM-Faktorisierungen, Bayesian-Priors und die Marginalisierung ungelabelter Daten sind durch die nachstehenden Quellen gestützt. Die spezifische B1-Qualitätskopplung, ihre diagonale Parametrisierung und die vollständige gemeinsame Modellgleichung (A.13) sind unsere eigene, ausdrücklich gekennzeichnete Modellkonstruktion. Eine veröffentlichte experimentelle Bestätigung exakt dieser Gesamtarchitektur liegt im bisherigen Quellenbestand nicht vor. Die vollständig strukturierte B1-VI bleibt eine notwendige eigene Herleitung.
+Quellenzuordnung (Arbeitsbibliografie)
+Rabiner (1989): klassische HMM-Grundlagen, Zustandsfolgen und Forward-Backward.
+Beal (2003): Variational Bayesian Hidden Markov Models, Dirichlet-Priors, Faktorisierung und Variational Updates.
+Shao et al. (2022), P112: Semi-Supervised Bayesian HMM, zustandsabhängige Emissionen, Priors und VI mit zeitpunktbezogenen Qualitätsgrößen.
+Chen et al. (2010): asynchrones Input-Output-HMM und Batch-Endqualitätsmessung.
+Mowbray et al. (2022): Batchprozesssequenzen und eine Endqualitätsmessung pro Batch; mehrere mögliche Zielgrößen.
+Shao, Ge & Song (2021), P111: Weighted Variational Inference und Einfluss ungelabelter Beobachtungen über C.
+Yuan et al. (2024), P114: wissensinformierte Priors für industrielle Bayesian-Semi-Supervised-Modelle.
+Gelman et al. (2020) und Gabry et al. (2019): Bayesian Workflow, Prior-/Posterior-Predictive Checks, Validierung.
+Hinweis: Diese Arbeitsbibliografie verweist auf die in unserem Quellenbestand vorhandenen Originalarbeiten. Sie ist noch kein vollständig nach Zitierstandard ausgearbeitetes Literaturverzeichnis. Separate Supplementary Materials und sämtliche Implementierungsdetails wurden nicht flächendeckend extrahiert.

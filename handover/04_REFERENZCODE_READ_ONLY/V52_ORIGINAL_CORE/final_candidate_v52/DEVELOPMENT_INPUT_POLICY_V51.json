@@ -1,0 +1,89 @@
+{
+  "protocol": "DM-V51-PROCESS-ONLY-SAFETY-2026-11-12-v1",
+  "purpose": "DEV-derived conservative input QA; not physical limits, not independent validation",
+  "training_ids_L": [
+    "DM04",
+    "DM05",
+    "DM06",
+    "DM09",
+    "DM12",
+    "DM16",
+    "DM17",
+    "DM18"
+  ],
+  "training_ids_U": [
+    "DM01",
+    "DM02",
+    "DM10",
+    "DM14"
+  ],
+  "never_used_test_ids": [
+    "DM07",
+    "DM08",
+    "DM11",
+    "DM15"
+  ],
+  "channels": [
+    "F_rad63",
+    "F_ax64",
+    "Ist_D150",
+    "Ist_s151",
+    "Ist_h152",
+    "RWG55"
+  ],
+  "units": [
+    "percent_machine_signal",
+    "percent_machine_signal",
+    "m",
+    "m",
+    "m",
+    "m_per_s"
+  ],
+  "timebase_s": 0.1,
+  "timebase_abs_tolerance_s": 0.002,
+  "min_initial_and_final_phase6_samples": 3,
+  "minimum_f2_samples": 111,
+  "minimum_f2_duration_s": 11.025,
+  "training_f2_min_samples": 148,
+  "training_f2_max_samples": 1293,
+  "feature_min_train": [
+    -0.7,
+    0.4,
+    0.32782,
+    0.03018,
+    0.0394,
+    0.0
+  ],
+  "feature_max_train": [
+    80.4,
+    90.6,
+    0.92029,
+    0.08096,
+    0.08204,
+    0.0476
+  ],
+  "feature_allowed_min": [
+    -20.975,
+    -22.15,
+    0.1797025,
+    0.017484999999999997,
+    0.028739999999999995,
+    -0.0119
+  ],
+  "feature_allowed_max": [
+    100.67500000000001,
+    113.14999999999999,
+    1.0684075000000002,
+    0.093655,
+    0.0927,
+    0.059500000000000004
+  ],
+  "allowed_domain_margin_fraction": 0.25,
+  "min_geometric_signal_span": [
+    0.0012413999999999993,
+    0.00013020000000000005,
+    0.00014219999999999996
+  ],
+  "training_development_ring_count": 12,
+  "caveat": "Gate screens obvious export errors; it does not prove valid physical operation or model calibration."
+}

@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-12",
+  "scope": "LINUX_DEVELOPER_QA_ONLY_NOT_INDEPENDENT_GENERALIZATION",
+  "python_version": "3.13.5",
+  "self_tests_passed": 7,
+  "negative_result_tamper_tests_passed": 7,
+  "synthetic_models_trained_twice": true,
+  "synthetic_epochs_per_model": 10,
+  "synthetic_max_abs_ELBO_repeat_diff": 0.0,
+  "synthetic_max_abs_mean_repeat_diff": 0.0,
+  "synthetic_max_abs_SD_repeat_diff": 0.0,
+  "trusted_synthetic_pickle_predictive_roundtrip_bitwise_equal": true,
+  "v53_original_fold_result_audit": "PASS",
+  "n_development_validation_rings": 8,
+  "n_historical_test_rings_scored": 0,
+  "dm_pickle_opened": false,
+  "official_final_model_training": false,
+  "windows_3_11_9_status": "PENDING",
+  "model_freeze_status": "NOT_APPROVED"
+}

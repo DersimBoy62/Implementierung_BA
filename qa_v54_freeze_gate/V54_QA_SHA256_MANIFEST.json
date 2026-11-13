@@ -1,0 +1,11 @@
+{
+  "scope": "read-only V5.4 pre-freeze QA overlay, NOT a model release",
+  "date": "2026-11-12",
+  "files_sha256": {
+    "pre_freeze_gate_v54.py": "f5b823edd7d043d6b182da63ff19f0e3f6525ed3c9670dae6a24de2646968aa7",
+    "README_V54_PRE_FREEZE_QA.md": "51062207f68dbe777463874c4e21cb78dbdbd8470f9f1507af32e62f1588c38a",
+    "V54_LINUX_QA_REFERENCE.json": "6ff42e476a4593dfb27b846e96f6cd0a46d795d74d90ee8fb6ebfc5e78e6237f"
+  },
+  "reference_v52_config_sha256": "88f9da6aa51be71db7968a8222cb36e5e4838b8a8431988bd7c54c09bace51ab",
+  "reuses_core_without_modification": true
+}

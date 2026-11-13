@@ -1,0 +1,112 @@
+Wissenschaftlicher Modell-Audit und priorisierter Evaluationsplan
+Teilfragen 2/3 · offene Punkte A–D · quellengebundener Befund- und Maßnahmenkatalog
+Stand: 12. November 2026. Dieses Dokument ist eine Arbeitsgrundlage für weitere Prüfungen und enthält keine nachträgliche Freigabe von Modellen oder neuen Testdaten.
+1  Forschungsziel und notwendige Unterscheidungen
+Ziel: Für zwei ringweise Endqualitätsgrößen (Außenunrundheit und Höhenschlag) untersuchen, ob ein Bayesian-HMM-basiertes Semi-Supervised-Regressionsmodell mit zusätzlichen Prozesssequenzen ohne verwendete Qualitätslabels eine verlässliche Qualitätsvorhersage liefert, wie sich das von streng überwachtem Lernen unterscheidet und wie weit die Leistung auf neue Ringe übertragbar ist.
+Teilfrage 2 (SSL-Nutzen): Effekte von gemeinsamen U-beeinflussten Skalierern/Initialisierung, gewichteten U-Prozess-ELBO-Beiträgen und lokaler y→q(z)-Rückkopplung getrennt ausweisen; je Zielgröße und je Ring.
+Teilfrage 3 (Generalisierung): Einmaligen historischen äußeren Test klar der damaligen V1 zuordnen; aktuelle V5.2-Leistung zunächst nur explorativ; externe Bestätigung benötigt neue, unberührte Prozess-/Qualitätsdaten oder einen vorab begrenzten transduktiven Sekundärtest.
+Wissenschaftliche Leitregel: Nicht jede neue Auswertung ist neue unabhängige Evidenz. Wiederholte CV, mehrere Seeds und zusätzliche Diagnostik erhöhen die Transparenz, aber nicht die Zahl unabhängiger Ringe.
+2  Tatsächliche Trainings- und Testhistorie
+Stand
+Trainings-/Testkonfiguration
+Wissenschaftlicher Status
+11.11.2026 · V1 / einmaliger OUTER
+K=3, C=1; 8 L + 4 U; äußere Ringe DM07/08/11/15 genau einmal bewertet. Außen-RMSE SSL/Strict/Mittelwert: 0,3888 / 0,5529 / 0,4953 mm. Höhe: 3,2064 / 3,3579 / 2,9785 mm.
+Einmaliger äußerer Test nur dieser damaligen Konfiguration. DM07/08/11/15 für spätere Modellwahl verbraucht.
+12.11.2026 · V4 Nested Optuna
+4×3 verschachtelte CV auf denselben acht zuvor wiederholt untersuchten Entwicklungslabels. Außen-RMSE Strict/Shared C0/SSL: 0,6541 / 0,5503 / 0,5453 mm; Höhe: 3,1756 / 3,2633 / 3,2100 mm.
+Methodisch kontrolliertere, aber erneut explorative Entwicklungs-CV. Nicht neue äußere Testbestätigung.
+12.11.2026 · V5.2 / V5.3 / V5.4
+K=2, C=0,2, P0/M2, 10 Epochen, 8 lokale VI-Schritte; reales 8L+4U-Entwicklungsmodell MODEL_8L4U_RUN01 gespeichert und geladen; V5.3 lokales Feedback 0 vs 8 über CV4.
+V5.2 hat reales Training und reproduzierbare Vorhersagen, aber keinen neuen unabhängigen äußeren Qualitätstest; Konvergenz nicht nachgewiesen.
+3  Wissenschaftliche Begründungsmatrix
+Status: G = gut technisch/numerisch belegt; E = explorativ empirisch gestützt; O = entscheidend offen. „Quelle“ benennt konkrete Original-Dateien/Prüfberichte, nicht ungeprüfte Literaturseiten.
+Annahme / Teilfrage
+Beobachtung und Befund
+Status
+Belege & Lücke
+Daten-/Labeldefinition
+2 Ziele, 6 F2-Kanäle, 16 aktive DM-Ringe, 8L/4U/4historisch; Datenhash fest.
+G
+DM-Master-Handover, Daten-/Kanalaudits; Original-Excel-Grünmarkierungen ggf. nochmals quellengebunden prüfen.
+Ringweise Datenaufteilung / Leakage
+Fold-lokale Zielskaler; U-Qualitäten maskiert; gesperrte äußere IDs; V5.1–5.4 Security-Tests.
+G mit Grenze
+V54-Original-CV-Audit, V51/V52 Tests; Originalpickle enthält weitere Datensätze, wird vor Filterung deserialisiert.
+HMM- und Emissionsstruktur
+K2, vollkovarianzielle Normal-Wishart-Prozessemission und M2-Momente numerisch geprüft; Alternativstrukturen exploriert.
+G/E
+V5 Mathematik-Audit, V5.3 Synthetik; K2/physikalische Zweckmäßigkeit nicht unabhängig bewiesen.
+Konvergenz des globalen VI-Trainings [A]
+V5.2-Entwicklungslauf 10 Epochen; letzter ELBO-Zuwachs +28,9777, Fold 3 +504,35.
+O
+V54_ELBO_HISTORY_AUDIT; keine Konvergenzschwellen mit langen Realtrainings geprüft.
+HMM-Zusatznutzen gegenüber Ringdeskriptoren [B]
+PHYS_NIG: 0,4803/4,3570 mm; früheres HMM-Hybrid: 0,5498/3,9918 mm. Designs mit ungleicher Feature-/Prior-Struktur.
+E/O
+Original: REFERENZ_QUALITAETS_LINK_CV4.json + REFERENZ_HYBRID_CV4.json; kein fairer kausaler HMM-Isolationstest.
+Zusatznutzen ungelabelter U-Daten [Teilfrage 2]
+V4: Strict 0,6541/3,1756; Shared C0 0,5503/3,2633; SSL 0,5453/3,2100 mm. C-Effekt klein, Höhenschlag uneinheitlich.
+E
+Original: NESTED_SUMMARY.json; 8 wiederholt verwendete Entwicklungslabels.
+Lokal gekoppelte Qualitäts-Posterioren
+V5.3 0 vs 8: ΔRMSE außen −0,0000021 mm; Höhe −0,0000431 mm, 21/24 lokale Updates akzeptiert.
+G/E
+V53_PAIRED_DEVELOPMENT_CV4_SUMMARY.json; Effekt real gemessen, aber nicht praktisch relevant.
+Priors / Shrinkage [D]
+Wishart-, NIG- und physikalische Priorvarianten exploriert; endgültige Priorwahl entwicklungsbedingt.
+E/O
+Vorhandene Priorstudien und Herleitungen A–D; keine systematische Prior-Predictive- und Sensitivitätsmatrix der finalen V5.2.
+Prädiktive Unsicherheiten [D]
+SDs ausgegeben; frühe 95-%-Normalapproximation deckte 4/4 je Ziel ab; keine exakten Mischungsquantile, keine Kalibrierung.
+O
+OUTER_FINAL_SCORE_V1.json + Herleitung D NEU; 4/4 ist keine belastbare Coverage-Schätzung.
+Reproduzierbarkeit / Modellpersistenz
+19/19 V5.2, 14/14 V5.3, V5.4 Integrität, reales Windows-Training/Pickle-Replay und Archivhash.
+G
+Nutzer-Terminalprotokolle, archivierte 67 Dateien, V54-Replay & SHA.
+Unabhängige Generalisierung V5.2 [C / Teilfrage 3]
+Keine neue unberührte X/y-Testgruppe für V5.2. V1-Testgruppe ist historisch geöffnet.
+O
+OUTER_FINAL_SCORE_V1.json ist nur für V1 confirmatory; V5.2 nur development.
+Physikalische Übertragbarkeit / Online-Nutzung
+F2-End-of-Process, Abschlussnachweis und Sensorprüfungen implementiert, aber keine neue reale Neuring-Positivprüfung.
+O
+V5.1/V5.4 Prediction-Boundary-QA; Maschinendokumentation für RWG55-Einheit/Bedeutung nachzuprüfen.
+4  Vorregistrierter Plan für zusätzliche Evaluation
+Die folgenden Schritte sind Vorschläge zur Vorregistrierung, noch KEINE ausgeführten Experimente. Reihenfolge priorisiert offene methodische Fragen und beschränkt das Risiko nachträglicher Optimierung.
+P1 – Konvergenzdiagnose [A]
+Versuchsdesign: Original K2/C0,2/P0/M2/NIG-Priors einfrieren. Entwicklungstrainings mit gleichem Start/Seed reproduzieren, danach ausschließlich trainingsintern längere Laufzeiten (z. B. 20/40/80) mit vollständiger ELBO-/Zustandsmassen-/Konditions-/numerischer Warnhistorie prüfen. Kein Validierungs-RMSE zur Epochenwahl. Auch mindestens drei vorab feste Seeds zur Stabilitätsanalyse; Zustandslabel-Permutationen berücksichtigen.
+Erwartetes Evaluationsmaterial: Konvergenzkurven je Seed, ELBO-Inkremente absolut und relativ, Zustandsbelegung, Varianzen, Monotonie, Diagnose „plateau / kein plateau“. Ein stabiler Verlauf beweist nur lokales/stationäres Verhalten, kein globales Optimum.
+P2 – Direkte HMM-Komponentenablation [B]
+Versuchsdesign: Gleiche festen CV4-Folds, dasselbe zulässige X-Fenster und exakt dieselben Zielwerte. Vier vorab definierte Vergleiche: Trainingsmittelwert; rein physikalischer Bayesian-NIG-Kopf; HMM-Zustandsmomente ohne Deskriptoren; HMM + identisch definierte Deskriptoren. Priors und Featureanzahl nachvollziehbar angleichen, keine Optuna.
+Erwartetes Evaluationsmaterial: Gepoolte RMSE/MAE je Ziel, ringweise ΔSE/ΔAE, Leave-one-ring-out-Richtungsstabilität, Modellkomplexität und Streuung. Explorativ auf 8 bekannten Entwicklungsringen.
+P3 – Isolierter U-Datennutzen [Teilfrage 2]
+Versuchsdesign: Die vorhandene V4-Kontrastzerlegung zuerst vollständig analysieren. Für die aktuelle eingefrorene K2/C0,2-Version nur falls zentral nötig: gepaarte, vorab fixe CV4 mit Shared C=0 und Shared C=0,2; gleiche U-beeinflussten X-Skalierer und Initialisierung. Separat Strict L-only. Keine C-Optimierung.
+Erwartetes Evaluationsmaterial: C-spezifischer Zusatznutzen je Ziel und Ring, Mittelwert vs. Extremringe, robuste Zeichendeutung; Unterschiede zwischen Strict und Shared nicht als reiner U-ELBO-Effekt bezeichnen.
+P4 – Priors und prädiktive Unsicherheiten [D]
+Versuchsdesign: Literatur-/Codeabgleich der tatsächlich verwendeten Wishart/NIG-Priors; prior-prädiktive Plausibilität in physikalischen mm-Einheiten und numerische Kondition. Bestehende CV-Out-of-Fold-Vorhersagen für standardisierte Residuen, Intervalle und proper Scores auswerten, soweit die tatsächlich implementierte Verteilung dies trägt. Keine falschen exakten t-Mischungsquantile.
+Erwartetes Evaluationsmaterial: Quellen- und Annahmetabelle mit Priorparametern; Intervalldeckung samt Nenner, mittlere Intervallbreite, NLL/CRPS nur bei korrekter prädiktiver Verteilung; breite Unsicherheit aufgrund n=8.
+P5 – Generalisierung und finaler Test [C / Teilfrage 3]
+Versuchsdesign: Vor weiterem externen Test: eine festgeschriebene, begründete Modellversion und Scores vorab fixieren. Für einen echten neuen Test zusätzliche Ringversuche/externen Datensatz mit bislang unbekannten X und y beschaffen, Vorhersagen vor y-Öffnung versiegeln, einmal auswerten. Wenn keine neuen Ringe vorliegen: lediglich retrospektive V1-Testhistorie + exploratory V5.2-CV berichten. Optional 4 maskierte U-Labels nur als transduktiven, ausdrücklich NICHT unabhängigen X-Test unter eigenem Protokoll.
+Erwartetes Evaluationsmaterial: Nur bei neuen Ringen: echte unabhängige RMSE/MAE, ringweise Fehler, Unsicherheit/Calibration und Erfolg vs. Baselines. Andernfalls „für V5.2 nicht unabhängig belegt“ explizit beibehalten.
+5  Verbindliche Regeln für die Auswertung
+Jede Analyse mit Experiment-ID, Datum, exaktem Quellarchiv, Konfigurations- und Daten-SHA, Code-Version, Seeds und unveränderten Fold-IDs versehen.
+Die zwei Zielgrößen getrennt berichten. Keine gemeinsame, dimensionslose „beste Qualität“ ohne vorab begründeten Gewichtungsschlüssel.
+Alle Baselines und Ablationen auf denselben Ringen paarweise vergleichen. Verbesserte einzelne Ringe zählen, aber n=8 nicht als Signifikanzbeweis ausgeben.
+Historische Outer-Testresultate niemals als unabhängigen Test für die nachfolgende Modellversion etikettieren.
+Data-Leakage, scheinbare U-Anteile, bekannte Zielwerte in U-Pickles und Rückkopplungsschritte im Methodikteil transparent beschreiben.
+Nicht nachträglich Parameter anhand des historischen Outer-Scores oder der wiederholt benutzten CV-Ringe einstellen.
+Berichtte Evidenz in drei Klassen trennen: mathematische/technische Korrektheit, explorative Entwicklungsbeobachtung, neue unabhängige Generalisierungsbestätigung.
+6  Quellen- und Prüfstatus dieser Arbeitsfassung
+Quellenstatus
+Einordnung
+Originaldatei direkt gelesen
+OUTER_FINAL_SCORE_V1.json (im vorhandenen Archiv 05_ABGESCHLOSSENER_AUSSERER_TEST); NESTED_SUMMARY.json; REFERENZ_QUALITAETS_LINK_CV4.json und REFERENZ_HYBRID_CV4.json.
+Aktuelle tatsächliche Nutzer-Outputs
+V5.2-, V5.3- und V5.4-Terminalausgaben mit 8L/4U-Modell-SHA und Vorhersage-Fingerabdruck; hochgeladene vier Fold-JSONs und Summary.
+Berichte/Herleitungen als sekundäre Einordnung
+MASTER_HANDOVER_BAYESIAN_BACHELOR_DM_2026-11-11.docx, MASTER_HANDOVER_BAYESIAN_BACHELOR_V3_V4_FORTSETZUNG_2026-11-12.docx, Herleitung D NEU, V5.1–V5.4-Prüfberichte.
+Originale im vorliegenden Schritt nicht vollständig nachgeprüft
+Jedes wissenschaftliche Originalpaper, sämtliche historischen Prior- und Kanalrohdaten. Seitenzahlen, maschinenphysikalische Grenzwerte und einzelne Priorvarianten dürfen erst nach Originalprüfung exakt zitiert oder als bestätigt bezeichnet werden.
+Entscheidung: Noch KEINE wissenschaftliche Endfreigabe. Nächster unmittelbar ausführbarer Forschungsschritt = P1 (Konvergenzprüfung) nach Prüfung der tatsächlichen Trainings-CLI/Checkpointfähigkeit. Vorhandene Entwicklungsversion und 67-Dateien-Archiv unverändert lassen.

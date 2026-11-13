@@ -1,0 +1,12 @@
+{
+  "research_overlay": "V6.0",
+  "dependencies": {
+    "V59_source_sha256": "ed2de4bc67631701071ef9a84570a1682fe863cb6617a63f2e2f55cdfdcd570d",
+    "V58_source_sha256": "585d51325443a7ef222f9afec4610779137372441263b1071c3317b247dde1bd"
+  },
+  "files": {
+    "README.md": "0501d63a02f72ad848c61a5e29e6e6593e662e443dd7b30f0dfad3b0452b37ec",
+    "V60_30E_LOCAL_RESEARCH_SUMMARY.json": "5181fb5862fc600dc7538333ad08dacf896a8130b1d66b3c9f2502f9b3401639",
+    "m2_prior_reduction_v60.py": "051987b95f83ecd4170154622cecda389fe0962dc7e9842f4c1fc169d0859d13"
+  }
+}

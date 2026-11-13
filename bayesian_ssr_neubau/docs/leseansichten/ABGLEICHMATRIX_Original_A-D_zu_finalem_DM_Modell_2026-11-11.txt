@@ -1,0 +1,187 @@
+Abgleichmatrix – Originalherleitungen A–D gegen eingefrorenen DM-Modellstand
+Nicht stillschweigend alte Modellgleichungen übernehmen: konkrete Änderung, Codebeleg, Tests, wissenschaftlicher Status
+11. November 2026
+1. Vorgehen und Evidenzstatus
+Vergleichsquellen: Original-Word A/B/C/D vom 27.–29.10.2026 (vollständig verfügbar, als Markdown inkl. mathematischer Formeln konvertiert); Codepakete vb_b1.py, full_markov_b1.py, fullcov_b1.py, two_head_b1.py, compare_two_head_cv4.py, dm_data.py, outer_predict_frozen.py, outer_score_frozen.py und einmalig hochgeladener Abschlussbericht. Die hier gelisteten Umstellungen sind nicht automatisch von den Originalpapern übernommen; wo die konkrete Methodenkombination neu ist, gilt „eigene Implementierung und Herleitung“.
+Alter Abschnitt
+Ursprüngliche Aussage
+Neues mathematisches / methodisches Ergebnis
+Code-/Evidenzbezug
+A Teil I
+Modellpfad B1 offen
+B1 ringweit realisiert, zusätzlich zwei Kopfstrukturen; B2 nur Historie
+two_head_b1.py
+A.1
+Drei Qualitätsgrößen geplant
+Exakt zwei bestätigte DM-Qualitätsfelder
+dm_data.TARGETS, Betreuervorgabe
+A.1
+Alte SFA-Prozessgrundlage
+16 aktive DM, 17 geliefert, DM13 ausgeschlossen
+DM-Input-/QA-Archive
+A.2
+HMM erster Ordnung
+Übernommen, K=3, Ring-Sequenzen
+two_head_b1.train
+A.3
+Diagonale univariate Gauß-NIG-Emission
+Vollständige multivariate Normal-Wishart-Emission
+fullcov_b1.py, NW-Tests
+A.3.1
+Bedingte Kanal-Unabhängigkeit
+Nicht mehr erzwungen; Off-Diagonal-Emissionen erlaubt
+Emissions- und Zustandsresiduen-Audits
+A.4.1
+Nur normierte Aufenthaltsanteile hZ
+hZ plus vordefinierte beobachtete Ringmerkmale
+extract_descriptors, augment
+A.4.2
+Gleiche Regressionsdarstellung je Output
+Zwei Eingangsvektoren mit D1=9, D2=8
+compare_two_head_cv4.OPTIONS
+A.4.3
+Kein Intercept
+Weiterhin kein separater Intercept (Summe h=1)
+Head mu Länge K+p
+A.4.4
+Verlust der gesamten Signalform
+Ringweite Kräfte, Geometrieänderungen und Dauer teilweise ergänzt; nicht die ganze Zustands-Reihenfolge
+12 Kennwerte / feste Teilmengen
+A.5
+pX,Z,Y als HMM+Qualität
+Neu explizit pX∣Z pY∣X,Z: Deterministische sjX keine dritte Datenlikelihood
+two_head_b1
+A.6.1
+Dirichlet-Priors
+Beibehalten, inkl. diagonaler Übergangsboost
+fullcov_b1.make_priors_full
+A.6.2
+Diagonal-NIG-Emissionsprior
+Normal-Wishart mit ν0=d+3 und W0=I/d+3
+fullcov_b1
+A.6.3
+Drei NIG-Regressionen über h
+Zwei NIG-Köpfe über h;sj, separate V0-Diagonalen
+two_head_b1.prior_head
+A.7
+Marginalisierung U, kein Pseudo-Label
+Beibehalten, U ausschließlich X im Modelleintrag; echte U-ELBO wirkt via globalen Prozessposterior
+two_head_b1.train, SSR-Ablationen
+B.2–B.4
+Strukturierte VI als Rechenkonzept
+Faktorzerlegung qΘi​qi tatsächlich implementiert
+full_markov_b1, fullcov_b1
+B.5
+Markovqi
+Freie, zeitabhängige Übergangslogits Qit
+full_markov_b1.unpack_logits
+B.6
+Gamma/Xi erforderlich
+Beibehalten, Forward-Backward / Markov-Marginalen
+markov_marginals
+B.7–B.8
+m=Eh,H=EhhT
+Exakte Zählmomenten-Rekursion unter q getestet, nicht exakter wahrer Zustandsposterior
+vb_b1.moments_occupancy
+B.9
+Erwartete Qualität für h
+Augmentierte m,H inkl. beobachteter Kopf-Kennwerte
+two_head_b1.augment
+B.10
+Qualitätsterm in ELBO
+Zwei Qualitätskopf-Terme werden zu gemeinsamen b,G,c zusammengefasst
+both_compressed_coeff
+B.11
+Lokaloptimum durch numerisches VI
+Analytische Gradienten mit L-BFGS-B, nur akzeptierter positiver lokaler Gewinn
+full_markov_b1, two_head_b1
+C.3
+ELBO Prozess+Qualität
+Gleiche Logik, jetzt volle Emission + zwei NIG-Köpfe + markovsche Entropie
+two_head_b1.train
+C.4.2
+Emissions-Elog bei NIG
+NW: Elogdet Präzision, d/κ, νx−mTWx−m
+fullcov_b1.elog_emission_full
+C.5.1
+Dirichlet-Updates
+Mit gewichteten U-Zählungen
+fullcov_b1.update_process_full
+C.5.2
+NIG-Update je Prozesskanal
+Volle Kreuzproduktmatrix und NW-Update
+update_process_full
+C.5.3
+NIG-Regression K-Zustandsanteile
+Separate NIG-Updates mit jeweiligen D_j und H-Tilde
+two_head_b1.fit_head
+C.6
+Dirichlet-/NIG-KL
+Dirichlet + Normal-Wishart + zwei NIG-KLs
+kl_all
+C.7
+Qualitätsfeedback über h
+Beide Qualitätsköpfe verändern q und liefern exakten markovschen Momentengradienten
+two_head_b1._local_augmented
+C.8
+Faktor C auf U-ELBO
+Bestätigt: kompletter U-Beitrag einschließlich Entropie; C=1 final; C0 getrennt von U-Skalierung
+audit_two_head_ssr.py
+C.9–C.10
+Trainingsablauf geplant
+10 Epochen, 8 lokale Schritte, K3, F2, V1, Seed 20261111; inner CV4 und Outer Freeze
+outer_predict_frozen.py
+C.11–C.13
+Tests und Instabilität
+Synthetische Enumeration, finite Differenzen, positive Definitheit, Leakage, Priors getestet
+test_*.py
+D.1–D.3
+Neuer Ring X ohne y
+Induktive X-only-Vorhersage; train-only Scaler und Kopfdeskriptoren
+outer_predict_frozen._x_only
+D.4
+m/H für new qZ
+Beibehalten, bei Vorhersage nur Prozess-FB
+two_head_b1.predict
+D.5
+Volle HMM-Parametersimulation als Möglichkeit
+Nicht implementiert; Elog-Process-FB statt wiederholtem globalem HMM-Parameterziehen
+fullcov_b1.infer_process_full
+D.6
+Bedingte Student-t aus NIG
+Beibehalten pro festem Qualitätsfeaturevektor; globale q und Mischung approximativ
+two_head_b1.predict
+D.7–D.8
+Mittelwert/Kovarianz dreier Outputs
+Zwei Kopf-Mittelwerte/Varianzen aus augmentierten m/H; Output-Kreuzkovarianz mathematisch möglich, nicht berichtet
+two_head_b1.predict
+D.9
+Exakte Mischungs-Quantilintervalle
+Noch nicht umgesetzt; nur y±1,96⋅SD
+OUTER_FINAL_SCORE_V1.json
+D.10
+P1/P2/P3-Ablation
+Nicht vollständig ausgeführt; offener neuer Forschungszweig
+Kein entsprechender Abschlussreport
+D.11
+RMSE/MAE/NLL/Coverage
+Abgeschlossener Outer: RMSE/MAE/Einzelring, nominale Momenten-Coverage; NLL-Kalibrierung weiter offen
+outer_score_frozen.py
+D.12–D.14
+geplante Experimente
+Breite DM-Entwicklungsstudie durchgeführt; Outer-Test einmalig abgeschlossen, weitere Modelle nicht auf altem Outer tunen
+Master-Handover / Freeze
+2. Literarische Begründung versus eigene Modellkonstruktion
+Allgemeine HMM/Variational-Methodik aus Rabiner (1989) und Beal (2003): Markov-Faktorisierung, Dirichlet-Posterior, Forward-Backward, ELBO.
+Shao et al. (2022): semi-supervised Bayesian-HMM, Normal-Wishart für multivariate Emissionspräzision; eine direkte vollständige ringweite zweiköpfige Qualitätskopplung wie hier ist daraus nicht unverändert übernommen.
+Shao, Ge & Song (2021): weighted-VI-Vergleichskontext; die HMM-Umsetzung mit vollständiger lokaler U-Entropie ist die eigene Adaption.
+Mowbray et al. (2022): Batch-Endqualität, wenige Qualitätslabels, redundante Prozessdaten; Motivation für Ringkennwerte und Redundanzdiagnostik.
+Eigene mathematische Integration: Präzisionsmatrizen + freie Markov-VI + Zählmomente + getrennte NIG-Köpfe + explizite Prozess-Qualitäts-Rückkopplung, Datensicherheits-/Testprotokoll.
+Quellenstatus: A–D-Originale und die lokalen Python-Archivfassungen sind verfügbar und wurden für diesen Abgleich gesichtet. Die bibliografischen Paper sind im bisherigen Projektquellenbestand bekannt und teilweise früher im Original geprüft; ihre exakten Seitenzahlen sollten bei der Manuskriptübernahme einzeln nachgeschlagen werden. Nicht behaupten, Supplements oder vollständige Seitenkontrollen seien in dieser Dokumentationsrunde abgeschlossen worden.
+3. Was noch nicht als erledigt bezeichnet werden darf
+Exaktes globales Bayesian-Integrieren von HMM-Parametern im posterior Predictive.
+Exakte Quantile der vollständigen prädiktiven Student-t-Zustandsmischung; gültig kalibrierte 95-%-Intervalle.
+Statistisch abgesicherte Modellüberlegenheit bei nur vier äußeren Ringen.
+Erneut unabhängige Testevaluation der nach dem 11.11.2026 neu entwickelten Modelle auf denselben DM07/08/11/15-Ringen.
+Neue umfassende Literaturneuheitsanalyse und sichere physikalische Identifizierung jedes Zustands.
+Aktualisierung des aktuellen Bachelorarbeit-DOCX und der früheren Projektarbeit selbst: Hier wurden neue getrennte Herleitungsdokumente angelegt, noch kein existierender BA-Fließtext überschrieben.

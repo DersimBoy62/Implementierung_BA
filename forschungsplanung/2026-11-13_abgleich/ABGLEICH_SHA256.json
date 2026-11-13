@@ -1,0 +1,17 @@
+{
+    "date":  "2026-11-13",
+    "scope":  "Dokumentationsabgleich ohne neue Modellversuche",
+    "matrix_rows":  13,
+    "docx_paragraphs_read":  185,
+    "local_markdown_links_valid":  true,
+    "baseline_files_checked":  157,
+    "baseline_unchanged":  true,
+    "files":  {
+                  "ABGLEICH_MATRIX.csv":  "73691f9c08740ce7c4a365dd18d152e9e63cf90a5367193821dc33198870432d",
+                  "BESTANDSPRUEFUNG.json":  "c874a340648d6a28e993582f2dbab057471a697d327ed1fe22ee5aee23a8a4af",
+                  "OPTIMIERUNGSFAHRPLAN_VOLLSTAENDIG.txt":  "d23adf1a79f3f3fdfa90133410cb08a6c6321d931c1e556dbc49bcc70f1899ce",
+                  "pruefe_und_extrahiere.py":  "3f83b046adaab3a807549340af8811ff140903f9f005738f934bcea57baac6ae",
+                  "README.md":  "3d0c29cfa37ea1080898a41fdf753bbeefa0a2522fb33220d90516040895f97d",
+                  "UNTERSUCHUNGSVORLAGE.md":  "87c4cc257f2ed9c47afad1f9e5e43c1dd6ef0f9ca2eb0482fcfc721aa3cf6948"
+              }
+}

@@ -1,0 +1,142 @@
+{
+  "suite": "DM-V53-SYNTHETIC-NUMERICAL-QA-PREFREEZE-v1",
+  "run_utc": "2026-11-12T14:04:01.677297+00:00",
+  "v52_release": "DM-V52-CONFIG-AND-ARTIFACT-2026-11-12-v1",
+  "v52_config_sha256": "88f9da6aa51be71db7968a8222cb36e5e4838b8a8431988bd7c54c09bace51ab",
+  "environment": {
+    "python_version": "3.13.5",
+    "python_implementation": "CPython",
+    "operating_system": "Linux",
+    "machine": "x86_64",
+    "byteorder": "little",
+    "word_bits": 64,
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "scikit-learn": "1.8.0",
+      "numba": "0.65.1",
+      "threadpoolctl": "3.6.0"
+    }
+  },
+  "no_training": true,
+  "no_dataset_deserialization": true,
+  "no_historical_test": true,
+  "synthetic_only": true,
+  "global_core_unchanged": true,
+  "n_pass": 14,
+  "n_total": 14,
+  "results": [
+    {
+      "test": "locked_V52_config_and_ten_math_hashes",
+      "status": "PASS",
+      "detail": "all 10 mathematical core SHA256 and V5.2 registered config verified"
+    },
+    {
+      "test": "M2_exact_path_enumeration",
+      "status": "PASS",
+      "detail": {
+        "paths": 32,
+        "max_abs_error": 1.1102230246251565e-16
+      }
+    },
+    {
+      "test": "local_objective_exact_path_enumeration",
+      "status": "PASS",
+      "detail": {
+        "paths": 32,
+        "max_abs_error": 0.0,
+        "scope": "local Markov+quality path objective, not full global ELBO"
+      }
+    },
+    {
+      "test": "M2_probability_PSD_invariants",
+      "status": "PASS",
+      "detail": "T=4,5,17,101: normalized, symmetric and PSD to numerical tolerance"
+    },
+    {
+      "test": "M2_analytic_vs_finite_difference_gradient",
+      "status": "PASS",
+      "detail": {
+        "coordinates": 7,
+        "max_abs_error": 8.658185279841746e-11
+      }
+    },
+    {
+      "test": "M2_long_2048_steps",
+      "status": "PASS",
+      "detail": {
+        "T": 2048,
+        "occupancy": [
+          0.594140828948566,
+          0.4058591710514302
+        ]
+      }
+    },
+    {
+      "test": "M2_near_deterministic_transitions",
+      "status": "PASS",
+      "detail": {
+        "T": 80,
+        "min_probability": 1e-12
+      }
+    },
+    {
+      "test": "Normal_Wishart_KL_self_identity",
+      "status": "PASS",
+      "detail": "Normal-Wishart KL(q||q)=0 for d=2 and d=6"
+    },
+    {
+      "test": "Normal_Wishart_near_degenerate_W",
+      "status": "PASS",
+      "detail": {
+        "scale_condition": 100000000.0,
+        "self_kl": 0.0,
+        "perturbed_kl": 0.2252729091292438
+      }
+    },
+    {
+      "test": "invalid_Wishart_scale_fail_closed",
+      "status": "PASS",
+      "detail": "indefinite precision Wishart scale correctly rejected"
+    },
+    {
+      "test": "full_covariance_update_collinear_process",
+      "status": "PASS",
+      "detail": {
+        "T": 50,
+        "features": 6,
+        "worst_W_condition": 2.1013987451722556
+      }
+    },
+    {
+      "test": "two_NIG_heads_positive_predictive_variance",
+      "status": "PASS",
+      "detail": "both synthetic Bayesian NIG heads yield finite positive predictive variance"
+    },
+    {
+      "test": "fixed_global_local_VI_steps_0_vs_8",
+      "status": "PASS",
+      "detail": {
+        "local_gain": 229.89391710999593,
+        "max_M2_moment_shift": 0.4185302666441513,
+        "iterations": 8
+      }
+    },
+    {
+      "test": "fixed_global_label_direction_response",
+      "status": "PASS",
+      "detail": {
+        "occupancy_z1_y_plus": 0.7902081992461588,
+        "occupancy_z1_y_minus": 0.20979180075384873
+      }
+    }
+  ],
+  "caveats": [
+    "No user Windows 3.11 verification yet",
+    "No empirical local feedback on real 8L+4U data",
+    "Synthetic strong quality heads are deliberately not fitted to DM labels",
+    "Not an independent quality/generalization test",
+    "Not a global proof of convergence or numerical stability",
+    "V5.2 model freeze remains provisional"
+  ]
+}

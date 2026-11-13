@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bayesian-ring-ssr"
+version = "0.1.0"
+description = "Eigenständiges variationales Bayesian SSR HMM für DM-Ringsequenzen"
+requires-python = ">=3.11,<3.13"
+dependencies = ["numpy>=2.0,<3", "scipy>=1.13,<2", "scikit-learn>=1.5,<2", "pandas>=2.2,<3.1", "numba>=0.61,<0.69", "threadpoolctl>=3.1,<4"]
+
+[project.optional-dependencies]
+audit = ["pytest>=8,<10", "pypdf>=5,<7"]
+
+[project.scripts]
+bayesian-ring-ssr = "bayesian_ring_ssr.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+

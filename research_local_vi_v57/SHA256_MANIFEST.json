@@ -1,0 +1,7 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "README.md": "fb0c4748e446fa881acf72779d7624075bcb8ce4df93efaf38018345d14d4ed4",
+    "audit_local_optimizer_v57.py": "24604fa4ad4145010d0a1fcdb56e9cc3c388a2da1fc6c909baea0adc48efb938"
+  }
+}

@@ -1,0 +1,238 @@
+Technischer und wissenschaftlicher Code-Audit
+Bayesian-SSR-Ringwalzmodell V5 · vorläufiger Hauptmodellkandidat
+Stand: 12. November 2026  |  Umfang: Quellcode, gesperrte Datentrennung, HMM/VI, U-ELBO, prädiktive Qualität, Persistenz und Reproduzierbarkeit.
+Status: AUDIT DURCHGEFÜHRT; ENDGÜLTIGER MODEL-FREEZE NICHT FREIGEGEBEN. Diese Untersuchung ist keine neue Generalisierungsbewertung und ändert die Kernmodule nicht.
+Kurzurteil
+Die V5-Architektur stimmt in wesentlichen Teilen mit dem dokumentierten Forschungsmodell überein. Die feste Aufteilung 8 L + 4 U wird beachtet, die vier historisch geöffneten Testringe werden vom Entwicklungstraining ausgeschlossen. Die 10 Kernmodule stimmen SHA256-genau mit der eingefrorenen Konfiguration überein. Ein bereits trainierter QA-Modellstand ist numerisch endlich, und unabhängige mathematische Kleintests reproduzieren Markov-Momente, Gradienten und Bayesian-Regressionstherme.
+Vor einer Freigabe sind insbesondere die Identitätssperre für neue Ringe, das Ende-des-Prozesses-Kriterium, die Zeitachsenkontinuität und die Plausibilitätsprüfung von Sensorsignalen zu verbessern. Bei der Modellinterpretation ist zwischen dem vollständigen SSL-Workflow, der nur indirekten U-Nutzung bei C=0 und dem zusätzlichen U-ELBO-Beitrag zu unterscheiden.
+Prüffeld
+Befund
+Freigabestatus
+Datenleakage / Split
+8 L, 4 U maskiert, 4 alte Testringe gesperrt
+technisch bestanden; Pickle enthält physisch 16 Ringe
+Modellgleichungen
+Konjugierte Prozess-/Qualitätsupdates und M2-Momente plausibel
+synthetische Nachweise positiv; keine Vollverifikation
+Vorhersageeingang
+kein Endsignal, keine dt-/Einheiten-Domaingrenzen
+NICHT freigeben
+Prozessprognose
+Speichern/Laden und Replay einer L-Prozesssequenz funktionieren
+technischer Smoke-Test, keine unabhängige Güte
+Modellauswahl
+K2/P0/M2/C0,2/Prior0,3853 robustheitsorientiert
+vorläufig, entwicklungsdatenabhängig
+
+1. Prüfgegenstand und Quellenstatus
+Geprüft wurden main_bayesian_ssr_v1.py (Zeilen 1–207), PROPOSED_MODEL_FREEZE.json, README_HAUPTMODELL_KANDIDAT.md und die zehn mitgelieferten final_core-Module einschließlich dm_data, quality_link_challenge, dynamic_quality_v2, dynamic_markov_v2, fullcov_b1, two_head_b1 und vb_b1. Zusätzlich wurden die 8 vorhandenen Vertragstests erneut ausgeführt sowie unabhängige numerische und Eingabe-Tests erstellt.
+Für reale Prozessprüfungen wurde ausschließlich die SHA256-verifizierte DM-Pickledatei verwendet, daraus aber nur die zuvor zugelassenen acht L-Ringe und vier maskierten U-Ringe in eine Entwicklungsansicht übernommen. Die ursprünglichen vier alten Testringe wurden nicht für Modellfit, Hyperparameterwahl oder Bewertungsmetriken verwendet. Das monolithische Pickle wird allerdings als Gesamtobjekt deserialisiert, bevor die Entwicklungsansicht gefiltert wird; diese technische Tatsache darf nicht mit einer streng separaten Dateispeicherung gleichgesetzt werden.
+Quellenstatus: Quellcode, Modellschema, QA-Manifest, Entwicklungssignale sowie drei C-Dosis-Zusammenfassungen liegen vor und wurden überprüft. Die Originalpaper von Shao et al. (2021/2022), Mowbray et al. (2022) und die Herleitungen A–D wurden in diesem Code-Audit nicht erneut seitenweise ausgelesen. Die Literaturbezüge sind deshalb als Dokumentationshintergrund und nicht als neu geprüfte Seitenbelege anzusehen.
+2. Trainingsdaten, Ringaufteilung und Qualitätsziele
+Verwendungsart
+Ring-IDs
+F2-Zeitpunkte
+L – Zielwerte erlaubt
+DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18
+6068
+U – nur Prozessdaten
+DM01, DM02, DM10, DM14
+1372
+Historisch äußerer Test (gesperrt)
+DM07, DM08, DM11, DM15
+0 im Fit
+
+Die beiden zugelassenen Ziele sind ovality.ovality_radial_mm (Außenunrundheit, mm) und planarity.height_deviation_mm (Höhenschlag, mm). Die früher diskutierten Felder ovality.r_outer_mm und ovality.r_inner_mm bezeichnen gemessene Extremradien, nicht zwei eigenständige Ringinnen- bzw. Ringaußenunrundheiten. Für DM04 und DM05 stimmt ovality.ovality_radial_mm bis auf Rundungsfehler mit r_outer_mm − r_inner_mm überein. Die grüne Originalmarkierung aus all_targets bleibt vor endgültiger Abgabe direkt anhand der maßgeblichen Exceldatei zu prüfen.
+Codeort: dm_data.py:11–16, 63–82; compare_dynamic_quality_cv4.py:25–55; main_bayesian_ssr_v1.py:27–30, 65–81. Die U-Qualitätswerte werden in der Entwicklungsansicht durch NaN ersetzt, bevor dm.view aufgerufen wird. Im Hauptfit werden niemals historische äußere Test-X an die Skalierer übergeben.
+3. Die sechs Eingangssignale und ihre technische Bedeutung
+Kanal
+Im Prozess modellierte Information
+Einheit laut Audit
+F_rad63
+Radialkraftsignal
+%
+F_ax64
+Axialkraftsignal
+%
+Ist_D150
+Ist-Ringdurchmesser
+m
+Ist_s151
+Ist-Wandstärke
+m
+Ist_h152
+Ist-Ringhöhe
+m
+RWG55
+Ringwachstumsgeschwindigkeit (ring growth rate)
+m/s
+
+Achtung: Ein früheres Deskriptor-Array nennt RWG55 „radial_speed“ (quality_link_challenge.py:47–49, compare_two_head_cv4.py:16–20). Der vorliegende 114-Kanal-Audit ordnet RWG55 dagegen als Ringwachstumsgeschwindigkeit (m/s) ein. Der Name im Code sollte vor dem wissenschaftlichen Methodiktext präzisiert und möglichst mit einem Maschinenhandbuch abgeglichen werden. Ein Rückschluss „Ringhöhe“ aus der Kanalnummer 55 ist unzulässig: Die Ringhöhe ist Ist_h152.
+Die Eingaben stammen ausschließlich aus kontinuierlichen Prozesssignalen. Fertigringmesswerte der Zielwerttabelle werden nicht als X verwendet. Die Eignung des Sets V1_Kern_6 ist durch frühere Entwicklungsexperimente begründet, nicht durch eine unabhängige Merkmals-Optimalitätsgarantie. Wegen hoher Korrelationen der Geometriesignale ist die volle Emissionskovarianz gegenüber einer naiv diagonalen Annahme besonders relevant.
+4. Zeitfenster F2 und Konsistenz der neuen Ringsequenz
+Training: F2 = phase804 ∈ {1, 2} und LaserOK=1 und MessEin=1; das extrahierte Zeitfenster muss innerhalb eines Rings eine lückenlos zusammenhängende Folge von Logger-Indizes sein (dm_data.py:70–80). In allen zwölf Entwicklungssignalen liegt der Zeitschritt nach F2-Gating bei 0,1 s, mit 148 bis 1.293 zulässigen Messpunkten je Ring. Die CSV-Vorhersageroutine verlangt nur ansteigende Zeitstempel, sechs Prozesspunkte und Indexkontinuität nach dem Gate.
+Das ist keine hinreichende Prozessabschlussprüfung. Ein kurzer, abgeschnittener F2-Ausschnitt oder eine Zeitachse mit einer großen Lücke wird derzeit eingelesen. Bei den zwölf originalen Entwicklungsloggern folgen nach dem F2-Ende jeweils noch 18–20 Loggerpunkte und am Loggerende Phase 6; nicht bei allen Ringen sind sämtliche nachfolgenden Punkte bereits Phase 6. Deshalb ist ein validiertes Ende-des-Prozesses-Kriterium anhand originaler Abschluss-/Phaseninformation zu definieren, statt pauschal eine willkürliche Mindestlänge zu setzen.
+5. Datenskalierung: P0 versus ringweise Deskriptoren
+Die sechs Prozesskanäle werden mit einem gepoolten Mittelwert und einer gepoolten Standardabweichung über alle verfügbaren Trainingszeitpunkte der 8 L + 4 U-Ringe standardisiert. Je länger ein Ringprozess ist, desto stärker beeinflusst er die Prozessskalierung. P0 ist damit ausdrücklich eine zeitpunktgewichtete, nicht ringgleichgewichtete Normierung (dm_data.py:95–102).
+Die beiden Qualitätsziele werden dagegen nur mit den acht tatsächlich gelabelten Trainingsringen skaliert, und zwar je Qualitätsdimension separat (dm_data.py:105–110). Die statischen, erst aus den skalierten Zeitreihen berechneten physikalischen Deskriptoren erhalten zwei eigene StandardScaler; hier trägt jeder Ring genau eine Deskriptorzeile bei (main_bayesian_ssr_v1.py:82–89). Diese beiden Skalierungsschichten dürfen im Methodikkapitel nicht vermischt werden.
+Bei C=0 werden U-Ringe weiterhin zur X-Skalierung, statischen Deskriptor-Skalierung und K-Means-Initialisierung verwendet. Ein C=0 innerhalb dieser gemeinsamen Pipeline ist daher kein striktes überwachtes Vergleichsmodell; die frühere Strict-L-only-Kontrolle trennt diesen Fall bewusst.
+6. Was bedeutet das U-Gewicht C tatsächlich?
+In dynamic_quality_v2.py:89–114 erhalten gelabelte Prozesssequenzen das Gewicht 1 und U-Prozesssequenzen das Gewicht C. Die Emissions- und Übergangssuffizienzstatistiken werden entsprechend gewichtet; positive U-Sequenzen besitzen keine Qualitätsterme. Das HMM-Training findet damit nicht auf gepseudolabelten Qualitätsmessungen statt.
+Eine zusätzliche Größenordnung liefert die gewichtete Anzahl von Prozesszeitpunkt-Beiträgen: Anteil_U(C) = C × 1.372 / (6.068 + C × 1.372). Bei C=0,2 sind dies 4,33 %, bei C=1 etwa 18,44 % und bei C=2 etwa 31,14 %. Das ist eine Hilfsrechnung der Datengewichte und KEIN exakter Anteil von posteriorer Information, da Übergangszählungen, Priors, Labels, Kovarianzparameter und Regressionsköpfe beteiligt sind.
+
+Abbildung 1: Rechnerischer U-Anteil der gewichteten Prozesszeitpunkte im vollständigen Entwicklungsfit (ohne Modellbewertung).
+Wegen unterschiedlicher Prozesslängen ist C nicht dasselbe wie der Anteil ungelabelter Ringe und nicht dasselbe wie das Prozentgewicht der gesamten ELBO. Die C-Dosisstudie sollte in Kapitel 4 genau mit dieser Differenz erläutert werden.
+7. Qualitätskopplung und physikalische Merkmalsgruppen
+Die Funktion extract_descriptors (quality_link_challenge.py:24–49) erzeugt zwölf physikalisch motivierte Deskriptoren aus den standardisierten Signalen: log(Prozessdauer), Kraftmittelwerte, Kraftstreuungen, Änderungen von Durchmesser/Wandstärke/Höhe, RWG55-Mittelwert/Streuung sowie maximale Kraftwerte.
+Qualitätskopf
+Selektierte Deskriptoren (Code-Indizes)
+HMM-Signalanteil
+Außenunrundheit
+0 log(Dauer); 1 Mittel F_rad; 3 Std F_rad; 5 ΔD; 6 Δs; 10 Max F_rad
+M2: zwei Occupancy-Werte + zwei Late-Early-Kontraste
+Höhenschlag
+0 log(Dauer); 2 Mittel F_ax; 4 Std F_ax; 7 Δh; 11 Max F_ax
+M2: zwei Occupancy-Werte + zwei Late-Early-Kontraste
+
+RWG55 wird vom HMM als sechster Prozesskanal genutzt, seine Mittelwert-/Std-Deskriptoren 8 und 9 gehen in der vorgeschlagenen SEPARATE_AXIAL-Variante jedoch in keinen der beiden physikalischen Regressionsköpfe direkt ein. Der Effekt von RWG55 auf die Qualität erfolgt hier über die gelernten HMM-Zustandsinformationen.
+Die M2-Merkmale bilden h_k = (1/T)∑_t 1[z_t=k] sowie die Differenz zwischen spätem und frühem Zustandsanteil. Nicht Viterbi-Pfade, sondern exakte erste und zweite Momente dieser Pfadfunktionen fließen in die posterioren Regressionsupdates ein.
+8. Mathematischer Modellkern: Abgleich mit dem Code
+8.1 Prozess-HMM
+Zustände folgen einer Markov-Kette mit Dirichlet-verteiltem Startparameter π und Übergangsmatrix A. Für x_t | z_t=k verwendet das Modell eine multivariate Normalverteilung mit voller Präzisionsmatrix Λ_k. Die globale Posteriorapproximation enthält q(π), q(A) und pro Zustand eine Normal-Wishart-Verteilung q(μ_k,Λ_k). Updates der natürlichen Suffizienzstatistiken stehen in fullcov_b1.py:71–94.
+8.2 Lokale Variationsverteilung
+Für gelabelte Ringe maximiert die lokale Optimierung die erwartete Prozess-Loglikelihood plus Markov-Entropie plus beide Qualitätsterme. q(z) wird in einer zeitabhängigen Markov-Variationsfamilie über q0 und Q_t repräsentiert, nicht in einer unabhängigen Pro-Zeitpunkt-Approximation. Die exakt berechneten Pfadmomente E[g], E[ggᵀ] und deren Gradienten stehen in dynamic_markov_v2.py:49–167 und werden in dynamic_quality_v2.py:37–59 genutzt.
+8.3 Zwei Bayesian-Qualitätsköpfe
+Je Qualitätsgröße verwendet der Code einen Normal-Inverse-Gamma-Prior für die Regressionsgewichte und die Residualvarianz. Die posterioren Updates berücksichtigen die ersten und zweiten Momente des HMM-Pfadmerkmals zusammen mit festen physikalischen Deskriptoren (two_head_b1.py:37–80). Die prädiktive Varianz addiert Parameter-/Residuenunsicherheit und Streuung über latente HMM-Pfade (dynamic_quality_v2.py:125–136).
+8.4 ELBO-Bewertung und Identifizierbarkeit
+Die ELBO nach dem globalen Schritt enthält für L-Ringe Prozess- und Qualitätsterme, für U-Ringe den C-gewichteten Prozessbeitrag, abzüglich KL aller globalen Approximationen. Damit ist eine klar definierte gewichtete Variationszielfunktion implementiert. Diese konkrete gewichtete Zieldefinition sollte als eigene Modellannahme dargestellt und nicht ungeprüft mit Standard-SSR-Paperformeln gleichgesetzt werden.
+Bei K=2 summieren sich die Zustandsbelegungsanteile zu 1 und die Late-Early-Differenzen zu 0. Damit enthält die HMM-Zusammenfassung lineare Abhängigkeiten; die Bayesian-Priors regularisieren den Regressionskopf. Diese Abhängigkeit ist mathematisch zu erwähnen, wenn Koeffizienten als einzeln interpretierbar dargestellt würden.
+9. Numerische Tests und Grenzen der Beweiskraft
+Test
+Ergebnis
+Bedeutung
+8 vorhandene V5-Vertragstests
+8/8 bestanden
+Config-Hashes, ID-Sperre für exakte Großschreibung, F2-Parser, Leakage-Spalten, Write-once, Deskriptormapping
+M2-Pfadmomente vs. 32 exakt enumerierte Zustandspfade
+max. Abweichung 2,2 × 10⁻¹⁶
+Bestätigung der ersten/zweiten Momente im kleinen K2/T5-Fall
+Finite-Difference gegen analytischen Markov-Gradienten
+max. Abweichung 4,5 × 10⁻¹⁰
+Starker numerischer Konsistenztest im synthetischen Fall
+Normal-Wishart-KL(q||q)
+0 bei d=2 und d=6
+Notwendige KL-Identität erfüllt
+Bayesian-Qualitätslogterm vs. komprimierte Momentenkoeffizienten
+Differenz 0
+Konsistente Qualitätsquadratik
+CSV-Lücke / nur sechs Punkte / ID-Alias
+alle drei Risiken reproduziert
+Gegenwärtige Eingabevalidierung ist noch nicht ausreichend
+Persistenz / DM04-Prozess-Replay
+alle 829 Werte identisch; Modell laden und vorhersagen erfolgreich
+Nur technische Wiederholbarkeit, keine Generalisierung
+
+Grenzen: Die synthetischen Tests beweisen nicht, dass beliebige lange Sequenzen numerisch stabil bleiben, die ELBO global optimal maximiert wird oder der gesamte Ansatz physikalisch richtig spezifiziert ist. Dazu fehlen gezielte Stress- und Reproduzierbarkeitsprüfungen.
+10. Trainierter QA-Lauf: ELBO, Zustandsposterior und lokales Feedback
+Der lokal vorhandene, SHA256-geprüfte QA-Trainingslauf hat genau 10 Epochen. Seine ELBO steigt von -26739.321 auf -24242.301; der Endwert der Zustandsanteile beträgt 63.38 % und 36.62 %. Die ELBO bleibt bis zur letzten Epoche ansteigend. Dies ist mit stabilen Iterationen vereinbar, aber ein ausreichender Konvergenznachweis ist daraus nicht abzuleiten.
+
+Abbildung 2: ELBO des vorhandenen technischen V5-Entwicklungsfits, ohne Qualitäts-Validierungswertung.
+Die kumulierten Verbesserungen durch lokale, gelabelte Zustandsoptimierung („local_gain“) sind pro Epoche sehr klein, ungefähr zwischen 3 × 10⁻⁵ und 3 × 10⁻⁴. Daraus folgt NICHT, dass die Kopplung nutzlos ist; es rechtfertigt aber eine gesonderte quantitative Ablation und Posterioranalyse. Der starke Prozesslikelihood-Anteil vieler Zeitpunkte kann die ringweite Qualitätstermwirkung überlagern.
+Das bestehende Trainingsmanifest enthält Hashes von Datensatz, Konfiguration, Kernmodulen und gespeichertem Modell. Es enthält bislang keine durch den Prozess erzeugten train/val Qualitätsprognosen, und solche Trainingsprognosen dürfen nicht als unabhängige Modellgüte interpretiert werden.
+11. Prädiktive Unsicherheit und Prozessoptimierung
+Die Vorhersage liefert für beide Zielgrößen Mittelwert und prädiktive Standardabweichung in mm. Der Export meldet ausdrücklich eine vollständige F2-Endprognose. Da zur Berechnung der späten HMM-Zustandsbelegung und der Dauer die komplette Prozesssequenz benötigt wird, ist daraus noch keine validierte Echtzeitregelung ableitbar. Ein zukünftiger Prozessoptimierer würde zusätzliche Prognosezeitpunkte, zulässige Stellgrößen und prospektive Prüfungen benötigen.
+Die acht äußeren, historisch wiederverwendeten Entwicklungsvorhersagen aus der Nested-Optuna-CV deuten auf einen Außen-RMSE-Vorteil des SSL-Workflows gegenüber Strict Supervised hin (0,5453 statt 0,6541 mm), während sich der Höhen-RMSE leicht verschlechtert (3,2100 statt 3,1756 mm). Auch die gesonderte U-ELBO-Ablation zeigt kleine Effekte. Diese Ergebnisse rechtfertigen einen Forschungsbeitrag, aber weder eine behauptete unabhängige Externvalidierung noch eine behauptete reale Prozessoptimierung.
+12. Risiko- und Korrekturregister (mit Codeort)
+12.1 Hoch
+A01  Ring-ID-Gate case-sensitive  [main_bayesian_ssr_v1.py:163–165]
+Befund: Historische ID „dm04“ wird für eine technische Replay-Prognose akzeptiert.
+Maßnahme: IDs normieren/canonicalisieren; sämtliche historischen DM01–DM18 sowie Aliasformen sperren.
+A02  Prozessabschluss nicht bestätigt  [main_bayesian_ssr_v1.py:139–143]
+Befund: Sechs aktive F2-Punkte werden akzeptiert. Bei den 12 Entwicklungsringen ist ein nachfolgender Abschluss im Logger beobachtbar.
+Maßnahme: Abschlussmarker/Phase-6-Trailer oder separat dokumentierten End-of-run-Nachweis verlangen.
+A03  Zeitlücken bleiben unbemerkt  [main_bayesian_ssr_v1.py:137–143]
+Befund: Zeitachse mit einer künstlichen ca. 20-s-Lücke wird akzeptiert; Trainings-F2 hat durchweg dt=0,1 s.
+Maßnahme: Delta-t-/Gap-Validierung mit begründeten Toleranzen; keine stillschweigende Interpolation.
+A04  Kein validierter Sensor-Domain-Gate  [main_bayesian_ssr_v1.py:168–181]
+Befund: Endliche, aber physikalisch unplausible Eingaben können erst bei numerischem Abbruch auffallen oder extrapoliert werden.
+Maßnahme: Einheiten-/Plausibilitätsprüfung und OOD-Abweisung/Warnung vor HMM-Inferenz; schwellenwerte trainingsbasiert dokumentieren.
+12.2 Mittel
+A05  Config-Schema nur teilweise abgesichert  [main_bayesian_ssr_v1.py:47–62]
+Befund: Z. B. „quality_targets“, „process_window“, „model“ und Skalierregel werden nicht vollständig gegen ausführbare Konstanten geprüft.
+Maßnahme: Vollständige Konfigurationsvalidierung; dynamisch geladene Config und tatsächlich verwendete Methoden deckungsgleich halten.
+A06  Write-once statt atomarer Modelltransaktion  [main_bayesian_ssr_v1.py:99–115]
+Befund: Bricht ein Lauf nach dem Pickle-Schreiben ab, kann ein unvollständiger Ergebnisordner zurückbleiben.
+Maßnahme: Temporäre Dateien, Hash+Manifest prüfen und danach atomar als vollständigen Ergebnisordner übernehmen.
+A07  Pickle + SHA ist keine authentifizierte Quelle  [main_bayesian_ssr_v1.py:146–158]
+Befund: Das Manifest ist neben dem Pickle veränderbar. Ein Dateihash schützt vor unbemerkter Einzeldateiveränderung, nicht vor gemeinsam manipulierter Herkunft.
+Maßnahme: Nur eigene vertrauenswürdige Modellpakete laden; ggf. signiertes Manifest oder sicherere Artefaktformate.
+A08  Versionswechsel blockiert alte Modelle  [main_bayesian_ssr_v1.py:150]
+Befund: Ein Wrapper-Codeupdate verändert dessen SHA und verhindert das Laden eines sonst intakten Modells.
+Maßnahme: Strikte Release-Versionen/Manifestformat definieren; ältere Versionen als unveränderliche Releases archivieren.
+A09  Kleiner lokaler Label-Feedback-Gewinn  [dynamic_quality_v2.py:37–59, 95–119]
+Befund: Im gespeicherten Entwicklungsfit liegen local_gain-Werte sehr nahe null. Die Rückkopplung ist implementiert, ihre empirische Bedeutung ungeklärt.
+Maßnahme: Gezielte steps=0 vs steps=8 Ablation nur auf Entwicklungsdaten; Wirkung auf Posteriormomente und Qualität messen.
+A10  Unvollständiger Konvergenznachweis  [dynamic_quality_v2.py:90–121]
+Befund: ELBO steigt bis Epoche 10 weiter; keine Abbruch-/Konvergenztoleranz, keine globale Optimierungsgarantie.
+Maßnahme: ELBO/Parameteränderungen protokollieren, alternative Epochenzahlen nur im Entwicklungsschema prüfen.
+A11  Fehlende verlässliche Unsicherheitskalibrierung  [dynamic_quality_v2.py:125–136]
+Befund: Prädiktive SD ist vorhanden, aber die acht explorativen äußeren Vorhersagen können keine stabile 95%-Deckung belegen.
+Maßnahme: Roh-SD, z-Residuen und spätere echte Kalibrierungsprüfung; keine garantierten 95%-Intervalle.
+A12  Kein bindendes Environment-Lock  [README_HAUPTMODELL_KANDIDAT.md]
+Befund: Der Container verwendet Python 3.13, der Nutzer Python 3.11; Paketversionen sind im Modellmanifest nicht gespeichert.
+Maßnahme: requirements-lock, Python/NumPy/SciPy/sklearn/Numba-Version und deterministische Threads protokollieren.
+12.3 Niedrig
+A13  Ungewichtete Zustandsmasse missverständlich  [dynamic_quality_v2.py:116–119]
+Befund: Die protokollierte state_mass ist über alle lokalen Ringe ungewichtet; sie ist keine durch C gewichtete Prozessmasse.
+Maßnahme: Beide Kennzahlen getrennt mit klaren Namen berichten.
+A14  RWG55-Bezeichnungen nicht konsistent  [quality_link_challenge.py:39–49; compare_two_head_cv4.py:16–20]
+Befund: RWG55 heißt im Kanalaudit ring growth rate (m/s); Code spricht von radial_speed.
+Maßnahme: Deskriptornamen und wissenschaftliche Beschreibung angleichen; Maschinenhandbuch gegenprüfen.
+A15  Neuer-Ring-Bericht ohne Modell-SHA  [main_bayesian_ssr_v1.py:182–188]
+Befund: Vorhersage enthält Konfig-ID und CSV-Hash, aber keinen Modellartefakt-SHA.
+Maßnahme: Modell-SHA/Training-Manifest-ID im Vorhersagebericht mitspeichern.
+12.4 Forschung
+A16  F2-Endprognose ≠ Online-Prozesssteuerung  [quality_link_challenge.py:24–28]
+Befund: Zeitdauer, Endgeometrie und spät-früh Zustandsvergleich verwenden vollständige Prozesssequenz.
+Maßnahme: In Kapitel 5 nur potenziellen Nutzen für Prozessoptimierung, keinen validierten geschlossenen Regelkreis behaupten.
+13. Verbindliche Reihenfolge vor dem finalen Modell-Freeze
+Gate 1 – V5 als Referenz archivieren: Quellcode, Datenhash, Konfigurationshash, QA-Modell und bisherigen Auditbericht unverändert lassen.
+Gate 2 – Vorhersageeingang härten: ID-Normalisierung, Prozessabschluss, Zeitraster, vollständige F2-Plausibilität, Kanal- und Einheitenprüfung, reproduzierbare negative Tests.
+Gate 3 – Provenienz und Export härten: versionierte Modellarchitektur, atomare Artefakte, Python-/Paketversionen, Modell-SHA in jedem Ergebnis, sensible Pickle-Ladepolitik.
+Gate 4 – Kernmodell numerisch prüfen: weitere KL-/Markov-Grenzfälle, sehr lange Sequenzen, near-degenerate W-Matrizen, Gradient-/ELBO-Bounds, lokales Feedback und Lerndynamik.
+Gate 5 – Train/Prediction-Parität: CSV-Importer auf neu erzeugten trainbekannten Prozesssequenzen gegen exakt denselben F2-View prüfen (keine Bewertung von Trainingslabels).
+Gate 6 – Forschungsentscheidung protokollieren: K2/P0/M2/C0,2/physical_var0,3853 ist ein bewusst robustheitsorientierter Kandidat. K2/C0,1 und K3/C2 erhalten separate, unveränderte Vergleichskonfigurationen.
+Gate 7 – Nach signierter Versionsfestlegung final trainieren, gespeichertes Modell nach Neustart reproduzierbar laden, Vorhersageformat/Fehlerbehandlung prüfen. Für Aussagen zur Generalisierung werden neue unberührte Ringe benötigt.
+14. Verwertung in der Bachelorarbeit
+Kapitel 4: experimentelle Untersuchung
+Vorgehen: exakte Prozessdatengrundlage 8 L + 4 U und zwei Qualitätsziele, Kanal-/Fensterwahl F2, P0-Skalierung und getrennte Ring-Deskriptoren, mathematische M2-Modellstruktur, exakte Variation von C in der gewichteten ELBO, 16er K-Raster, 24 Extended-Optuna-Trials, faktorielle Prior-/C-Ablation, Strict-vs-Shared-C0-vs-SSL, Seed-/Split-Sensitivität, C-Dosis über drei Datenaufteilungen, verschachtelte 4×3-CV und ringweise Fehler-/Unsicherheitsdiagnostik. Jede Ergebnisgrafik erhält den Hinweis Entwicklungsdaten/repeated-use.
+Kapitel 5: Diskussion und Fazit
+Diskussion: Quantifizierung, wann und für welches Ziel U-Daten helfen; Trennung der Effekte über Skalierung/K-Means und echte U-ELBO-Beiträge; mangelnde Monotonie des C-Effekts; Abhängigkeit von Priorwahl und K; unterschiedliche Fehlerprofile bei Unrundheit und Höhenschlag; begrenzte Labelzahl; kleine acht-Ring-Stichprobe; historische mehrfache Modellauswahl; Grenzen der kalibrierten Unsicherheit; nur End-of-Process-Prognose; zukünftig notwendige aktive Prozessoptimierung und neue Prospektivversuche.
+Wissenschaftliche Sprachregelung: Die vorgeschlagene V5-Hauptkonfiguration ist eine nachvollziehbare entwicklungsbasierte Festlegung, keine global oder extern nachgewiesene Optimalarchitektur. Die Quelle einer konkreten Entscheidung ist ein eigenes Experiment oder ein original geprüftes Paper; beides wird getrennt zitiert.
+Anhang A – Exakte technische Prüfdetails
+Feld
+Wert / Anmerkung
+Dataset-SHA256
+bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5
+V5-Konfiguration
+DM-V5-MAIN-PROPOSED-2026-11-12-v0
+Inputsequenzen
+8 L = 6068 + 4 U = 1372 F2-Messpunkte
+Trainingsstatus
+QA-Fit vorhanden, 10 Epochen, K2/M2/C0,2, noch keine externe Qualitätsbestätigung
+Modell-SHA256
+a8de1d40eaaab8c6dd53a2fb12424d6001e4e8305e5d41963d3dd6187727c3e5
+Python-Laufumgebung hier
+3.13.5 · NumPy 2.3.5 · SciPy 1.17.0 · scikit-learn 1.8.0 · Numba 0.65.1
+Nutzerrechner
+Python 3.11.x, Optuna 5.0.0 – exakte Modellversionsparität separat zu prüfen
+Testdateien
+test_main_bayesian_ssr_v1.py; audit_v5_math_and_io.py
+Audit-Artefakte
+AUDIT_MATH_IO_RESULTS_V2.json; AUDIT_FINDINGS.csv / .json
+
+Modul-Fundstellen: dm_data.py:11–16/63–110; quality_link_challenge.py:24–49; compare_two_head_cv4.py:16–26; dynamic_markov_v2.py:49–167; dynamic_quality_v2.py:25–136; fullcov_b1.py:39–108; two_head_b1.py:37–86; main_bayesian_ssr_v1.py:47–189. Dies sind prüfbare Dateistellen im unveränderten V5-Paket.
+Anhang B – Wiederholbare, zunächst ungefährliche Prüfungen
+Windows/PowerShell aus Implementierung_BA nach Entpacken des Auditskripts direkt in final_candidate_v5:
+.\.venv\Scripts\python.exe .\final_candidate_v5\test_main_bayesian_ssr_v1.py.\.venv\Scripts\python.exe .\final_candidate_v5\audit_v5_math_and_io.py --out results\v5_audit\MATH_IO_01.json
+Diese Befehle nutzen synthetische Daten bzw. die vorhandenen SHA-geprüften Kernel. Sie führen keinen neuen Modellfit und keine neue unabhängige Auswertung der Qualität durch. Das zusätzliche Auditskript weist zwei Risiken ausdrücklich als „RISK VERIFIED“ aus; das sind bestätigte Schwachstellen und keine bestandenen Sicherheitskontrollen.

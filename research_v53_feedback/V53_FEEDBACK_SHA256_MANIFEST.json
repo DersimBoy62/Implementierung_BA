@@ -1,0 +1,24 @@
+{
+  "name": "V53 development-only paired 0 vs 8 local VI overlay",
+  "date": "2026-11-12",
+  "no_dm_data_in_package": true,
+  "no_core_modules_in_package": true,
+  "source_v52_math_not_modified": true,
+  "files": [
+    {
+      "path": "README_V53_FEEDBACK_DEVONLY.md",
+      "size_bytes": 6939,
+      "sha256": "ded3afdb1c0010468427f5ad800d448b9a36d96fdc7cb8f20c1fc70f16ea76f0"
+    },
+    {
+      "path": "paired_feedback_dev_v53.py",
+      "size_bytes": 15933,
+      "sha256": "5b0d44b00d4249e66458e3794ec61fa2a00d930cf57f7c95b063f7bd3ef20eda"
+    },
+    {
+      "path": "test_paired_feedback_smoke_v53.py",
+      "size_bytes": 1293,
+      "sha256": "9cede35c0f7a210ec917f9965b32382978a15b278053257e74c6d592584b6cc7"
+    }
+  ]
+}

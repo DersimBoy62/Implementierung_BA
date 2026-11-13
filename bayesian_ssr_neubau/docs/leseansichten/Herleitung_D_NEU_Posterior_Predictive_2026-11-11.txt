@@ -1,0 +1,132 @@
+Herleitung D (Neufassung) – Posterior Predictive für zwei Qualitätsgrößen
+Exakte bedingte NIG-Integration, Zustandsmischung, implementierte Momentenapproximation und äußerer Test
+11. November 2026 | Abschlussmodell und offene prädiktive Erweiterungen
+D.0 Ausgangspunkt und Abgrenzung
+Das Original Herleitung_D_Posterior_Predictive_Bayesian_SSR.docx war für drei Qualitätswerte, eine reine Zustandsaufenthaltsregression und diagonale Emissionen geschrieben. Es diskutierte zudem vollständige prädiktive Simulation, Importance Sampling und Quantilintervalle als Entwicklungswege. Der am 11.11.2026 tatsächlich einmalig extern geprüfte Code two_head_b1.predict und outer_predict_frozen.py berechnet demgegenüber für zwei Qualitätsgrößen jeweils den prädiktiven Mittelwert und eine momentbasierte Standardabweichung. Diese Implementierungsgrenze wird im Folgenden explizit hergeleitet.
+D.1 Neues Testobjekt und eingefrorene Modellparameter
+Für einen neuen Ring * ist ausschließlich seine vollständig aufgezeichnete Loggersequenz X* mit Zeitachse t* verfügbar. Beide Qualitätswerte sind für die Vorhersage unbekannt. F2-Fenster und die sechs Loggerkanäle werden identisch zum Training angewandt. Der Prozess-Scaler SX, die zwei Descriptor-Scaler Ssj und der Qualitäts-Scaler SY stammen ausschließlich aus den jeweiligen Trainingsringen. Die zugehörigen Ringkennwerte werden deterministisch berechnet:
+s*j=Ssj​fjSXX*,t*,  j∈{1,2}.
+Die relevante globale Approximation lautet
+qΘ=qπk​qAk,:k​qμk,Λkj=12qβj,σj2.
+Die beiden Qualitätsköpfe besitzen feste, im Protokoll dokumentierte unterschiedliche Eingangsdimensionen D1=9 und D2=8. Die Standardisierung der Zielgröße wird am Ende rückgängig gemacht; tabellierte Außen-Testfehler sind daher mm, nicht normierte Einheiten.
+D.2 Der ideale vollständige Posterior Predictive
+Formal wäre die volle Bayesian-Vorhersage
+py*∣X*,D=∫Z*​py*∣Z*,X*,Ψ pZ*∣X*,ΘX pΘ∣D dΘ.
+Unsere Software approximiert pΘ∣D durch qΘ und den neuen Zustandsfaktor durch eine Prozess-Forward-Backward-Verteilung auf erwarteten HMM-Logpotenzialen. Eine vollständige Monte-Carlo-Marginalisierung über global zufällige HMM-Parameter findet bei der eingefrorenen Routine nicht statt. Auch die zwei Qualitätskopffaktoren sind im globalen Variationsposterior faktorisiert. Man darf die nachfolgend berechneten Momente deshalb nicht als exakte vollständig integrierte wahre Posterior-Predictive-Momente ausgeben.
+D.3 Induktive lokale Zustandsinferenz ohne Qualitätslabel
+Für X* wird
+ℓ*tk=Eqμk,ΛklogNdx*t;μk,Λk−1
+sowie Eqlogπ und EqlogA verwendet. Die neue prozessbedingte Zustandsverteilung q*Z*∣X* entsteht mit Forward-Backward. Anders als beim Training eines gelabelten Rings wird hier die Qualitätslikelihood nicht in den lokalen Faktor aufgenommen – sonst würde man das unbekannte Testlabel voraussetzen. Die Momentenrekursion aus B liefert
+m*=Eq*h*, H*=Eq*h*h*⊤, Covq*h*=H*−m*m*⊤.
+Für jeden Qualitätskopf werden wieder die deterministischen X-Kennwerte angefügt:
+m*j=m*s*j,  H*j=H*m*s*j⊤s*jm*⊤s*js*j⊤.
+D.4 Bedingte Qualitätsprädiktion: Normal-Invers-Gamma führt zu Student-t
+Für einen fixierten augmentierten Qualitätsvektor u*j und ein NIG-Posterior qβj,σj2=NIGμj,Vj,aj,bj ist die integrierte ein-dimensionale Verteilung
+y*j∣u*j,qβj,σj2∼t2aj​μj⊤u*j, bjaj1+u*j⊤Vju*j.
+Der zweite Parameter ist hier das Quadrat der Student-t-Skala. Die Verteilungsvarianz existiert für aj>1 und beträgt
+Vary*j∣u*j=bjaj−11+u*j⊤Vju*j.
+Der für X* relevante Zustandspfad ist aber weiterhin unbekannt. Daher entsteht nach Mischung über q*Z* im Allgemeinen keine einzelne Student-t-Verteilung, sondern eine Mischung mit zufallsabhängigem h*Z*.
+D.5 Tatsächlich implementierter prädiktiver Mittelwert
+Der Erwartungswert der unter q* gemischten bedingten Regressionsprädiktion ist
+y*j=μj⊤m*j.
+Im Original D war dies Bmh für drei Zielgrößen. Neu ist die Summe eines zustandsbedingten und eines direkten beobachteten Kennwertanteils für jeden der zwei Köpfe:
+y*j=μhj⊤m*+μsj⊤s*j.
+Der Code two_head_b1.predict verwendet genau diese Gleichung. Der Mittelwert ist auf standardisierter Zielskala berechnet und wird mit dem ausschließlich aus L-Ringen angepassten Y-Scaler nach mm zurücktransformiert.
+D.6 Tatsächlich implementierte prädiktive Varianz
+Mit dem Gesetz der totalen Varianz und den exakten Momenten unter dem lokalen Markov-Faktor folgt
+v*j=bjaj−11+trVjH*j+μj⊤H*j−m*jm*j⊤μj.
+Die zwei Summanden repräsentieren (i) erwartete bedingte Beobachtungs-/Regressionsunsicherheit und (ii) Varianz des posterioren Zustandsaufenthaltes bei festem Regressionsmittelwert. Der zweite Term betrifft nur den variablen Aufenthaltsblock, da die aus X* berechneten Descriptoren deterministisch sind. Der Code begrenzt einen durch Rundung leicht negativen Zustandsvarianzterm auf null, ebenso wird die ausgegebene Standardabweichung numerisch positiv gehalten.
+SDy*j=maxv*j,10−12.
+Zentrale Einschränkung: Die Unsicherheit des globalen HMM-Parameters ΘX wird nicht voll durch wiederholtes Simulieren aus qΘX und erneute Zustandsinferenz integriert. Die Standardabweichung ist eine momentbasierte, variational bedingte Approximation; nicht zwingend die vollständige physikalische Prognoseunsicherheit.
+D.7 Abhängigkeiten zwischen den zwei Qualitätsprognosen
+Obwohl qβ1,σ12 und qβ2,σ22 als globale Faktoren separat sind und die Qualitätsrauschkomponenten bedingt unabhängig angenommen werden, teilen beide Köpfe denselben zufälligen Aufenthaltsvektor. Daher enthält ihre prädiktive Kreuzkovarianz mindestens den gemeinsamen Zustandsunsicherheitsbeitrag
+Covstatey*1,y*2=μh1⊤H*−m*m*⊤μh2.
+Im eingefrorenen äußeren Ergebnis wurden jedoch nur die zwei marginalen Standardabweichungen gespeichert, keine vollständige 2×2-Qualitäts-Kovarianzmatrix. Die obige Beziehung gehört daher zur mathematischen Konsequenz des Modells, nicht zu den bereits berichteten numerisch ausgegebenen Kennzahlen.
+D.8 Quantile, Intervalle und was der Code wirklich berechnet
+Das Original D.9 sah prädiktive Samples und Quantile aus der gesamten Zustands-/NIG-Mischung vor. Diese exakten numerischen Mischungsquantile wurden nicht implementiert. Stattdessen enthält der Abschlussbericht die deskriptive Normalapproximation
+I*j95%,approx=y*j−1,96SDy*j, y*j+1,96SDy*j.
+Diese Intervalle sind weder exakte 95-%-Quantilintervalle der Student-t-Mischung noch nachweislich frequentistisch kalibriert. Auf vier äußeren Ringen liegen die beiden Qualitätswahrheiten jeweils innerhalb dieses approximierten Intervalls (4/4 je Ziel). Die prädiktiven Halbbreiten sind relativ groß; daraus lässt sich keine allgemeine Kalibrierungsaussage ableiten.
+Die ursprünglich vorgesehene Klassifikation P1/P2/P3 ist im finalen Code nicht als systematisch durchgeführte experimentelle Ablation vorhanden. P2 (bedingte global-HMM-Parametersimulation mit Importance-Weighing und ESS) und vollständige Mischungsquantile bleiben mögliche neue Forschung, nicht Ergebnis dieser Abschlussauswertung.
+D.9 Definition und dokumentierte Berechnung der äußeren Qualitätsmetriken
+Für N=4 äußere Test-Ringe wird jeder Ring gleich gewichtet, unabhängig von Ti:
+RMSEj=1Ni=1Nyij−yij2,  MAEj=1Ni=1Nyij−yij.
+Für den versiegelten äußeren Test gelten die unveränderten, im hochgeladenen OUTER_FINAL_SCORE_V1.json gespeicherten Werte:
+Modell
+RMSE Außen [mm]
+RMSE Höhenschlag [mm]
+MAE Außen [mm]
+MAE Höhenschlag [mm]
+Zweikopf-Bayesian-SSR (primary_ssl)
+0,3888
+3,2064
+0,3564
+2,8053
+Zweikopf rein überwacht (strict_supervised)
+0,5529
+3,3579
+0,4834
+3,1092
+Trainingsmittelwert (mean_baseline)
+0,4953
+2,9785
+0,4474
+2,5937
+Die paarweise Differenz des mittleren quadratischen Fehlers primary_ssl minus control lautet in mm²: gegen strict_supervised −0,1545467,−0,9943688, gegen mean_baseline −0,0941513,+1,4098057. Ein negativer Wert bevorzugt SSR; beim Höhenschlag ist die Baseline besser.
+D.9.1 Die vier individuellen äußeren Ringprognosen des Hauptmodells
+Ring
+Wahrheit Außen [mm]
+SSR Außen [mm]
+Wahrheit Höhenschlag [mm]
+SSR Höhenschlag [mm]
+SD Außen / Höhe [mm]
+DM07
+2,5444
+2,1491
+16,7152
+15,4342
+0,8553 / 3,5650
+DM08
+2,7078
+2,2471
+13,6179
+18,7056
+0,8513 / 3,8578
+DM11
+2,3657
+1,8889
+16,5130
+13,1317
+0,6472 / 2,8221
+DM15
+1,8461
+1,9387
+17,4662
+18,9375
+0,8464 / 4,0325
+Die numerische Interpretation ist differenziert: Außenunrundheit ist bei vier Ringen besser als beide Kontrollmodelle im aggregierten RMSE. Für Höhenschlag ist SSR besser als dieselbe zweiköpfige Architektur ohne U-Ringe, aber schlechter als die simple Baseline. Bei DM08 ist der absolute Höhenschlagfehler des SSR-Modells ungefähr 5,09 mm. Es wäre daher wissenschaftlich falsch, eine generell überlegene Qualitätsvorhersage für beide Ziele zu behaupten.
+D.10 Ablauf der einmaligen äußeren Auswertung
+Protokoll-Freeze: DM_TWO_HEAD_PROTOCOL_FREEZE.json; Originaldaten-SHA256 bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5. Die Vorhersagen wurden am 11.11.2026 mit outer_predict_frozen.py für alle drei Modelle erstellt und mit SHA256 vor Testlabelöffnung versiegelt:
+fcaf3cf7874070845641e6f46c5e9dcafe77dde5812427caa3dde87a8178ab26.
+Danach wurde outer_score_frozen.py einmalig ausgeführt. Die äußere Testauswertung ist nun geschlossen. Die Ringe DM07, DM08, DM11 und DM15 dürfen bei späteren Modellsuchen nicht erneut als unangetasteter Testsatz behandelt werden. Die Kenntnis der Resultate kann selbst bei guter Absicht die nächste Modellentwicklung beeinflussen. Neue unabhängige Bestätigung erfordert neue zuvor ungesehene Ringe oder einen externen Datensatz und ein zuvor festgelegtes Bewertungsprotokoll.
+D.11 Abgleich mit Original D und zukünftige Forschungszweige
+Original-D-Teil
+Neue Aussage und Status
+D.1–D.3
+Neuer Ring nur aus Prozess-X; J=2; zeitlich vollständige Sequenz; train-only Skalierung.
+D.4
+Exakte Aufenthaltsmomente unter dem prozessbedingten lokalen q* aus B.
+D.5
+Vollständige HMM-Parameterintegration nicht implementiert; erwartete Prozess-Logpotenziale.
+D.6–D.7
+Zwei NIG-Köpfe mit unterschiedlichen augmentierten Momenten; Mittelwert und Varianz hergeleitet.
+D.8
+Mögliche Ziel-Kreuzkovarianz nach Integration von Zustand, nicht als numerischer Output verfügbar.
+D.9
+Nur μ±1,96 SD, keine echten Mischungsquantile.
+D.10
+P1/P2/P3 noch kein abgeschlossenes Vergleichsexperiment.
+D.11–D.13
+Ringweise Testmetriken, Commit und One-time-Score aus tatsächlich ausgeführtem Pipeline-Code.
+D.14–D.16
+Numerische Teilprüfungen ausgeführt; Unsicherheitskalibrierung mit N=4 offen.
+Ergebnis der neuen Herleitung D: Zwei probabilistische Endqualitätsprognosen mit getrennten Bayes-Köpfen, gemeinsamer latenter Zustandsunsicherheit und implementierter momentbasierter posterior-prädiktiver Approximation. Die Formeln unterscheiden ausdrücklich eine mathematisch umfassendere idealisierte Bayesian-Predictive von der tatsächlich ausgeführten, approximativen Abschlussroutine.

@@ -1,0 +1,94 @@
+Herleitung B (Neufassung) – Strukturierte Variational Inference und zwei Qualitätsköpfe
+Freie Markov-Variationsfamilie, exakte Aufenthaltsmomente, augmentierte Qualitätsstatistiken
+11. November 2026 | mathematisch mit Implementierung abgeglichen
+B.0 Status und prüfbare Referenz
+Die ursprüngliche Herleitung B (Herleitung_B_Strukturierte_Variationsverteilung_Bayesian_SSR.docx) beschrieb ein Modell mit diagonalen Prozessemissionen, drei Qualitätswerten und gemeinsamer Zustandsaufenthaltsregression. Der neu implementierte Zweikopf-Modellkern weicht davon ab. Folgende Darstellungen wurden mit full_markov_b1.py, fullcov_b1.py und two_head_b1.py abgeglichen. Die exakte Berechnung der ersten/zweiten Momente gilt innerhalb der Markov-Variationsfamilie; die globale Posteriorapproximation bleibt eine Variationsapproximation.
+B.1 Ausgangspunkt: exakter gemeinsamer Posterior
+Gegeben sind D=XL,YL,XU und globale Parameter Θ aus Herleitung A. Der exakte Posterior
+pΘ,Z∣D=pΘ,Z,XL,XU,YLpXL,XU,YL
+ist wegen der Kopplung der gesamten Sequenz an einen einzigen Qualitätswert und wegen der nichtlinearen Integration über sämtliche Parameter und Zustandsfolgen praktisch nicht geschlossen auswertbar. Die direkte Produktzerlegung der Qualitätslikelihood über einzelne Zeitpunkte ist nicht zulässig: Jede yij ist eine ringweite Beobachtung, keine Serie von Ti unabhängigen Labels.
+B.2 Gewählte Variationsfamilie
+Wir approximieren den Posterior durch
+qΘ,Z=qπk=1KqAk,:k=1Kqμk,Λkj=12qβj,σj2i∈L∪U​qiZi.
+Die globalen Faktoren bleiben in den jeweiligen konjugierten Familien: Dirichlet, Normal-Wishart und Normal-Invers-Gamma. Für die lokalen Faktoren wird nicht die künstlich vollfaktorisierte Zeitpunktsform t​qzt gewählt, sondern eine frei parametrisierte Markov-Kette:
+qiZi=ρizi1t=2TiQi,t−1zi,t−1,zit.
+Dabei sind ρi∈ΔK−1 und alle zeitabhängigen Zeilen Qi,t−1k,:∈ΔK−1 frei. In full_markov_b1.py werden sie durch Softmax aus reellen Logits parametrisiert. Dies unterscheidet FULL_JOINT grundlegend von der historisch ebenfalls getesteten, auf konstante Zusatzpotenziale beschränkten Variante TILT_JOINT.
+B.3 Prozessmarginalen und Übergangsstatistiken
+Die prozessbezogene lokale Zielfunktion hängt von den erwarteten Log-Priors, Log-Übergängen und Emissionen ab. Benötigt werden
+γitk=qizit=k,  ξitkℓ=qizit=k,zi,t+1=ℓ.
+Für eine explizite lokale Markov-Kette gilt γi1=ρi und
+ξitkℓ=γitkQitk,ℓ,  γi,t+1,ℓ=k=1Kξitkℓ.
+Die Zustands- und Übergangszählungen sind nik=t​γitk und Nikℓ=t=1Ti−1ξitkℓ. Ihre Summen lauten k​nik=Ti und kℓ​Nikℓ=Ti−1. Für ungelabelte Ringe ist die optimale Markov-Verteilung bei fixierten globalen Faktoren und ohne ringweiten Qualitätsbeitrag durch logstabilen Forward-Backward auf den erwarteten HMM-Logpotenzialen berechenbar. Für gelabelte Ringe wird die freie Markov-Verteilung zusätzlich nach dem globalen Qualitätsterm optimiert.
+B.4 Exakte erste und zweite Aufenthaltsmomente
+Die relative Aufenthaltsstatistik eines Rings ist
+hikZi=Ni,TikTi,  Nitk=s=1t1{zis=k}.
+Die für die Regression notwendigen Momente sind
+mi=Eqihi,  Hi=Eqihihi⊤.
+Nur mi einzusetzen wäre nicht äquivalent, denn im Allgemeinen gilt Hi≠mimi⊤. Der Unterschied Hi−mimi⊤ beschreibt die unter qi vorhandene Unsicherheit über Zustandsanteile.
+B.4.1 Dynamische Rekursion für die ersten und zweiten Zählmomente
+Für einen Ring unter einer lokalen Markov-Variationskette definieren wir unnormierte, auf das aktuelle Endzustandsereignis gewichtete Größen
+Ptk=qzt=k,Mtk,a=ENta1{zt=k},Stk,a,b=ENtaNtb1{zt=k}.
+Mit δa,k=1{a=k} gilt bei t=1:
+P1k=ρk, M1k,a=ρkδa,k, S1k,a,b=ρkδa,kδb,k.
+Für t≥2 folgen die exakten Rekursionen:
+Ptk=j​Pt−1jQt−1j,k,
+Mtk,a=j​Mt−1j,aQt−1j,k+δa,kPtk,
+Stk,a,b=j​St−1j,a,bQt−1j,k +δa,kj​Mt−1j,bQt−1j,k +δb,kj​Mt−1j,aQt−1j,k +δa,kδb,kPtk.
+Daraus ergibt sich am Sequenzende:
+mia=1Tik​MTik,a,  Hiab=1Ti2k​STik,a,b.
+Der konkrete Code vb_b1.moments_occupancy verwendet eine äquivalente rückwärts konditionierte Rekursion auf Basis der Paarmarginalen ξ und γ. full_markov_b1._markov_objective_and_grad verwendet zusätzlich eine vorwärtsgerichtete Zählmomentenrekursion mit analytischem Reverse-Mode-Gradienten. Beide Varianten werden in synthetischen Enumerationstests kontrolliert. Die Rechnung ist für gegebenes qi exakt; sie ist keine exakte Lösung des gesamten latenten Posteriors.
+Invarianten: 1⊤mi=1, Hi1=mi, 1⊤Hi1=1, Hi≽0 und Hi−mimi⊤≽0 bis auf numerische Rundungsfehler.
+B.5 Neue augmentierte Momente für die zwei unterschiedlichen Qualitätsköpfe
+Aus Herleitung A ist uij=hi;sij. Die beobachteten Ringkennwerte sij sind bei fixierter Loggersequenz deterministisch. Deshalb gelten die folgenden analytischen Zusammenhänge ohne weitere Simulation:
+mij=Eqiuij=misij
+und
+Hij=Eqiuijuij⊤=Himisij⊤sijmi⊤sijsij⊤.
+Das sind die implementierten Inhalte von two_head_b1.augment. Für Kopf 1 hat die Matrix Dimension 9×9, für Kopf 2 8×8. Insbesondere darf der Block links oben nicht durch mimi⊤ ersetzt werden, weil dies die Zustandsunsicherheit unterdrücken würde.
+B.6 Erwarteter ringweiter Qualitätsbeitrag zur ELBO
+Für jeden Qualitätskopf gilt im NIG-Faktor
+qβj,σj2=NIGμj,Vj,aj,bj,  Eqσj−2=ajbj,
+Eqlogσj−2=ψaj−logbj.
+Die erwartete Loglikelihood eines einzigen Qualitätswerts yij lautet
+LijY=Eqiqjlogpyij∣uij,βj,σj2=−12log2π+12ψaj−logbj −12ajbjyij2−2yijμj⊤mij+μj⊤Hijμj+trVjHij.
+Diese Gleichung ist der zentrale neue Qualitätsbeitrag gegenüber Original B.9. Beide Terme Li1Y und Li2Y werden für einen gelabelten Ring addiert. Es wird kein künstlicher Zeitpunktsverlust für Qualitätslabels erzeugt.
+B.6.1 Komprimierung der Qualitätsrückkopplung
+Zerlegen wir μj=μhj,μsj und Vj in Zustands-, Kennwert- und Kreuzblöcke. Bei gegebenem yij und sij lässt sich der Qualitätsbeitrag darstellen als
+LijYqi=cij+bij⊤mi+trGijHi,
+mit
+bij=ajbjyijμhj−ajbjμhjμsj⊤+Vj,hssij,Gij=−12ajbjμhjμhj⊤+Vj,hh.
+Die in cij zusammengefassten restlichen Terme hängen bei festem yi, si und globalem q nicht von der lokalen Markov-Verteilung ab. Die Summe über die beiden Köpfe ergibt ci, bi und Gi. Die Implementierung two_head_b1.both_compressed_coeff berechnet exakt diese Komprimierung und übergibt sie an den freien lokalen Markov-Optimierer. Durch diesen Schritt wirken beide Zielgrößen gemeinsam auf dieselbe lokale Zustandsfolge zurück, ohne die gesamte Ringsequenz enumerieren zu müssen.
+B.7 Lokale Optimierung: Warum Standard-Forward-Backward nicht genügt
+Für einen gelabelten Ring sind mit globalem qΘ fest die erwarteten Prozesspotenziale
+ℓitk=Eqμk,Λklogpxit∣zit=k, gk=Eqlogπk, akℓ=EqlogAkℓ.
+Die lokale Zielfunktion lautet
+Fiqi=k​γi1kgk+t,k,ℓ​ξitkℓakℓ+t,k​γitkℓitk +Hqi+j=12LijY.
+Die lokale Entropie ist für die parametrisierte Markov-Kette explizit
+Hqi=−k​ρiklogρik−t=1Ti−1k,ℓ​ξitkℓlogQitk,ℓ.
+Da Hi die gesamte Sequenz koppelt, zerfällt Fi nicht in eine bloße Summe gewöhnlicher HMM-Zeitpunktpotenziale. Ein unverändertes Forward-Backward-Update ist daher für gelabelte Ringe nicht das vollständige lokale B1-Optimum. Stattdessen optimiert der Code mit L-BFGS-B freie Logits für ρi und alle Qit. Die Ableitungen der exakt rekursiv berechneten Aufenthaltsmomente werden analytisch mitgerechnet. Ein lokaler Kandidat wird nur übernommen, wenn er die lokale Zielfunktion gegenüber der prozessbasierten Startverteilung nachweislich erhöht. Für das abgeschlossene Experiment waren höchstens acht lokale Iterationen vorgesehen – das ist keine Konvergenzgarantie.
+Für einen ungelabelten Ring fehlt die letzte Summe und das konditionale lokale Optimum innerhalb der Markov-Familie ist per Forward-Backward zugänglich.
+B.8 Globale Konjugation und ihre Grenze
+Die globale Faktorapproximation beachtet die Kopplung von Mittelwert und Präzision innerhalb jedes Normal-Wishart-Faktors und von Regressionskoeffizient und Varianz innerhalb jedes NIG-Faktors. Dagegen werden Prozessparameter, Qualitätsköpfe und ringweise qi variational voneinander faktorisiert. Die im Modell enthaltenen Bayesian-Priors machen die Inferenz somit nicht exakt. Eine höhere ELBO beweist auch nicht, dass die Qualität des nachgelagerten Ringzielwerts besser wird.
+B.9 Abgleich alt gegen neu und Tests
+Original-B-Abschnitt
+Status der Neufassung
+Numerischer Prüfnachweis
+B.1–B.4 Posterior, Variationsfaktoren
+Übernommen, q um Normal-Wishart und zwei ungleichdimensionierte Köpfe erweitert
+test_fullcov_b1.py, test_two_head_b1.py
+B.5–B.6 strukturierte Zustandsverteilung
+Neu: vollständig freie zeitabhängige Markov-Logits statt nur als Ziel formuliert
+test_full_markov.py
+B.7–B.8 Aufenthaltsmomente
+Beibehalten, in beiden Algorithmen exakt unter q rekursiv berechnet
+Enumerations- und Konsistenztests
+B.9 erwartete Qualität
+Neu: zwei getrennte augmentierte Momentenblöcke
+test_quality_link_challenge.py, test_two_head_b1.py
+B.10–B.11 lokale ELBO
+Gemeinsame Summe beider Qualitätsrückkopplungen; analytische Gradienten
+finite Differenzen und Qualitätsfeedback-Test
+B.12–B.14 Implementierung
+Auf echten DM-Ringen ausführbar; lokale Optimierung weiterhin approximativ
+10-Epochen- und CV4-Läufe am 11.11.2026
+Mathematische Grenzziehung: Die Befunde belegen die Korrektheit getesteter Rekursionen und die Ausführbarkeit der spezifizierten Variationsoptimierung. Sie belegen nicht, dass das globale Optimum der ELBO gefunden wurde oder dass der wahre Posterior in der Markov-Familie liegt.
+Ergebnis von Herleitung B: Eine vollständig konkretisierte Variationsfamilie für beide Zielgrößen, exakt berechenbare erste/zweite Zustandsmomente und eine differentiable gemeinsame Rückkopplung zweier unterschiedlich dimensionierter Qualitätsköpfe. Die globalen Updates und das Gesamttraining werden in Herleitung C formuliert.

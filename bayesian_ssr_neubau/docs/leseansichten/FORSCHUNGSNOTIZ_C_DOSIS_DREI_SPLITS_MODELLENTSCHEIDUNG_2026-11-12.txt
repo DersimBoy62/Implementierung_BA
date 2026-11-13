@@ -1,0 +1,201 @@
+C-Dosis-Wirkung über drei Entwicklungsaufteilungen
+Bayesian Bachelor | Forschungsnotiz und vorläufige Modellauswahl | 12. November 2026
+Status: Drei C-Kurven aus bereits vorliegenden Berichten auswertbar; keine neuen Ringdaten und kein unabhängiger Test. Diese Notiz ersetzt nicht die Originalberichte oder das Master-Handover.
+1. Ausgangspunkt und Status der Terminalausgabe
+Bei den erneuten Aufrufen von scan_u_weight_dose_v3.py wurde FileExistsError vor dem Datenzugriff ausgelöst: Die benannten Zielordner bestehen bereits. Das ist eine absichtlich eingebaute Überschreibsperre; daraus folgt weder ein neuer Modellfehler noch die Notwendigkeit, die Versuche zu wiederholen.
+Die anschließende Aufsummierung konnte canonical, 20261114 und 20261115 vollständig laden, ihre Protokolle und Prüfsummen kontrollieren und sämtliche C-Stufen für Trial 13 und 22 ausgeben. Erst das Speichern der zusammenfassenden JSON-Datei wurde wegen eines bereits existierenden Dateinamens verhindert. Die Ergebnisse sind somit lesbar; es wurde nichts überschrieben.
+Sicherer read-only Befehl: summarize_u_weight_dose_v3.py mit --canonical, --split-a und --split-b, jedoch OHNE --out. Das bereits vorhandene JSON darf separat mit Get-Content gelesen werden. Kein --resume für bereits abgeschlossene C_DOSE_SUMMARY.json-Ordner.
+2. Wissenschaftliches Versuchsprotokoll
+Untersucht wurden dieselben acht gelabelten Entwicklungsringe in drei verschiedenen Vier-Fold-Paarungen. Die Pairings sind keine drei unabhängigen Datensätze. Die gesamte Studie ist explorativ; ein historisch bereits ausgewerteter äußerer Testsatz wurde nicht zur Modellwahl verwendet.
+Faktor
+Trial 13
+Trial 22
+HMM-Zustände K
+3
+2
+Vorverarbeitung / Kopplung
+P0 / M2
+P0 / M2
+Physikalische Priorvarianz
+0,4732915362
+0,3852610875
+Referenz-Optuna-C
+0,2505335699
+0,3684500650
+Trainingsprotokoll
+10 Epochen / 8 lokale VI-Schritte
+10 Epochen / 8 lokale VI-Schritte
+CV-Aufteilungen
+canonical / 20261114 / 20261115
+canonical / 20261114 / 20261115
+
+C gewichtet den zusätzlichen Prozess-ELBO-Beitrag der ungelabelten Ringe. Shared C=0 nutzt U-Ringe weiterhin für Prozessskalierung und HMM-Initialisierung; es ist kein streng überwachtes Training. Alle anderen Modellgrößen wurden je Trial über das C-Raster festgehalten.
+Die hier ausgewiesene Kennzahl ist das ARITHMETISCHE MITTEL aus drei foldübergreifend gepoolten RMSE-Werten (je ein RMSE pro Aufteilung). Sie ist NICHT ein auf 24 unabhängigen Beobachtungen gepoolter RMSE und keine zusätzliche Teststichprobe.
+3. Vollständige C-Dosis-Tabelle – Trial 13 (K=3)
+C
+Außen-RMSE [mm]
+Höhen-RMSE [mm]
+Außen besser als C0
+Höhe besser als C0
+0
+0,5254
+3,3712
+0/3
+0/3
+0,05
+0,5225
+3,4111
+2/3
+1/3
+0,1
+0,5176
+3,3197
+3/3
+3/3
+0,2
+0,5192
+3,3487
+3/3
+2/3
+0,250534
+0,5187
+3,3312
+3/3
+2/3
+0,35
+0,5185
+3,3284
+3/3
+2/3
+0,5
+0,5185
+3,3279
+3/3
+2/3
+0,75
+0,5155
+3,3382
+3/3
+2/3
+1
+0,5143
+3,3360
+3/3
+2/3
+2
+0,5117
+3,2463
+3/3
+3/3
+
+K=3: Über das dreifache C-Raster erreicht C=2,0 mit Außen-RMSE 0,5117 mm und Höhen-RMSE 3,2463 mm die kleinsten ausgegebenen Mittelwerte. Gegenüber C=0 (0,5254 / 3,3712 mm) entspricht dies ungefähr −2,6 % bzw. −3,7 %. Beide Ziele verbessern sich gegenüber C=0 in 3 von 3 Aufteilungen. C=2 liegt am oberen Rasterrand; kein allgemeingültiges Optimum ableiten.
+
+Abbildung 1: Außen-RMSE als Funktion des U-Gewichts C – Mittel über drei Entwicklungen.
+4. Vollständige C-Dosis-Tabelle – Trial 22 (K=2)
+C
+Außen-RMSE [mm]
+Höhen-RMSE [mm]
+Außen besser als C0
+Höhe besser als C0
+0
+0,5351
+3,3195
+0/3
+0/3
+0,05
+0,5219
+3,1969
+3/3
+2/3
+0,1
+0,5194
+3,1474
+3/3
+2/3
+0,2
+0,5219
+3,1509
+3/3
+3/3
+0,35
+0,5250
+3,1502
+3/3
+3/3
+0,36845
+0,5251
+3,1518
+3/3
+3/3
+0,5
+0,5256
+3,1508
+3/3
+3/3
+0,75
+0,5258
+3,1791
+3/3
+3/3
+1
+0,5253
+3,2004
+3/3
+2/3
+2
+0,5148
+3,2439
+3/3
+2/3
+
+K=2: Außen wird mit C=2,0 (0,5148 mm) am besten vorhergesagt, während der kleinste mittlere Höhen-RMSE bei C=0,1 (3,1474 mm) liegt. Die Kurve ist somit zielgrößenspezifisch und nicht monoton. C=0,2 (0,5219 / 3,1509 mm) ist gegenüber C=0 bei beiden Zielen in ALLEN drei Pairings besser, während C=0,1 beim Höhenziel nur in 2 von 3 Pairings günstiger ist.
+
+Abbildung 2: Höhen-RMSE als Funktion des U-Gewichts C – Mittel über drei Entwicklungen.
+5. Pareto-Vergleich und Kandidaten für eine Hauptvariante
+Auf den gerundeten drei-Split-Mittelwerten sind über die untersuchten 20 Kombinationen drei Punkte nicht von einem anderen Punkt in beiden Zielgrößen übertroffen: (1) K=3, C=2,0, Priorvarianz 0,4733; (2) K=2, C=2,0, Priorvarianz 0,3853; und (3) K=2, C=0,1, Priorvarianz 0,3853. Dieser rechnerische Pareto-Befund ist DESKRIPTIV und basiert auf vorab mehrfach betrachteten Entwicklungsringen.
+
+Abbildung 3: Zwei-Ziel-Pareto-Vergleich der 20 C-/K-Punkte anhand der gerundeten Entwicklungs-Mittelwerte.
+Kandidat
+Außen [mm]
+Höhe [mm]
+Stabilität ggü. C0
+Einordnung
+K=3; C=2,0; v=0,4733
+0,5117
+3,2463
+3/3; 3/3
+Außen-orientierter Pareto-Kandidat
+K=2; C=2,0; v=0,3853
+0,5148
+3,2439
+3/3; 2/3
+Mittlerer Pareto-Kandidat
+K=2; C=0,1; v=0,3853
+0,5194
+3,1474
+3/3; 2/3
+Höhen-orientierter Pareto-Kandidat
+K=2; C=0,2; v=0,3853
+0,5219
+3,1509
+3/3; 3/3
+Robuste Kompromisskandidatur
+
+Zwischen K=3/C=2 und K=2/C=0,1 ist der Außen-Mittelwertunterschied nur 0,0077 mm, der Höhen-Mittelwertunterschied hingegen 0,0989 mm zugunsten von K=2/C=0,1. Das ist kein Nachweis, dass der Effekt auf neue Ringversuche übertragbar wäre.
+6. Abgleich mit der verschachtelten Optuna-CV V4
+Die methodisch getrennte 4x3-Nested-CV wählte bei den vier äußeren Validierungsfolds für SSL die U-Gewichte C=0,051496; 0,094271; 0,110629 und 0,050900 (K=3, 3, 3, 2). Diese Werte liegen nahe dem unteren Ende der C-Dosiskurve. Die Nested-CV trainiert innerhalb jedes äußeren Folds mit nur vier inneren gelabelten Trainingsringen, wählt gleichzeitig K und Priorvarianz und optimiert eine andere Entscheidungssituation als die isolierte C-Dosis bei festem Prior. Deshalb sind die C-Ergebnisse nicht widersprüchlich im Sinne eines Codefehlers; sie dürfen aber auch nicht zu einem einzigen behaupteten optimalen C-Wert zusammengemischt werden.
+In V4: SSL gegenüber Strict Außen-RMSE 0,5453 vs. 0,6541 mm; Höhe 3,2100 vs. 3,1756 mm. Zusätzliches U-ELBO gegenüber Shared C=0: Außen 0,5453 vs. 0,5503 mm; Höhe 3,2100 vs. 3,2633 mm. Die kontrollierten Zusatzvorteile sind klein und teils durch DM09 getragen. V4 ist auf historisch wiederverwendeten acht Entwicklungsringen KEINE unabhängige neue Bestätigung.
+7. Vorläufige Modellentscheidung und verbleibende Prüfung
+Vorläufig empfehlenswerter Hauptpfad für eine EINHEITLICHE Zwei-Ziel-Pipeline ist K=2 / P0 / M2 bei C im Bereich 0,1–0,2 und physical_var=0,385261..., wenn gleichwertige Beachtung beider Ziele und einfache Zustandsstruktur im Vordergrund stehen. K=3 / P0 / M2 mit C=2,0 / physical_var=0,473291... bleibt der klare Vergleichskandidat mit dem niedrigsten hier gemittelten Außen-RMSE. Die Empfehlung ist ausdrücklich KEIN finaler Modell-Freeze.
+Entscheidung noch nicht endgültig: (a) die drei C_DOSE_SUMMARY.json-Berichte aus den drei Split-Verzeichnissen samt Einzelring-Restfehlern und Varianz pro Split als Originaldateien prüfen; (b) K=2/C=0,1 vs. 0,2 anhand definierter Robustheitspriorität vergleichen; (c) getrennt klären, ob die kopfspezifischen Bayesian-Priors und Modellannahmen in der endgültigen Train-auf-allen-Entwicklungsringen-Version beibehalten werden; (d) Konfiguration, Seed und Daten-Hash danach als vorläufig eingefrorenen Entwicklungsstand dokumentieren. Kein erneutes Tuning auf alten Außen-Testlabels.
+8. Direkte Verwendung für Kapitel 4 und Kapitel 5
+Kapitel 4 – Experimentelle Untersuchung
+Tabelle der beiden vollständigen C-Dosisprofile, zwei Zielkurven, 3-Split-Stabilitätszählungen, exakte Definition des U-Gewichts in der ELBO, Vergleich der zwei K/physikalischen Priorvarianten, klare Unterscheidung zwischen festgehaltenen und optimierten Hyperparametern. Die optisch stärksten Befunde und auch ungünstige C-Stufen dokumentieren.
+Kapitel 5 – Diskussion und Ausblick
+Unterschiedliche C-Sensitivität der Qualitätsgrößen, Nichtmonotonie, Grenzen eines gemeinsamen C-Optimums, Veränderungen durch verschiedene Fold-Paarungen, Spannungsverhältnis von reiner C-Ablation und Nested-Optuna-Auswahl, Trennung von U-Preprocessing-Effekt und U-ELBO-Effekt, Einfluss einzelner Ringe, kleine Datenlage und wiederholte Exploration. Prognosegenauigkeit ist noch keine experimentell bewiesene aktive Prozessoptimierung.
+9. Quellen- und Datenstatus
+Ergebnisbasis: vom Nutzer übermitteltes PowerShell-Protokoll zu summarize_u_weight_dose_v3.py mit drei Splitordnern. Dessen 20 angegebene C-Punkte wurden auf vier Nachkommastellen in diese Notiz übertragen und im begleitenden CSV reproduzierbar archiviert. Die originalen lokalen Dateien C_DOSE_SUMMARY.json sowie C_DOSE_ALL_SPLITS_SUMMARY_V1.json liegen hier nicht vor; eine vollständige Paar-/Ringprüfung dieser neuen Dosisstudie ist daher noch offen. Die vorliegenden früheren V4-Dateien NESTED_SUMMARY.json, OUTER_PREDICTIONS.csv und INNER_SELECTED_BY_OUTER_FOLD.csv wurden in den vorherigen Berichten überprüft. Kein aktueller Abruf der PDF-Originalquellen oder Seitenzitate für die C-Kurve: Dies sind eigene experimentelle Befunde, keine Literaturzahlen.
+10. Ohne Überschreiben in Windows weiterarbeiten
+Befehl (read-only, nur erneut anzeigen):
+.\.venv\Scripts\python.exe summarize_u_weight_dose_v3.py --canonical results\optuna_v3\C_DOSE_CANONICAL_V1 --split-a results\optuna_v3\C_DOSE_SPLIT_20261114_V1 --split-b results\optuna_v3\C_DOSE_SPLIT_20261115_V1
+Falls gewünscht: Vorhandenes Gesamt-JSON lesen: Get-Content results\optuna_v3\C_DOSE_ALL_SPLITS_SUMMARY_V1.json -Raw. Die drei C_DOSE_SUMMARY.json-Dateien liefern jeweils die ringweisen Originalresultate. Bestehende Output-Verzeichnisse und JSON-Dateien nicht löschen.

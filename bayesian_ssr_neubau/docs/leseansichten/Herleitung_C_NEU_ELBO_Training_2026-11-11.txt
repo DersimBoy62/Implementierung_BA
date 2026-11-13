@@ -1,0 +1,114 @@
+Herleitung C (Neufassung) – ELBO, globale Updates und vollständiger Trainingsalgorithmus
+Zweiköpfiges Bayesian-SSR-HMM mit Normal-Wishart-Emissionen und FULL_JOINT-Markov-VI
+11. November 2026 | Implementierungsabgleich
+C.0 Status und Quellengrenzen
+Dieses Dokument überarbeitet die Originaldatei Herleitung_C_Vollstaendiger_Trainingsalgorithmus_Bayesian_SSR.docx unter Verwendung der eingefrorenen DM-Abschlussimplementierung two_head_b1.py sowie der zugrunde liegenden fullcov_b1.py, full_markov_b1.py, vb_b1.py und der äußeren Datensperre. Beal (2003) stützt die Variations-HMM-Grundstruktur; Shao et al. (2022) die Normal-Wishart-Emissionen; Shao, Ge & Song (2021) den Literaturkontext gewichteter VI. Die Kopplung zweier ringweiter Endqualitätsmessungen ist eine eigene Modelladaption.
+C.1 Welche Größen werden tatsächlich trainiert?
+Das trainierte Modell besitzt globale Variationsfaktoren
+qπ, {qAk,:}k=1K, {qμk,Λk}k=1K, {qβj,σj2}j=12,
+sowie ringspezifische freie Markov-Faktoren qiZi=ρizi1t​Qitzit,zi,t+1 aus Herleitung B. Die sechs skalierten Loggerkanäle werden als Prozess- und die zwei skalierten Endqualitätswerte als Qualitätsbeobachtungen verwendet. Alle Ringkennwerte sij sind deterministische Funktionen der Loggerdaten und werden nicht als dritte stochastische Datengruppe behandelt.
+Eingefrorene Hauptkonfiguration: K=3, d=6, J=2, C=1, 10 Epochen, höchstens 8 Iterationen pro gelabeltem Ring und lokaler Aktualisierung, Seed 20261111, Normal-Wishart-Emissionen, zwei NIG-Qualitätsköpfe, FULL_JOINT-Lokalinferenz.
+C.2 Vollständige ELBO für C=1
+Für die gemeinsame Verteilung aus Herleitung A schreiben wir
+Lq=EqlogpΘ,Z,X,YL−EqlogqΘ,Z.
+Unter der angegebenen Faktorzerlegung ergibt sich die auswertbare Form
+Lq=i∈L∪U​Piqi+Hqi+i∈L​j=12Qijqi,qj−KLqΘ‖pΘ.
+Dabei ist H die lokale Markov-Entropie (Herleitung B.7), Qij die erwartete Loglikelihood der einen Ringqualität, und
+Pi=k​γi1k Eqlogπk+t,k,ℓ​ξitkℓ EqlogAkℓ  +t,k​γitk EqlogNdxit;μk,Λk−1.
+Die globale KL-Divergenz zerfällt in Dirichlet-, Normal-Wishart- und die beiden NIG-KL-Terme. Alle drei Familien werden variational, nicht durch einen einzigen Punktwert, aktualisiert.
+C.2.1 Gewichteter ungelabelter Beitrag und Interpretationsgrenze
+Die für die Ablation verwendete verallgemeinerte Zielfunktion lautet
+LCq=i∈L​Pi+Hqi+j=12Qij+Ci∈U​Pi+Hqi−KLqΘ‖pΘ.
+Wichtig: Das Gewicht C multipliziert bei i∈U den ganzen lokalen Variationsbeitrag inklusive Entropie, nicht nur die Emissionsloglikelihood. Bei C=1 liegt der normale ELBO des Modells mit fehlenden Qualitätswerten vor. Bei C≠1 ist dies eine gewichtete/generalisiert-Bayesian-artige Trainingszielfunktion, nicht ohne weitere Herleitung die exakte ELBO einer unverändert gewöhnlichen Likelihood. Bei fixiertem globalen q und C>0 bleibt die optimale lokale U-Verteilung durch das positive gemeinsame Gewicht unverändert; die globalen Updates werden jedoch mit C gewichtet.
+C.3 Erwartete Emissionslogdichte für vollständige Kovarianzen
+Für qμk,Λk=NWmk,κk,Wk,νk gilt mit Wishart-Skalenparametrisierung
+EqlogΛk=r=1dψ​νk+1−r2+dlog2+logWk.
+Wegen der konjugierten Kopplung von μk und Λk ergibt sich die tatsächlich implementierte Logpotenzialgleichung
+ℓitk=12ElogΛk−dlog2π−dκk−νkxit−mk⊤Wkxit−mk.
+Es wäre falsch, die Kovarianzmatrix einfach anstelle der Präzisionsmatrix einzusetzen oder d/κk fortzulassen. Für d=6 werden die determinanten- und quadratikbezogenen Terme mit stabilen Linearalgebra-Routinen berechnet. Alle posterioren Matrizen müssen positiv definit bleiben.
+C.4 Globale Dirichlet-Updates
+Aus den lokalen Zustandsmarginalen werden gewichtete ausreichende Statistiken gebildet. Mit wi=1 für i∈L und wi=C für i∈U gilt
+αk=α0k+i​wiγi1k,ηkℓ=η0kℓ+i​wit=1Ti−1ξitkℓ.
+Die posterioren Erwartungen der Log-Wahrscheinlichkeiten folgen aus Digamma-Differenzen der jeweiligen Dirichletparameter. Die Zustandsinitialisierung erfolgt in der aktuellen Implementierung ringweise aus trainingsexklusiven K-Means-Zentren. Der Verzicht auf Initialisierung mit Testdaten wird gesondert geprüft.
+C.5 Globaler Normal-Wishart-Update: vollständige Kovarianz
+Für jeden Zustand definieren wir ausreichende gewichtete Größen
+Nk=i​wit​γitk,  Sk=i​wit​γitkxit,  Rk=i​wit​γitkxitxit⊤.
+Für die Normal-Wishart-Faktoren lauten die Updategleichungen
+κk=κ0k+Nk,mk=κ0km0k+Skκk,νk=ν0k+Nk,Wk−1=W0k−1+Rk+κ0km0km0k⊤−κkmkmk⊤.
+Die letzte Zeile ist die exakte Form der im Modul fullcov_b1.update_process_full implementierten hinreichenden Statistik. Das Update benötigt die vollen Kreuzprodukte xitxit⊤ und ist daher keine diagonale, kanalweise NIG-Aktualisierung. Der symmetrisierte Rechenweg muss positive Definitheit erhalten; Schlechtkonditionierung wurde in eigenen Priortests ausdrücklich untersucht.
+C.6 Globale NIG-Updates für beide Qualitätsköpfe
+Für Kopf j seien Dj=K+pj, P0j=V0j−1, uij=hi;sij, mij=Eqiuij und Hij=Eqiuijuij⊤. Dann gilt jeweils nur über tatsächlich gelabelte Trainingsringe
+Pj=P0j+i∈L​Hij,  Vj=Pj−1,μj=VjP0jβ0j+i∈L​yijmij,aj=a0j+L2,bj=b0j+12i∈L​yij2+β0j⊤P0jβ0j−μj⊤Pjμj.
+Diese Gleichungen werden in two_head_b1.fit_head für beide verschieden dimensionierten Köpfe separat angewendet. Die Matrixinversion wird implementierungsseitig über Cholesky-Lösungen berechnet. Unbekannte U-Qualitäten werden nicht imputiert, und U-Ringe erscheinen in den Summen des Qualitätsupdates nicht. Die Korrelation beider Kopfvorhersagen nach Integration über Z ist nicht gleichbedeutend mit einem gemeinsam voll besetzten Qualitätsrauschmodell.
+C.7 Lokale Optimierung gelabelter Ringsequenzen
+Zunächst wird jeder lokale Faktor aus der prozessbedingten Forward-Backward-Verteilung initialisiert. Für gelabelte Ringe sind dann bei festen globalen Faktoren alle Zeitpunkte der lokalen initialen und Übergangs-Logits variabel. Die L-BFGS-B-Zielfunktion besteht aus
+Fi=Pi+Hqi⏟Prozess und lokale Entropie+Qi1+Qi2⏟zwei ringweite Qualitätsfaktoren.
+Die numerischen Gradienten durch die Zählmomentenrekursion wurden gegen finite Differenzen geprüft (unter anderem mit Fehler um 3,98⋅10−7 in einem dokumentierten Test). Die Qualitätsköpfe werden zu einem linearen Term in mi und einem quadratischen Term in Hi komprimiert. Die beiden Kopfterme wirken gemeinsam auf dieselbe Markov-Verteilung zurück. Für einen gelabelten Ring wird der neue lokale Faktor nur akzeptiert, wenn die exakt berechnete lokale Zielfunktion gegenüber der initialen prozessbedingten Verteilung gestiegen ist. Diese Absicherung ist nicht identisch mit einem Beweis der Konvergenz des global alternierenden Verfahrens.
+U-Ringe: Die lokalen Faktoren werden ohne Qualitätslikelihood durch Forward-Backward aktualisiert. Das beschleunigt die numerische Rechnung, ohne die Prinzipien von B1 zu verlassen.
+C.8 Vollständiger implementierter Trainingsablauf
+Eingang schützen: Vertrauenswürdige DM-Pickles mit SHA256 prüfen. Nur 16 aktive Ringe; DM13 nicht trainieren; alte SFA-Daten nicht mischen. Split vor jedem Fitting ringweise festlegen.
+Merkmalsfenster festlegen: F2 und V1-Kern6 aus ausschließlich erlaubten Loggerkanälen; keine Messspalten der Produkt-Endqualität als Eingabe verwenden.
+Foldlokale Transformation: Sechs Loggerkanäle nur auf gewählten Trainingsringen skalieren; zwei Qualitätsziele ausschließlich auf gelabelten Trainingsringen skalieren; physikalische Ringkennwerte aus transformierten X berechnen und pro Kopf ebenfalls nur auf Trainingsringen skalieren.
+Posteriorinitialisierung: Dirichlet-, Normal-Wishart- und NIG-Priors setzen; K-Means nur auf den vom Modus zugelassenen Trainingsringen; zustandsspezifische Parameter initialisieren.
+Lokale E-Stufe: Für jeden gelabelten Ring FULL_JOINT-Markov-Verteilung mit zwei Qualitätsfaktoren maximieren; für U-Ringe prozessbedingtes Forward-Backward verwenden.
+Globale M-/VI-Stufe: Dirichlet- und Normal-Wishart-Faktoren aus gewichteten γ,ξ,X aktualisieren; beiden NIG-Köpfe aus m,H der gelabelten Ringe aktualisieren.
+ELBO und Diagnostik: Zustandssummen, KL-Terme, gewichtete Prozessbeiträge, lokale Gewinne und ELBO protokollieren. 10 Epochen ohne val-selektiertes Early Stopping; keine weiteren Hyperparameteränderungen nach Freeze.
+Vorhersage: Neuen Ring nur aus X inferieren; beide Köpfe und Skalierungen anwenden. Diese Phase wird in Herleitung D präzisiert.
+Das Training arbeitet alternierend und verwendet approximierte lokale Markov-Faktoren. Im Code befinden sich keine expliziten, aus dem Modell errechneten Pseudo-Qualitätslabels für U.
+C.9 Kontrollexperimente und Erkenntnisse
+Modelltest
+Gesicherte Beobachtung
+Schlussgrenze
+OFF, TILT_JOINT, FULL_JOINT
+FULL_JOINT nach 10 Epochen höhere ELBO als OFF, bei sehr ähnlichen Zustandsmassen
+ELBO-Verbesserung beweist keine Vorhersageverbesserung
+8 vs. 16 lokale Iterationen
+Differenz im Experiment höchstens ungefähr 1,4⋅10−8
+Kein allgemeiner Konvergenzbeweis
+Diagonal vs. voll
+Voll kann Prozesslogscores verbessern; Qualitätsziele teils gegensätzlich
+Keine allgemein „beste“ Emission
+Wishart-Prior-Skalierung / ν0
+Kondition und Qualitätsfehler reagieren stark auf Priorwahl
+Werte nicht nach äußerem Test neu optimieren
+Lineare zeitabhängige Emission
+Kein allgemeiner Gewinn, Außen-RMSE schlechter
+Eigener explorativer Vergleichszweig
+12 Ringdeskriptoren ohne HMM
+Außenunrundheit-Vergleichs-RMSE 0,4803 mm inner-CV; Höhenschlag schlechter
+Kein vollgemeinsames SSR; mehrfach genutzte CV-Ringe
+Hybrid sechs Kennwerte
+Außen-RMSE 0,5498 mm inner-CV
+Höhenschlag schwächer
+Zwei Kopfstrukturen
+Außen-RMSE 0,5529 mm, Höhenschlag 3,2026 mm inner-CV
+Explorative Architekturfindung, N=8
+Zwei-Kopf-SSR-Ablation
+C1 gegen C0: kleine Verbesserung beider Ziele; C1 vs. rein supervised beim Höhenschlag schlechter
+Vorverarbeitungs- und ELBO-Effekt trennen
+Numerischer Teststatus: Originaltests der Zustandsmomente, lokalen analytischen Gradienten, Normal-Wishart-Dichten/KL, augmentierten Kopfstatistiken und der exakten Qualitätslikelihood-Komprimierung wurden auf künstlichen Daten bestanden. Reale Trainingstests und vier innere Folds sind durch Nutzer-Terminalausgaben bestätigt. Eine mathematisch einwandfreie Komponente ersetzt keine unabhängige Validierung der Gesamtvorhersage.
+C.10 Leakage-Regeln und versiegelte äußere Bewertung
+Die Entwicklung trennte acht gelabelte Ringe L, vier künstlich ungelabelte Trainingsringe U und vier echte äußere Testringe. Für die finale Vorhersageroutine wurde ein gesonderter XOnlyRing-Zugriff implementiert; Qualitätswerte von U und dem äußeren Test wurden nicht als Trainings-/Vorhersageinputs indiziert. Nach Protokoll-Freeze wurde jede Vorhersage über alle drei Modelle vor Öffnung der äußeren Testlabels mit SHA256 gesichert.
+Der Vorhersage-Commit lautet fcaf3cf7874070845641e6f46c5e9dcafe77dde5812427caa3dde87a8178ab26. Der Report verwendet Protokollhash ff964627da5c4e04308659d2f7681338966fa834f48049c818ef9b2b5b6ef0b8. Am 11.11.2026 wurde der äußere Test einmalig ausgewertet. Jede weitere Optimierung anhand der vier äußeren Testfehler ist für das bereits behauptete unabhängige Ergebnis ausgeschlossen.
+C.11 Abgleich alt gegen neu
+Original-C-Kapitel
+Neufassung
+C.1–C.4
+Gleiche ELBO-Struktur, jetzt zwei ringweite Köpfe und voller NW-Prozessfaktor.
+C.5.1
+Dirichlet-Updates erhalten, nach Ringgruppen kontrolliert gewichtet.
+C.5.2
+Diagonale NIG-Emissionsupdates ersetzt durch multivariate Normal-Wishart-Updates.
+C.5.3
+Einheitsdimensionierte Zustandsregression ersetzt durch zwei verschieden dimensionierte NIG-Köpfe mit augmentierten Momenten.
+C.6
+Globaler KL neu: Dirichlet + Normal-Wishart + zwei NIG-Faktoren.
+C.7
+Freie q0,Qt-Markov-Logits mit analytischen Gradienten tatsächlich implementiert.
+C.8
+Gewicht C einschließlich U-Entropie erhalten; C0-Vorverarbeitung explizit kontrolliert.
+C.9–C.13
+Ausgeführter DM-Pipeline-/Trainings- und Testablauf, numerische Tests und abgeschlossener Freeze.
+C.14–C.15
+Neu: dokumentierte Evidenz, Ergebnissicherheit und Forschungsgrenzen.
+Ergebnis von Herleitung C: Das tatsächliche B1-Verfahren ist mathematisch und algorithmisch bestimmt. Seine globale Inferenz ist vollständig priorbehaftet, aber variational approximiert; seine lokale gelabelte Markov-Inferenz ist frei und differenzierbar, aber mit endlicher Iterationszahl gelöst. Die Qualitätsvorhersage mit dieser Approximation folgt in D.

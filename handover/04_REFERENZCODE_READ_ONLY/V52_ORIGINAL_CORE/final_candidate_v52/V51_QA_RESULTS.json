@@ -1,0 +1,110 @@
+{
+  "release": "DM-V51-INPUT-SAFETY-2026-11-12-v1",
+  "technical_status": "PRE-RELEASE INPUT-VALIDATION AUDIT; NO FINAL TRAINING",
+  "synthetic_tests_passed": 18,
+  "synthetic_test_names": [
+    "unchanged_full_bayesian_model_config_and_10_hashed_math_kernels",
+    "new_ring_identifier_canonicalization_and_historical_alias_rejection",
+    "complete_raw_logger_positive_with_phase6_before_and_after",
+    "missing_end_of_run_phase6_rejected",
+    "truncated_start_rejected",
+    "six_point_f2_ended_but_incomplete_rejected",
+    "twenty_second_gap_rejected_before_inference",
+    "duplicate_time_rejected",
+    "fragmented_process_window_rejected",
+    "quality_or_unexpected_columns_rejected",
+    "millimetre_instead_of_metre_sensor_rejected",
+    "large_finite_but_out_of_domain_ring_growth_rejected",
+    "stuck_geometric_sensor_rejected",
+    "nan_sensor_value_rejected",
+    "independent_completion_record_binds_exact_logger_and_F2_extent",
+    "predict_requires_explicit_model_and_completion_record",
+    "historical_prediction_rejected_before_model_or_csv_access",
+    "wrong_units_in_policy_rejected"
+  ],
+  "real_process_loggers_confirmed": 12,
+  "development_loggers": [
+    {
+      "ring_id": "DM01",
+      "raw_rows": 219,
+      "F2_rows": 148,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM02",
+      "raw_rows": 490,
+      "F2_rows": 419,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM04",
+      "raw_rows": 898,
+      "F2_rows": 829,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM05",
+      "raw_rows": 765,
+      "F2_rows": 694,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM06",
+      "raw_rows": 1119,
+      "F2_rows": 1085,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM09",
+      "raw_rows": 226,
+      "F2_rows": 155,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM10",
+      "raw_rows": 451,
+      "F2_rows": 381,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM12",
+      "raw_rows": 1364,
+      "F2_rows": 1293,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM14",
+      "raw_rows": 495,
+      "F2_rows": 424,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM16",
+      "raw_rows": 1122,
+      "F2_rows": 1051,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM17",
+      "raw_rows": 734,
+      "F2_rows": 663,
+      "matches_original_F2_bitwise": true
+    },
+    {
+      "ring_id": "DM18",
+      "raw_rows": 369,
+      "F2_rows": 298,
+      "matches_original_F2_bitwise": true
+    }
+  ],
+  "all_twelve_F2_reproduced_bitwise": true,
+  "historical_test_rings_read": false,
+  "U_or_old_test_labels_used": false,
+  "old_V5_QA_replay": "Old trusted V5 QA model used in read-only development DM04 replay via isolated QA injection; identical numerical prediction. Does not authorize V5.1 trained model or independent accuracy.",
+  "old_V5_QA_DM04_output_mm": [
+    1.52251645,
+    10.31188097
+  ],
+  "model_training_performed_in_this_v51_release": false,
+  "evaluation_limit": "All model selection remains exploratory using repeatedly reused 8 L development rings."
+}

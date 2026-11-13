@@ -1,0 +1,79 @@
+V5.7 – Paarweise Prüfung der lokalen VI: 8 gegen 16 Iterationen
+240 × 2 L-BFGS-B-Aufrufe  ·  8 gelabelte DM-Ringe  ·  30 Epochen  ·  Seed 20261111
+Evidenzstatus: originaler Windows-Trainingsoutput, zwei bereitgestellte vollständige JSON-Logs, unabhängig programmatisch nach Ring und Epoche zusammengeführt. Die archivierten mathematischen Kernmodule wurden nicht verändert.
+1. Versuchsdesign und Integrität
+Einziger beabsichtigter Unterschied ist die maximale Zahl lokaler L-BFGS-B-Iterationen (8 gegenüber 16). Beide reale Trainingsläufe nutzen K=2, C=0,2, M2, identische 8L+4U-Entwicklungsdaten und jeweils 30 Epochen. Kein erneuter äußerer Test, kein Qualitätsscore. Alle 240 Ring-Epochen-Paare konnten exakt zugeordnet werden; Daten-, Konfigurations- und Kerncodeprüfsummen stimmen überein.
+2. Ergebnisübersicht
+Die lokale Optimierung ist im längeren Budget formal erfolgreicher, aber nicht substantiell anders ausoptimiert.
+Kennzahl
+maxiter 8
+maxiter 16
+Aufrufe / erfolgreich
+240 / 234
+240 / 240
+Abbruch: relative Zielfunktionsänderung
+179
+185
+Abbruch: projizierter Gradient
+55
+55
+Abbruch: Iterationslimit
+6
+0
+Akzeptierte lokale Updates
+210
+210
+Gesamte Optimierer-Iterationen
+700
+707
+Gesamte Funktionsauswertungen
+1.154
+1.162
+Max. Endgradient in Epoche 30
+8,768638641 × 10⁻⁵
+8,768638622 × 10⁻⁵
+Finale Trainings-ELBO
+−22.028,914445296
+−22.028,914445300
+
+3. Was die sechs beseitigten Abbrüche wirklich bedeuten
+Nur drei der sechs zuvor durch maxiter begrenzten Ring-Epochen-Paare führen im 16er-Lauf zusätzliche Optimierer-Iterationen aus. In den anderen drei Fällen verändert sich die SciPy-Abbruchklassifikation, obwohl die tatsächliche Iterationszahl bei acht bleibt. Formal 240/240 Erfolg heißt deshalb NICHT, dass sechs lokale Teilprobleme intensiv weiteroptimiert wurden.
+Ring / Epoche
+nit 8 → 16
+Gradient 8 → 16
+zusätzl. lokale Verbesserung*
+DM05 / 1
+8 → 10
+1,1823e−4 → 4,8686e−5
++1,166e−6
+DM17 / 3
+8 → 12
+8,1582e−5 → 3,7589e−5
++1,254e−6
+DM06 / 10
+8 → 9
+1,0420e−4 → 9,5809e−5
++2,484e−7
+DM06 / 7, 8, 9
+8 → 8
+nahezu gleich
+≈ 0
+
+* Unterschied der protokollierten lokalen Zielfunktionsreduktionen für das gepaarte Ring-Epochen-Paar; kein direkter Zuwachs der globalen Trainings-ELBO.
+4. Gradienten und Stoppkriterien
+
+Abb. 1: Verlauf des jeweils größten lokalen Endgradienten über die acht gelabelten Ringe; Kurven überlagern sich nahezu vollständig. Die Linie bei 10⁻⁵ bezeichnet die eingestellte Gradiententoleranz, nicht ein nachgewiesenes globales Konvergenzkriterium.
+Bei maxiter=16 enden 185/240 Aufrufe durch das relative Zielfunktionskriterium und 55/240 durch das projizierte Gradientenkriterium. Alle 185 relativen Abbrüche weisen im Log eine absolute Endgradienten-∞-Norm oberhalb 10⁻⁵ auf. In Epoche 30 liegen weiterhin sechs von acht Ringen oberhalb dieses Werts; DM09 und DM16 darunter. Wichtig: Die dokumentierte Norm stammt aus unbeschränkten Softmax-Logits; die tatsächliche numerische Güte ist zusätzlich anhand Skalierung, Parametrisierung und Zielfunktionsänderung zu bewerten.
+5. Die 30 nicht akzeptierten Updates
+Beide Verfahren haben exakt dieselben 30 nicht übernommenen Updates: DM09 in den Epochen 2–30 (29) und DM04 in Epoche 2 (1). Sie haben alle nit=0 und Zielfunktionsreduktion=0. Das entspricht erfolgreichen Null-Schritten; die eigentliche lokale Optimierung wird nicht durch diese Ablehnungen behindert.
+6. Interpretation: stationäre ELBO ist nicht stationärer lokaler Posterior
+Die globale ELBO erreicht nach etwa 20 Epochen ein numerisches Plateau und beide Iterationsbudgets denselben Endwert bis auf 3,62 × 10⁻⁹. Das ist starke Evidenz für die Stabilität des ausgeführten Trainingswegs unter dieser einen Initialisierung. Zugleich bleibt ein Teil der lokalen Endgradienten oberhalb der eingestellten Toleranz. Der lokale Optimierer stoppt überwiegend nach ftol, nicht gtol. Daraus folgt weder ein Beweis lokaler vollständiger Stationarität noch eines globalen Optimums.
+Im Originalcode beginnt local_joint in jeder Epoche erneut beim prozessbasierten Forward-Backward-Posterior, nicht beim lokal optimierten Zustand der vorherigen Epoche. Der wiederholt kleine, positive lokale Verbesserungswert ist daher kein Indikator dafür, dass sich der globale Trainingsstand noch wesentlich verändert. Über die 30 Epochen summierte lokale Verbesserungen sind keine additiven globalen ELBO-Gewinne.
+7. Konsequenz und nächste Forschungsschritte
+Lokales Iterationsbudget: Für diese Konfiguration bringt der Wechsel von 8 auf 16 nur geringe lokale Zusatzschritte und keine erkennbare finale ELBO-Verbesserung. Vorerst keinen Modell-Freeze darauf stützen.
+Großer Sprung nach Epoche 10: Die Prozess-, Qualitäts- und KL-Beiträge der ELBO sowie globale Parameter- und Zustandsänderungen zwischen Epochen 9–13 getrennt und konsistent protokollieren. Dies ist der nächste priorisierte Audit.
+Gradienteinordnung: Anschließend standardisierte lokale Optimalitätsdiagnostik (skalierte Zielfunktion, Normen, projizierter Gradient, ftol/gtol); kontrollierter Warmstart als eigene Ablation, nicht stillschweigend im Referenzmodell ändern.
+Initialisierung: Die bisherigen K-Means-Seeds liefern identische Zentren (bis Zustandspermutation). Eine echte Robustheitsprüfung erfordert tatsächlich unterschiedliche, dokumentierte Anfangslösungen.
+Vorhersagequalität, Bayes-/HMM-Nutzen, SSL und Generalisierung bleiben eigenständige Pflichtbereiche des Forschungsfahrplans. Die bisherigen Ergebnisse sind train-only und keine neue unabhängige Testbewertung.
+8. Quelle und Reproduzierbarkeit
+Direkt analysiert: LOCAL_VI_TRACE_L8_E30_01.json, LOCAL_VI_TRACE_L16_E30_01.json; Quellcode dynamic_quality_v2.py und in-memory-Diagnostik audit_local_optimizer_v57.py. Die zugeordneten 240 Paare stehen vollständig in BA_V57_Paarvergleich_240_Aufrufe_L8_L16_2026-11-12.csv. Quelle: Nutzerdaten und eigene aus dem Quellcode abgeleitete Interpretation; keine externe Literaturseite für diese konkreten Zahlen behauptet.

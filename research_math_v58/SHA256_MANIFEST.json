@@ -1,0 +1,17 @@
+{
+  "status": "RESEARCH_NOT_FINAL_MODEL",
+  "files": {
+    "math_train_audit_v58.py": {
+      "sha256": "585d51325443a7ef222f9afec4610779137372441263b1071c3317b247dde1bd",
+      "bytes": 18437
+    },
+    "README.md": {
+      "sha256": "689dc2a70d3ac0ed62741a0f2c589e9bce6207c8e06fdea4c23c53a722f2d88e",
+      "bytes": 6366
+    },
+    "V58_Beide_Methoden_30E_Entwicklungsdaten.json": {
+      "sha256": "22b9342dd6f3d16a836af4c0274dceba97e742b434630b532571fa31dc5c33a0",
+      "bytes": 80112
+    }
+  }
+}

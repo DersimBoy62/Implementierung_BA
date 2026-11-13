@@ -1,0 +1,124 @@
+V6.2 · Audit der HMM-Zeitdynamik
+Bayesian Bachelor | Mathematische Forschungsdiagnose | 12.11.2026 | Vorläufige lokale Entwicklungsauswertung
+Ausgangslage. Die V6.1-Prüfung reproduziert den Trainingsverlauf mit einer maximalen ELBO-Abweichung von 2,99 × 10⁻⁸ auf dem Rechner des Nutzers. Der Prozess-Update-Gewinn in Epoche 11 beträgt +1.146,3054; davon entfallen +1.143,3443 auf Emissionsmodell einschließlich Normal-Wishart-KL. Die nachfolgende V6.2-Probe untersucht jetzt das zeitliche Verhalten der tatsächlich inferierten Zustände und die bedingte Emissionsannahme. Die V6.2-Windows-Wiederholung steht noch aus.
+1 · Methodische Prüfung ohne Änderung des Modells
+Der ursprüngliche V6.1-Trainingspfad (K = 2; C = 0,2; Seed 20261111; 8 gelabelte und 4 ungelabelte Entwicklungsringe; 30 Epochen) wird instrumentiert. Keine erneute Qualitätsbewertung, keine historische äußere Testauswertung und keine Übernahme neuer Modellgewichte. Markov-Marginalen γₜ(k) und Paarmarginalen ξₜ(i,j) werden unmittelbar aus dem lokalen Variationsfaktor ausgelesen. Die mathematischen Kernmodule bleiben unverändert und werden per SHA256 geprüft.
+Posterior-erwartete Wechsel = Σₜ Σᵢ≠ⱼ ξₜ(i,j). Zusätzlich wird die Zahl der Wechsel der jeweils wahrscheinlichsten Zustandszuordnung argmaxₖ γₜ(k) angegeben. Letztere ist ausdrücklich keine Viterbi-Dekodierung. ξ- und γ-Marginalkonsistenz sowie Gleichheit zur Offdiagonal-Summe der Dirichlet-Suffizienzstatistik werden kontrolliert.
+2 · Befunde nach 30 Epochen
+Prüfgröße
+Lokale Entwicklungsauswertung
+Ringe mit mindestens einem argmax-γ-Wechsel
+8 von 12
+Ringe ohne argmax-γ-Wechsel
+4 von 12
+Erwartete Wechsel, ungewichtet
+28.545
+Erwartete Wechsel, mit C gewichtete U-Ringe
+27.745
+Maximale ξ/γ-Marginalabweichung
+1.07e-12
+Self-Transitions, posteriori Mittelwerte
+0,99596 und 0,99433
+Zeitliche mittlere Verweildauer (Markov-Annahme)
+ca. 247 und 176 Logger-Schritte
+
+Interpretation. Die Dynamik besteht nicht nur aus ringweiten Zustandsklassen: In 8 von 12 Entwicklungsringen treten zeitliche Zustandswechsel auf. Zugleich bleiben vier Ringe fast vollständig in einem Zustand. Ohne Abgleich der Wechselpunkte mit realen Walzphasen ist nicht belegt, dass die latenten Zustände physikalische Prozessphasen repräsentieren.
+
+3 · Ringbezogene Diagnose
+Ring
+Typ
+T
+Max. Masse
+E[Wechsel]
+argmax
+|ACF₁| Res.
+DM01
+U
+148
+1.000
+0.00
+0
+0.993
+DM02
+U
+419
+1.000
+0.00
+0
+0.998
+DM04
+L
+829
+0.907
+8.39
+9
+0.982
+DM05
+L
+694
+0.784
+3.48
+3
+0.994
+DM06
+L
+1085
+0.882
+3.59
+3
+0.996
+DM09
+L
+155
+1.000
+0.00
+0
+0.998
+DM10
+U
+381
+0.515
+1.00
+1
+0.996
+DM12
+L
+1293
+0.628
+3.00
+3
+0.996
+DM14
+U
+424
+1.000
+0.00
+0
+0.997
+DM16
+L
+1051
+0.517
+3.09
+3
+0.997
+DM17
+L
+663
+0.849
+3.00
+3
+0.994
+DM18
+L
+298
+0.775
+3.00
+3
+0.976
+
+ACF₁ der Residuen: Der Ringmedian der absoluten Lag-1-Autokorrelation nach Abzug des posteriorgewichteten Emissionsmittelwerts liegt weiterhin zwischen ungefähr 0,976 und 0,998. Das ist ein starker Hinweis auf zeitliche Reststruktur. Die Berechnung nutzt γ aus denselben Messungen; sie ist daher keine unabhängige Prüfung bedingter Emissionsunabhängigkeit.
+4 · Wissenschaftliche Konsequenzen
+Die vereinfachte HMM-Emissionsannahme p(x₁:ₜ | z₁:ₜ) = ∏ₜ p(xₜ | zₜ) ist bei stark geglätteten, eng abgetasteten Loggerzeitreihen prüfungsbedürftig. Die Korrelation kann durch physikalische Dynamik, Trends, die Abtastfrequenz, Signalfilterung sowie nicht abgebildete kontinuierliche Zustände entstehen. Eine kurze zeitliche Verweildauer ist aus dem Posterior nicht abzuleiten: 247/176 sind Logger-Schritte unter der geometrischen Markov-Verweildauerannahme, keine Sekunden und keine direkten Phasenlängen.
+Nächste Codearbeiten: (1) Zustandswechselpunkte mit der Logger-Phaseninformation und tatsächlichen Ereignissen abgleichen; (2) Autokorrelation nach Detrending, differenzierten Prozessgrößen und verschiedenen Zeitabständen getrennt prüfen; (3) ggf. einfaches autoregressives Emissionsmodell als kontrollierte mathematische Ablation konzipieren; (4) HMM gegen ein zeitlich unabhängiges Mischmodell und HMM-freie physikalische Deskriptorregression unter identischen Entwicklungs-Splits stellen. Ein finaler Model-Freeze ist nicht erfolgt.
+Quellenstatus: Sämtliche Zahlen dieser Notiz stammen aus der lokalen V6.2-Reproduktion der unveränderten Trainingsmathematik. Keine zusätzliche Originalpublikation wurde für diese Notiz neu ausgewertet. Eine Bestätigung durch den Windows-Lauf des Nutzers steht aus.

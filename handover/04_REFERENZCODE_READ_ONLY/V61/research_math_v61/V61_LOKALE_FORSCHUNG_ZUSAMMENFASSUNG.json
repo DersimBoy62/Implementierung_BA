@@ -1,0 +1,497 @@
+{
+  "status": "PRELIMINARY_LOCAL_REPLAY_DEVELOPMENT_ONLY_NOT_WINDOWS_VERIFIED",
+  "source_v60_max_abs_ELBO_diff": 8.947972673922777e-08,
+  "source_sha256": "bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5",
+  "seed": 20261111,
+  "K": 2,
+  "C": 0.2,
+  "physical_var": 0.38526108747593474,
+  "selected_epochs_9_to_14": [
+    {
+      "epoch": 9,
+      "elbo": -24271.27912226123,
+      "delta_local": 2.375518489858223,
+      "delta_process": 2.0276447687647305,
+      "delta_heads": 0.0005452674231491983,
+      "posterior_change": {
+        "mu_fro": 0.01136676947086561,
+        "mu_per_state": [
+          0.0031545066939212404,
+          0.010920280936029461
+        ],
+        "W_fro": 0.00031963765238719364,
+        "transition_alpha_fro": 12.6976321823583,
+        "initial_alpha_fro": 3.504756208173948e-12,
+        "max_change_predictive_transition": 3.8684101601349496e-05
+      },
+      "process_groups": {
+        "emission_NW": 2.0259772994645573,
+        "transition_Dirichlet": 0.0016674692986073936,
+        "initial_Dirichlet": 4.440892098500626e-16
+      },
+      "weighted_n": [
+        4558.205673803906,
+        1784.194326194398
+      ],
+      "emission_cov_traces": [
+        1.9063992946237562,
+        7.426484854620115
+      ],
+      "weighted_emission_by_ring": [
+        {
+          "ring_id": "DM01",
+          "weighted_emission_gain": -0.2576581924540508
+        },
+        {
+          "ring_id": "DM02",
+          "weighted_emission_gain": 3.288457399123891
+        },
+        {
+          "ring_id": "DM04",
+          "weighted_emission_gain": 5.467018268865096
+        },
+        {
+          "ring_id": "DM05",
+          "weighted_emission_gain": -8.628335536058708
+        },
+        {
+          "ring_id": "DM06",
+          "weighted_emission_gain": 3.9229542301512734
+        },
+        {
+          "ring_id": "DM09",
+          "weighted_emission_gain": -0.3823214683694337
+        },
+        {
+          "ring_id": "DM10",
+          "weighted_emission_gain": 4.358201461877949
+        },
+        {
+          "ring_id": "DM12",
+          "weighted_emission_gain": -7.920700885645933
+        },
+        {
+          "ring_id": "DM14",
+          "weighted_emission_gain": 2.072143553210132
+        },
+        {
+          "ring_id": "DM16",
+          "weighted_emission_gain": -7.5581448295277305
+        },
+        {
+          "ring_id": "DM17",
+          "weighted_emission_gain": -3.991005324932818
+        },
+        {
+          "ring_id": "DM18",
+          "weighted_emission_gain": 11.068239414711918
+        }
+      ]
+    },
+    {
+      "epoch": 10,
+      "elbo": -24242.301646844448,
+      "delta_local": 5.9371168967591075,
+      "delta_process": 23.039818804300012,
+      "delta_heads": 0.0005397157219704241,
+      "posterior_change": {
+        "mu_fro": 0.028462677643722064,
+        "mu_per_state": [
+          0.0074293884031365835,
+          0.027475956882441335
+        ],
+        "W_fro": 0.000920503603878146,
+        "transition_alpha_fro": 22.984186115275914,
+        "initial_alpha_fro": 1.4444652001829198e-11,
+        "max_change_predictive_transition": 0.0006993281119383314
+      },
+      "process_groups": {
+        "emission_NW": 22.660096668730944,
+        "transition_Dirichlet": 0.37972213556928036,
+        "initial_Dirichlet": -3.552713678800501e-15
+      },
+      "weighted_n": [
+        4542.05478319204,
+        1800.3452168105814
+      ],
+      "emission_cov_traces": [
+        1.8942878012082782,
+        7.451624427419505
+      ],
+      "weighted_emission_by_ring": [
+        {
+          "ring_id": "DM01",
+          "weighted_emission_gain": 0.03374270238943181
+        },
+        {
+          "ring_id": "DM02",
+          "weighted_emission_gain": 12.46453231593247
+        },
+        {
+          "ring_id": "DM04",
+          "weighted_emission_gain": 9.546199777830594
+        },
+        {
+          "ring_id": "DM05",
+          "weighted_emission_gain": -19.91171484758054
+        },
+        {
+          "ring_id": "DM06",
+          "weighted_emission_gain": 5.485213390339859
+        },
+        {
+          "ring_id": "DM09",
+          "weighted_emission_gain": 4.7881131181404655
+        },
+        {
+          "ring_id": "DM10",
+          "weighted_emission_gain": 9.56891284981822
+        },
+        {
+          "ring_id": "DM12",
+          "weighted_emission_gain": -1.486380242983019
+        },
+        {
+          "ring_id": "DM14",
+          "weighted_emission_gain": 6.218513491866775
+        },
+        {
+          "ring_id": "DM16",
+          "weighted_emission_gain": -35.136411020455455
+        },
+        {
+          "ring_id": "DM17",
+          "weighted_emission_gain": -11.512770183073059
+        },
+        {
+          "ring_id": "DM18",
+          "weighted_emission_gain": 38.248837770846926
+        }
+      ]
+    },
+    {
+      "epoch": 11,
+      "elbo": -22919.855611350773,
+      "delta_local": 176.134603267059,
+      "delta_process": 1146.3054166315997,
+      "delta_heads": 0.006015595015924191,
+      "posterior_change": {
+        "mu_fro": 0.15959534153485957,
+        "mu_per_state": [
+          0.04365190398911634,
+          0.15350955774072647
+        ],
+        "W_fro": 0.004432224965710974,
+        "transition_alpha_fro": 121.97533578810629,
+        "initial_alpha_fro": 1.1664078328715199e-11,
+        "max_change_predictive_transition": 0.0023630485616842464
+      },
+      "process_groups": {
+        "emission_NW": 1143.3442552620745,
+        "transition_Dirichlet": 2.9611613695259402,
+        "initial_Dirichlet": 2.4424906541753444e-15
+      },
+      "weighted_n": [
+        4456.055518620513,
+        1886.3444813834783
+      ],
+      "emission_cov_traces": [
+        1.8334639462800117,
+        7.5975745589746
+      ],
+      "weighted_emission_by_ring": [
+        {
+          "ring_id": "DM01",
+          "weighted_emission_gain": -5.575919871081922
+        },
+        {
+          "ring_id": "DM02",
+          "weighted_emission_gain": 37.265525780572744
+        },
+        {
+          "ring_id": "DM04",
+          "weighted_emission_gain": 125.86611298589564
+        },
+        {
+          "ring_id": "DM05",
+          "weighted_emission_gain": 77.119662083756
+        },
+        {
+          "ring_id": "DM06",
+          "weighted_emission_gain": 286.4027968921573
+        },
+        {
+          "ring_id": "DM09",
+          "weighted_emission_gain": -14.911137422222707
+        },
+        {
+          "ring_id": "DM10",
+          "weighted_emission_gain": 17.76500788770934
+        },
+        {
+          "ring_id": "DM12",
+          "weighted_emission_gain": 240.98419641330733
+        },
+        {
+          "ring_id": "DM14",
+          "weighted_emission_gain": 3.0483990957551104
+        },
+        {
+          "ring_id": "DM16",
+          "weighted_emission_gain": 20.97781438886038
+        },
+        {
+          "ring_id": "DM17",
+          "weighted_emission_gain": 262.2612344874085
+        },
+        {
+          "ring_id": "DM18",
+          "weighted_emission_gain": 130.40110659848202
+        }
+      ]
+    },
+    {
+      "epoch": 12,
+      "elbo": -22119.889656016705,
+      "delta_local": 537.8997613240645,
+      "delta_process": 262.06520403479954,
+      "delta_heads": 0.000989975203992799,
+      "posterior_change": {
+        "mu_fro": 0.04924916468296498,
+        "mu_per_state": [
+          0.01599403510925793,
+          0.04657972802511442
+        ],
+        "W_fro": 0.0033872863430365863,
+        "transition_alpha_fro": 18.248825790517788,
+        "initial_alpha_fro": 3.7607729579812035e-06,
+        "max_change_predictive_transition": 0.0030766064634817347
+      },
+      "process_groups": {
+        "emission_NW": 259.35007933479983,
+        "transition_Dirichlet": 2.7151246999957315,
+        "initial_Dirichlet": 2.112310326651823e-12
+      },
+      "weighted_n": [
+        4446.174023305633,
+        1896.2259766928303
+      ],
+      "emission_cov_traces": [
+        1.8345794157412605,
+        7.708625360537928
+      ],
+      "weighted_emission_by_ring": [
+        {
+          "ring_id": "DM01",
+          "weighted_emission_gain": -2.269862216473467
+        },
+        {
+          "ring_id": "DM02",
+          "weighted_emission_gain": 7.217305552564512
+        },
+        {
+          "ring_id": "DM04",
+          "weighted_emission_gain": 112.39510263743023
+        },
+        {
+          "ring_id": "DM05",
+          "weighted_emission_gain": 40.37749986669634
+        },
+        {
+          "ring_id": "DM06",
+          "weighted_emission_gain": 101.50304093219984
+        },
+        {
+          "ring_id": "DM09",
+          "weighted_emission_gain": -8.745029194482145
+        },
+        {
+          "ring_id": "DM10",
+          "weighted_emission_gain": -9.113719582716943
+        },
+        {
+          "ring_id": "DM12",
+          "weighted_emission_gain": 68.09457869107348
+        },
+        {
+          "ring_id": "DM14",
+          "weighted_emission_gain": -2.498419345234179
+        },
+        {
+          "ring_id": "DM16",
+          "weighted_emission_gain": -44.65714627087033
+        },
+        {
+          "ring_id": "DM17",
+          "weighted_emission_gain": 69.79035208296209
+        },
+        {
+          "ring_id": "DM18",
+          "weighted_emission_gain": -17.41093363281487
+        }
+      ]
+    },
+    {
+      "epoch": 13,
+      "elbo": -22036.04942074496,
+      "delta_local": 63.13556296391471,
+      "delta_process": 20.704191308130248,
+      "delta_heads": 0.0004809997008123901,
+      "posterior_change": {
+        "mu_fro": 0.031158708557509858,
+        "mu_per_state": [
+          0.008454498935908553,
+          0.029989774369183896
+        ],
+        "W_fro": 0.0010229745316577893,
+        "transition_alpha_fro": 12.820666528349326,
+        "initial_alpha_fro": 8.881650337241978e-05,
+        "max_change_predictive_transition": 0.000972116651264213
+      },
+      "process_groups": {
+        "emission_NW": 20.503651113054957,
+        "transition_Dirichlet": 0.20054019389645417,
+        "initial_Dirichlet": 1.1783087838779238e-09
+      },
+      "weighted_n": [
+        4437.46535846734,
+        1904.9346415289997
+      ],
+      "emission_cov_traces": [
+        1.8451115583856252,
+        7.768057470097586
+      ],
+      "weighted_emission_by_ring": [
+        {
+          "ring_id": "DM01",
+          "weighted_emission_gain": -1.0789082945055415
+        },
+        {
+          "ring_id": "DM02",
+          "weighted_emission_gain": 1.051764234304976
+        },
+        {
+          "ring_id": "DM04",
+          "weighted_emission_gain": 25.945374945473397
+        },
+        {
+          "ring_id": "DM05",
+          "weighted_emission_gain": 14.183533769983034
+        },
+        {
+          "ring_id": "DM06",
+          "weighted_emission_gain": 11.691358315569992
+        },
+        {
+          "ring_id": "DM09",
+          "weighted_emission_gain": -4.776192017078144
+        },
+        {
+          "ring_id": "DM10",
+          "weighted_emission_gain": -1.9243849617347513
+        },
+        {
+          "ring_id": "DM12",
+          "weighted_emission_gain": 15.607801346765433
+        },
+        {
+          "ring_id": "DM14",
+          "weighted_emission_gain": -0.6943272310386618
+        },
+        {
+          "ring_id": "DM16",
+          "weighted_emission_gain": -32.78988396026711
+        },
+        {
+          "ring_id": "DM17",
+          "weighted_emission_gain": 10.078609903551637
+        },
+        {
+          "ring_id": "DM18",
+          "weighted_emission_gain": -5.4325564734633165
+        }
+      ]
+    },
+    {
+      "epoch": 14,
+      "elbo": -22029.516110063923,
+      "delta_local": 5.06339106399173,
+      "delta_process": 1.4698346306031453,
+      "delta_heads": 8.498644092469476e-05,
+      "posterior_change": {
+        "mu_fro": 0.00834307307500601,
+        "mu_per_state": [
+          0.0035803369824771443,
+          0.007535784990748918
+        ],
+        "W_fro": 0.0002159119759087677,
+        "transition_alpha_fro": 3.1281479343283656,
+        "initial_alpha_fro": 0.0002824007851785445,
+        "max_change_predictive_transition": 0.0007817372061002205
+      },
+      "process_groups": {
+        "emission_NW": 1.3166991114140956,
+        "transition_Dirichlet": 0.15313550727645442,
+        "initial_Dirichlet": 1.1912074660003213e-08
+      },
+      "weighted_n": [
+        4438.1366631076025,
+        1904.2633368865
+      ],
+      "emission_cov_traces": [
+        1.8511119164089012,
+        7.792469837336673
+      ],
+      "weighted_emission_by_ring": [
+        {
+          "ring_id": "DM01",
+          "weighted_emission_gain": -0.09039189953629075
+        },
+        {
+          "ring_id": "DM02",
+          "weighted_emission_gain": 0.05755174618088351
+        },
+        {
+          "ring_id": "DM04",
+          "weighted_emission_gain": 3.776296014368604
+        },
+        {
+          "ring_id": "DM05",
+          "weighted_emission_gain": 7.427273321532373
+        },
+        {
+          "ring_id": "DM06",
+          "weighted_emission_gain": -0.1503939473196716
+        },
+        {
+          "ring_id": "DM09",
+          "weighted_emission_gain": -0.0832299723884441
+        },
+        {
+          "ring_id": "DM10",
+          "weighted_emission_gain": -1.1989284785360008
+        },
+        {
+          "ring_id": "DM12",
+          "weighted_emission_gain": 3.2150322736929535
+        },
+        {
+          "ring_id": "DM14",
+          "weighted_emission_gain": 0.15613268746916403
+        },
+        {
+          "ring_id": "DM16",
+          "weighted_emission_gain": -10.390679454071591
+        },
+        {
+          "ring_id": "DM17",
+          "weighted_emission_gain": 1.581962974449842
+        },
+        {
+          "ring_id": "DM18",
+          "weighted_emission_gain": -2.1080538417986503
+        }
+      ]
+    }
+  ]
+}

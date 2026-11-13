@@ -1,0 +1,135 @@
+---
+title: "Herleitung A (Neufassung) – Generatives Modell des zweiköpfigen Bayesian-SSR-HMM"
+subtitle: "DM-Ringwalzprozess | Abgleich mit Original A vom 27.10.2026 und dem eingefrorenen Abschlussmodell"
+date: "11. November 2026 | Forschungs- und Dokumentationsstand V2"
+lang: de-DE
+---
+
+# Status, Quellen und Leseregeln
+
+**Status:** mathematische Rekonstruktion des tatsächlich implementierten, am 11.11.2026 eingefrorenen Abschlussmodells; **keine** Behauptung, dass der ursprüngliche A-Text bereits diese Struktur enthalten habe. Das Modell wurde vor der einmaligen äußeren Auswertung festgelegt; alle darauf folgenden Modellideen müssen als neue explorative Forschung behandelt werden.
+
+**Quellenbasis:** Original-Word `Bayesian_SSR_Ringwalzen_Entscheidungen_Herleitung_A.docx` (vollständig verfügbar), ergänzend Originale B–D; tatsächliche Archivstände `two_head_b1.py`, `fullcov_b1.py`, `full_markov_b1.py`, `dm_data.py`, `outer_predict_frozen.py`, `compare_two_head_cv4.py`. Literaturzuordnung: Rabiner (1989) HMM; Beal (2003) Bayesian-HMM/VI; Shao et al. (2022) SsBHMM mit multivariatem Normal-Wishart-Baustein; Mowbray et al. (2022) Batch-Qualitätsprognose; Shao, Ge & Song (2021) gewichtete VI. Die konkrete **ringweite Zweikopf-Kopplung** ist eine eigene Modellkombination, keine aus einer Quelle unverändert übernommene Gleichung. Exakte Papierseiten und Supplements müssen vor Übernahme in Fließtext am Original nachgewiesen werden.
+
+# A.1 Aufgabenstellung und Beobachtungseinheit
+
+Ein Ring $i$ erzeugt eine zeitlich geordnete Beobachtungssequenz
+
+$$X_i=(\mathbf x_{i1},\ldots,\mathbf x_{iT_i}),\qquad \mathbf x_{it}\in\mathbb R^d,$$
+
+mit variabler, ringabhängiger Länge $T_i$. Für das eingefrorene Modell gilt $d=6$, $K=3$ und $J=2$ Qualitätsgrößen. Die Beobachtungsvektoren bestehen aus den sechs Loggerkanälen `F_rad63`, `F_ax64`, `Ist_D150`, `Ist_s151`, `Ist_h152`, `RWG55` – in dieser Reihenfolge. Es gibt **keine dritte Zielgröße**.
+
+$$\mathbf y_i=(y_{i1},y_{i2})^\top = (\text{Außenunrundheit},\ \text{Höhenschlag})^\top\in\mathbb R^2.$$
+
+Ihre Rohfelder lauten `ovality.ovality_radial_mm` und `planarity.height_deviation_mm`. Die physikalische Semantik dieser benannten Messspalten ist beim wissenschaftlichen Schreiben anhand der Messvorschrift zu sichern; vorliegend werden die bestätigten beiden Endqualitätsgrößen damit bezeichnet. Der Ring, **nicht** der Loggerzeitpunkt, bildet die unabhängige Qualitätsbeobachtung. Alle Größen $y_i$ werden im Trainingsmodell ausschließlich mit dem Mittelwert und der Standardabweichung gelabelter Trainingsringe standardisiert und für die Evaluation wieder in mm zurücktransformiert.
+
+**DM-Datenbestand:** 17 überlieferte DM-Versuche (DM01, DM02, DM04–DM18); DM03 ist nicht als gültiger Datensatz enthalten, DM13 wegen unvollständigem Versuch ausgeschlossen. Die **16 aktiven Ringe** besitzen zusammen 10.385 Roh-Zeitpunkte. Das selektierte Fenster **F2** umfasst ausschließlich `phase804` gleich 1 oder 2 sowie `LaserOK=MessEin=1` und muss zusammenhängend sein. Die sechs ausgewählten Kanäle werden in den Trainingsringen zeitpunktweise standardisiert. Die vollständige Ringdauer und Kennwerte werden erst am Ende des Walzvorgangs berechnet; das Abschlussmodell ist somit **kein unverändert einsatzfähiger Online-Prädiktor während eines laufenden Rings**.
+
+# A.2 Verborgene Zustandsfolgen: unverändertes HMM-Grundprinzip
+
+Jeder Ring besitzt eine eigene latente Folge $Z_i=(z_{i1},\ldots,z_{iT_i})$ mit $z_{it}\in\{1,\ldots,K\}$. Die global geteilte HMM-Anfangsverteilung $\boldsymbol\pi$ und Übergangsmatrix $A$ erfüllen:
+
+$$p(Z_i\mid\boldsymbol\pi,A)=\pi_{z_{i1}}\prod_{t=2}^{T_i} A_{z_{i,t-1},z_{it}}.$$
+
+Die Zustandsetiketten sind permutierbar; der numerische Name „Zustand 2“ hat nicht ohne unabhängige Zuordnung dieselbe physikalische Bedeutung über verschiedene Folds oder Initialisierungen hinweg. Es werden keine festen manuellen Phasenzustände vorgegeben. Das HMM beschreibt abhängig vom Zustand Wahrscheinlichkeitsverteilungen und markovsche Zustandswechsel; es garantiert weder mechanistische Kausalität noch die korrekte Phasengrenze.
+
+# A.3 Neue multivariate Emissionen: volle statt diagonale Kovarianz
+
+Die ursprüngliche Herleitung A.3 nutzte eine diagonale Gauß-Kovarianz mit unabhängigen Normal-Invers-Gamma-Faktoren pro Kanal. Der eingefrorene Hauptkandidat benutzt dagegen
+
+$$\mathbf x_{it}\mid z_{it}=k,\boldsymbol\mu_k,\Lambda_k\sim\mathcal N_d(\boldsymbol\mu_k,\Lambda_k^{-1}),\qquad \Lambda_k\in\mathbb S_{++}^{d}.$$
+
+$\Lambda_k$ ist die **vollständige Präzisionsmatrix**, $\Sigma_k=\Lambda_k^{-1}$ die Kovarianzmatrix. Nichtdiagonale Einträge sind zugelassen. Für den Bayesian-Baustein gelten konjugierte Normal-Wishart-Priors:
+
+$$\Lambda_k\sim\mathcal W_d(W_{0k},\nu_{0k}),\qquad \boldsymbol\mu_k\mid\Lambda_k\sim\mathcal N_d(\mathbf m_{0k},(\kappa_{0k}\Lambda_k)^{-1}).$$
+
+Die im Code tatsächlich eingesetzten, auf **standardisierte Prozessdaten** bezogenen Standardwerte sind $\mathbf m_{0k}=\mathbf0$, $\kappa_{0k}=0{,}2$, $\nu_{0k}=d+3=9$, $W_{0k}=I/(d+3)$. Somit gilt $\mathbb E[\Lambda_k]=\nu_{0k}W_{0k}=I$. Dieser priorpräzisionsbezogene Erwartungswert ist **nicht** mit $\mathbb E[\Sigma_k]$ gleichzusetzen. Für die HMM-Priors gelten
+
+$$\boldsymbol\pi\sim\operatorname{Dir}(\mathbf1_K),\qquad A_{k,:}\sim\operatorname{Dir}(\mathbf a_{0k}),\quad a_{0k\ell}=0{,}5+4\,\mathbf1\{k=\ell\}.$$
+
+Der Diagonalboost der Dirichlet-Prior bevorzugt Persistenz der latenten Zustände. Diese Modellwahl ist eine Regularisierung, keine gemessene physikalische Zustandsdauer. Das durch Shao et al. (2022) gestützte Normal-Wishart-Prinzip ist nicht identisch mit der im Folgenden **eigenständig ergänzten ringweiten Zweikopf-Qualität**.
+
+# A.4 Zwei unterschiedliche, aber gemeinsam gekoppelte Qualitätsköpfe
+
+Die alte Herleitung A.4 leitete Endqualität ausschließlich aus Zustandsaufenthalten ab. Dieser Pfad verlor Informationen zu absoluten Kräften, Verformungen, Ringdauer und zeitlicher Signalform. Deshalb wurde im abgeschlossenen Modell eine *additive ringweite Qualitätskopplung* implementiert, die für jede Zielgröße **andere** beobachtete Sequenzkennwerte verwendet.
+
+Zunächst definieren wir für jeden Ring die relativen latenten Zustandsaufenthalte:
+
+$$h_{ik}(Z_i)=\frac1{T_i}\sum_{t=1}^{T_i}\mathbf1\{z_{it}=k\},\qquad \mathbf h_i\in\mathbb R^K,\quad \mathbf1^\top\mathbf h_i=1.$$
+
+Für jede Qualitätsgröße $j\in\{1,2\}$ werden **aus $X_i$ deterministisch** Prozesskennwerte $\mathbf s_{ij}=f_j(X_i,t_i)$ gebildet. Nach jeweils ausschließlich trainingsbasiertem Skalierungsfit definiert das Modell
+
+$$\mathbf u_{ij}(Z_i,X_i)=\begin{bmatrix}\mathbf h_i(Z_i)\\\mathbf s_{ij}(X_i)\end{bmatrix}\in\mathbb R^{D_j},\quad D_j=K+p_j.$$
+
+Für das eingefrorene Modell gilt $p_1=6$ und $p_2=5$, also $D_1=9$ und $D_2=8$. Die beiden Qualitätslikelihoods werden getrennt, aber über **dieselbe latente Zustandsfolge** gekoppelt:
+
+$$y_{ij}\mid Z_i,X_i,\boldsymbol\beta_j,\sigma_j^2\sim\mathcal N(\boldsymbol\beta_j^\top\mathbf u_{ij}(Z_i,X_i),\sigma_j^2),\qquad j=1,2.$$
+
+**Kopf 1, Außenunrundheit:** `log_duration`, `avg_radial_force`, `std_radial_force`, `delta_outer_diameter`, `delta_wall_thickness`, `max_radial_force`. **Kopf 2, Höhenschlag:** `log_duration`, `avg_axial_force`, `std_axial_force`, `delta_height`, `max_axial_force`. Die Kennwerte werden aus sechs **zuvor standardisierten Loggerkanälen** berechnet und anschließend über die Trainingsringe erneut skaliert. Der Ausdruck „mittlere Kraft“ bezeichnet deshalb im Modell zunächst einen Kennwert auf der standardisierten Kanal-Skala, nicht unmittelbar den physikalischen Kraftwert in kN.
+
+Die Qualitätsköpfe sind **bedingt unabhängig bei gegebenen $Z_i$, $X_i$ und ihren globalen Regressionsparametern**; durch Integration über $Z_i$ können die Vorhersagen der zwei Zielgrößen dennoch abhängig werden.
+
+## A.4.1 Prior der beiden Regressionsköpfe
+
+Es werden separate Normal-Invers-Gamma-Priors verwendet:
+
+$$\sigma_j^2\sim\operatorname{IG}(a_{0j},b_{0j}),\qquad \boldsymbol\beta_j\mid\sigma_j^2\sim\mathcal N_{D_j}(\boldsymbol\beta_{0j},\sigma_j^2 V_{0j}).$$
+
+In der eingefrorenen Variante ist $\boldsymbol\beta_{0j}=0$, $a_{0j}=2{,}5$, $b_{0j}=1{,}5$. $V_{0j}$ besitzt auf der Diagonale den Wert 2 für die $K$ Zustandsanteile und 0,25 für die jeweiligen beobachteten Prozesskennwerte. Das ermöglicht unterschiedliche Prior-Regularisierung beider Merkmalsgruppen, ist aber noch **keine datenselektiv gelernte Feature-Relevanz**.
+
+**Achsenabschnitt:** Da $\sum_k h_{ik}=1$, liegt ein konstanter Regressionsanteil im linearen Spann der Zustandsmerkmale. Das Modell fügt daher keinen zusätzlichen freien Intercept hinzu. Der Zeitdauer-Logarithmus ist ein eigenes, nicht konstantes Merkmal.
+
+## A.4.2 Doppelte Nutzung der Daten ist kein automatisch unerlaubtes Leakage
+
+$\mathbf s_{ij}$ ist eine bekannte Funktion der Loggersequenz $X_i$ und wird **nicht** noch einmal als selbständige stochastische Beobachtung multipliziert. Die gerichtete Faktorisierung lautet daher $p(X_i\mid Z_i,\Theta_X)\,p(\mathbf y_i\mid X_i,Z_i,\Psi)$, **nicht** $p(X_i)p(\mathbf s_i)p(Y_i)$. Dadurch wird kein zusätzlicher unabhängiger Datensatz vorgetäuscht. Dennoch bleiben starke Kollinearität, Informationen über den Walzfortschritt und eine mögliche Schwäche der Qualitätsposterioren reale Modellrisiken.
+
+Die 32 übrigen Felder des ursprünglichen `Zielwerte`-Blatts und Walzprotokollgrößen, die erst aus der Endmessung stammen, wurden **nicht** als Eingänge der Qualitätsvorhersage verwendet. Nur die sechs Loggerkanäle und die zugehörige Zeitachse bilden Eingangsinformationen; die beiden einzigen Ziele bleiben Außenunrundheit und Höhenschlag.
+
+# A.5 Gemeinsame generative Verteilung
+
+Die globalen Parameter sind $\Theta=(\boldsymbol\pi,A,\{\boldsymbol\mu_k,\Lambda_k\}_{k=1}^K,\{\boldsymbol\beta_j,\sigma_j^2\}_{j=1}^2)$. Bei gegebenen und festen Präprozessierungsparametern lautet die vollständige gemeinsame Dichte für die beiden echten Trainingsgruppen $L$ (gelabelt) und $U$ (verdeckte Qualität):
+
+$$\begin{aligned}
+p(\Theta,Z,X,Y_L)&=p(\boldsymbol\pi)\prod_{k=1}^K p(A_{k,:})p(\Lambda_k)p(\boldsymbol\mu_k\mid\Lambda_k)\\
+&\quad\times\prod_{j=1}^{2}p(\sigma_j^2)p(\boldsymbol\beta_j\mid\sigma_j^2)\\
+&\quad\times\prod_{i\in L\cup U}p(Z_i\mid\boldsymbol\pi,A)\prod_{t=1}^{T_i}p(\mathbf x_{it}\mid z_{it},\boldsymbol\mu,\Lambda)\\
+&\quad\times\prod_{i\in L}\prod_{j=1}^{2}p(y_{ij}\mid Z_i,X_i,\boldsymbol\beta_j,\sigma_j^2).
+\end{aligned}$$
+
+Die bedingte Abhängigkeit von $Y$ von **$X$ und $Z$** ist gegenüber A alt ausdrücklich neu. Für ungelabelte $i\in U$ wird kein künstliches $y_i$ benötigt: Unter dem normierten Qualitätsmodell gilt
+
+$$\int p(\mathbf y_i\mid Z_i,X_i,\Psi)\,d\mathbf y_i=1.$$
+
+Daher besitzt $U$ im direkten gemeinsamen Modell nur HMM-Start-, Übergangs- und Emissionsbeiträge. Diese Integration ist **keine Pseudo-Label-Erzeugung**.
+
+# A.6 Datenaufteilung, Gewichte und Geltungsbereich
+
+Die 16 aktiven DM-Ringe sind in $L=$ DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18; $U=$ DM01, DM02, DM10, DM14; und den einmalig für die äußere Bewertung zurückgehaltenen Satz $T=$ DM07, DM08, DM11, DM15 getrennt. Alle $U$ besitzen physisch Qualitätsmessungen, diese wurden für den vorgesehenen SSL-Versuch **simuliert verborgen**. Die innere CV hält jeweils zwei der acht L-Ringe zusätzlich zurück und trainiert mit sechs L-Ringen plus vier U-Ringen.
+
+In der allgemeinen Likelihood ist die ungewichtete Variante $C=1$ das eigentliche gewöhnliche Bayesian-Modell. In Vergleichsversuchen mit $C\neq1$ wird eine **gewichtete VI-Zielfunktion** verwendet; deren wissenschaftliche Bedeutung ist von einem gewöhnlichen vollständigen Posterior zu unterscheiden (Herleitung C). Die finale Konfiguration lautet $C=1$, $K=3$, 10 Epochen, acht lokale Optimierungsschritte, Seed 20261111, `FULL_JOINT`.
+
+Die Vorhersage ist **induktiv**: Für einen neuen Ring werden seine Prozesswerte in die Inferenz eingegeben, nicht seine Qualität. Die äußeren Ringe wurden weder für die Vorverarbeitung noch für Initialisierung oder Training verwendet. Die Qualitätswerte wurden erst nach Speicherung und Hash-Versiegelung der Vorhersagen zur einmaligen Bewertung gelesen.
+
+# A.7 Abgleich mit Original A: Was blieb, was wurde ersetzt?
+
+| Originalabschnitt | Ursprünglicher Gedanke | Neufassung und Implementierungsstatus |
+|---|---|---|
+| A.1–A.2 | Ringweise Sequenz, Standard-HMM | **Beibehalten**, DM statt SFA; zwei Qualitätsziele. |
+| A.3 | Diagonale Gauß-Emissionen mit NIG | **Ersetzt** durch volle $d\times d$-Präzisionsmatrizen und Normal-Wishart. |
+| A.4.1 | Relative Zustandsaufenthalte | **Beibehalten**, genaue erste/zweite Momente erforderlich. |
+| A.4.2 | Gemeinsame Regression aus $h(Z)$ | **Ersetzt** durch zwei unterschiedliche $[h(Z);s_j(X)]$-Köpfe. |
+| A.4.3 | Kein extra Intercept | **Beibehalten**, Summe der Aufenthalte ist eins. |
+| A.4.4 | Zeit-/Signalinformation fehlt | **Teilweise adressiert**: Ringkennwerte; Reihenfolge von Zuständen nicht vollständig rekonstruiert. |
+| A.5–A.6 | Gemeinsame Verteilung, Priors | **Erweitert** um Normal-Wishart und Kopf-spezifische NIG-Priors. |
+| A.7–A.8 | $L+U$, Marginalisierung | **Beibehalten**, ohne Pseudo-Labels; konkrete U-Nutzung per Ablation geprüft. |
+
+# A.8 Explizite wissenschaftliche Grenzen
+
+1. Die Normalverteilung mit vollständiger zeitlich **konstanter** Emissionskovarianz kann physikalische Zeittrends, Nicht-Gaußförmigkeit und Prozessverschiebungen nur über Zustandswechsel approximieren. Getestete zeitabhängige Emissionen waren keine allgemein bessere Lösung.
+2. Die Zustandsaufenthalte erhalten die Reihenfolge der Zustände nicht; sechs bzw. fünf zusätzliche Ringkennwerte bilden lediglich einen ausgewählten Teil der vollständigen Signalform ab.
+3. Die vollbesetzte Präzisionsmatrix kann schlecht konditioniert sein; Normal-Wishart-Priors stabilisieren sie, garantieren aber kein ideal passendes Modell.
+4. Es existieren nur acht gelabelte Entwicklungsringe, pro innerem Fold sechs. Viele Zeitpunkte erhöhen die Zahl *ringweiter* Qualitätslabels nicht.
+5. Die Qualitätswerte für alle 16 Ringe stammen aus einem begrenzten Versuchsbestand; die SSL-Situation wird durch bewusstes Verbergen von vier Trainingslabels nachgebildet.
+6. „Fully Bayesian“ bedeutet hier Priors über die **globalen Modellparameter** und deren VI-Posteriorfaktoren. Die gemeinsame Posteriorintegration wird **approximativ**, nicht exakt gelöst.
+
+**Ergebnis von Herleitung A:** Ein mathematisch explizites, zweiqualitatives generatives Bayesian-HMM mit vollen Emissionskovarianzen und unterschiedlichen, aber latent gekoppelten ringweiten Qualitätsregressionen. Die Konsequenzen für Markov-Momente und VI folgen in den Herleitungen B und C; die tatsächlich implementierte prädiktive Approximation folgt in D.

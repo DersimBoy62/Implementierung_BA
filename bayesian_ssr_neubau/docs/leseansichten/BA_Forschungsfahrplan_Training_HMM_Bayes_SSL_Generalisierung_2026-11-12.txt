@@ -1,0 +1,291 @@
+Forschungsfahrplan zur wissenschaftlichen Fertigstellung des Bayesian-SSR-Ringwalzmodells
+Training & Konvergenz  ·  Nutzen des HMM  ·  Eigenständiger Beitrag von Bayes  ·  SSL-Effekt  ·  Generalisierung & Unsicherheit
+Verbindliche Arbeits- und Entscheidungsgrundlage | Stand: 12. November 2026 | Version: Forschungsplan 1.0
+Status: OFFENE FORSCHUNG – KEIN FINALER MODEL-FREEZE
+Zweck: Dieses Dokument hält die gemeinsam festgelegten Ziele, erforderlichen Untersuchungen, wissenschaftlichen Schutzregeln und Abschlusskriterien fest. Es soll vor jeder nächsten Entwicklungsentscheidung geprüft und abschnittsweise aktualisiert werden.
+0. Verbindliche Entscheidung und Arbeitsregeln
+Ein endgültiger Model-Freeze, eine wissenschaftliche Endfreigabe und die abschließende Modellbeschreibung erfolgen erst, wenn die Forschungsfelder T, H, B, U, G und P methodisch behandelt, dokumentiert und bewertet wurden – und der Nutzer dem Abschluss ausdrücklich zustimmt.
+Das bereits erstellte und verifizierte 67-Dateien-Archiv ist ein unveränderlicher TECHNISCHER REFERENZSTAND, keine wissenschaftliche Freigabe; das Referenzmodell MODEL_8L4U_RUN01 wird nicht überschrieben.
+Untersucht werden explizit negative, neutrale und positive Effekte. Kein Ergebnis wird nachträglich geschönt, keine bloße Testanzahl als Evidenz für Vorhersagekraft ausgegeben.
+Wir unterscheiden numerische Modellkorrektheit, Trainingsstabilität, interne/explorative Prognosevalidierung und unabhängige externe Generalisierung. Das eine ersetzt das andere nicht.
+Bei jedem Forschungsschritt: ursprüngliche Herleitungen A–D, DM-Neufassungen A–D (11.11.), tatsächlich implementierten Code und belegte Originalquellen abgleichen; Unterschiede offen protokollieren.
+Die historischen äußeren Testringe DM07, DM08, DM11, DM15 gelten seit der V1-Testauswertung vom 11.11. als bekannt und dürfen nicht für neue unabhängige Aussagen oder nachträgliche Modellwahl verwendet werden.
+1. Forschungsfrage und präzise Teilfragen
+Arbeitsfrage: Wie tragfähig ist eine ringweise Bayesian-HMM-basierte Semi-Supervised Regression zur Vorhersage der Außenunrundheit und des Höhenschlags aus vollständig aufgezeichneten Ringwalz-Zeitreihen, und welcher wissenschaftlich isolierbare Mehrwert stammt aus HMM-Zustandsmodellierung, Bayesian-Inferenz und ungelabelten Prozessdaten?
+Teilfrage
+Welche Antwort muss vorliegen?
+T: Training / Konvergenz
+Hat die implementierte VI bei begründeten Trainingsbudgets und mehreren Starts hinreichend stabiles Verhalten? Ist die lokale Optimierung verstanden?
+H: HMM
+Verbessern dynamische HMM-Zustandsinformationen bei kontrolliertem Vergleich die Qualitätsprognose oder nur das Prozessmodell?
+B: Bayes
+Welche Beiträge stammen von Priors/Regularisierung, Posteriorintegration, Unsicherheit und Bayesian-Updates im Gegensatz zu passenden Punkt-/MAP-Modellen?
+U: SSL (Teilfrage 2)
+Welche Leistung stammt aus gemeinsamer U-Vorverarbeitung, aus der gewichteten U-Prozess-ELBO und aus gelabelter Zustandsrückkopplung?
+G: Generalisierung (Teilfrage 3)
+Wie robust sind Vorhersagen über Ringe, Seeds, Trainingsbedingungen und nach Möglichkeit wirklich neu erhobene Ringe?
+P: Priors, Unsicherheiten, Physik
+Sind Wahrscheinlichkeitsannahmen, Priorstärken, prädiktive Standardabweichungen und Einheiten plausibel, kritisch überprüft und korrekt bezeichnet?
+Nicht-Ziel: Nachweis einer aktiven Prozessoptimierung. Das Modell wurde bislang auf End-of-Process-Vorhersage untersucht; es gibt keine experimentell nachgewiesene Verbesserung des Walzprozesses durch geänderte Stellgrößen.
+2. Bisher gesicherter Stand – ohne Überinterpretation
+Daten: 16 aktive DM-Ringe (DM03 und DM13 ausgeschlossen); davon 8 gelabelte Entwicklungseinheiten, 4 in der Entwicklung qualitätsmaskierte U-Ringe und 4 historisch geöffnete äußere Testringe; 6 Loggerkanäle im F2-Fenster und genau 2 ringweite Qualitätsziele.
+V1: einmalig zuvor gesperrter äußerer Test der damaligen Konfiguration K=3/C=1. RMSE außen (SSR/Strict/Mittelwert): 0,3888/0,5529/0,4953 mm. RMSE Höhenschlag: 3,2064/3,3579/2,9785 mm. Dieser Test ist NICHT für V5.2 wiederholbar unabhängig.
+V4: verschachtelte 4×3-Optuna-CV auf acht mehrfach verwendeten Entwicklungslabels. RMSE außen Strict/Shared C0/SSL: 0,6541/0,5503/0,5453 mm; Höhe: 3,1756/3,2633/3,2100 mm. Die isolierte U-ELBO-Wirkung ist klein und teils ringabhängig.
+V5.2/V5.4: realer K=2/C=0,2/P0/M2-Entwicklungsfit über 10 Epochen und 8 lokale VI-Schritte, Training auf 8 L+4 U, gespeichertes Modell SHA256 56c3605ba3e0157125ecb7b2adaaddcb160a15c16edf22f2e28e5b232f2ae3c4. Reproduzierbarkeit/Archiv verifiziert; letzte ELBO-Verbesserung +28,9777, kein Konvergenznachweis.
+V5.3: gepaarte 0-vs.-8-lokale-Schritte-CV: ΔRMSE außen ≈ −0,0000021 mm, Höhe ≈ −0,0000431 mm. Mechanismus numerisch funktional, praktische Zusatzwirkung auf diese Daten sehr gering.
+Verifiziertes Technikarchiv: 67 Dateien, ZIP-SHA256 e5d8fd9cfd7f6e438a451f0ba0703a880ca45d816ddc8943af906ab79bc2430b; kein formaler Modell-Freeze.
+3. Forschungsstrang T – Training, Optimierungsdynamik und Konvergenz
+T1 – Reproduktion und längere Trainingskurven
+Hypothese: Das feste 10-Epochen-Budget könnte die VI vor einer Stabilisierung abbrechen. Zunächst unveränderte Konfiguration und identischer Seed; 30-Epochen-Train-only-Diagnose aus gleichem Start. Die ersten zehn ELBO-Werte müssen gegen die gespeicherte Historie reproduziert werden. Danach ggf. 60/100 Epochen nur als vorab dokumentierte Konvergenzexperimente, nicht als Optimierung anhand von RMSE.
+Messgrößen: ELBO je Epoche, absolute/relative ΔELBO, lokale Gewinne, Zustandsbelegung, Varianzen und Kondition, Anzahl instabiler/nicht endlicher Schritte, Parameteränderungen (z. B. normierte Frobenius-/Vektornormen). Plateaudiagnose nur als diagnostisches Kriterium, kein Beweis für globales Optimum.
+T2 – Lokale FULL_JOINT-VI und Optimierungsqualität
+Prüfen, welche Größe „8 lokale Schritte“ im Code wirklich bezeichnet: maximal acht L-BFGS-B-Iterationen pro gelabeltem Ring und Update, kein garantiertes Konvergenzereignis. Systematische isolierte Variation (z. B. 0/8/16/32) auf kontrollierten Entwicklungs-Folds mit fixierten übrigen Parametern. Optimierer-Status, Gradienten-Norm, Akzeptanz/Abbruch und Zielfunktionsveränderung instrumentieren.
+T3 – Initialisierung, Seeds und lokale Optima
+Mehrere VORAB FESTE Seeds und ggf. getrennte K-Means-Initialisierungen bei gleicher Architektur. Kurvenvergleich inklusive label-switching-invarianter Größen (Zustandsoccupancy, Prozess-Logscore, Qualitätsfehler, vorhergesagte y) und Zustandszuordnung nur nach geeignetem Matching. Keine Seed-Selektion anhand eines historischen Tests.
+T4 – Parameter, ELBO-Zerlegung und numerische Stabilität
+KL-Beiträge der Dirichlet-, Normal-Wishart- und NIG-Faktoren getrennt protokollieren; Prozess- vs. Qualitäts-Likelihood und U-Gewichtung unterscheiden. Matrixkondition, positive Definitheit, endliche Varianzen, Posteriorpräzision und Unterschiede zwischen vollständig/diagonal dokumentieren. Prüfen, ob ELBO-Änderungen von lokalem Optimierungsfehler oder globalen Updates herrühren.
+T – Abschlussnachweise
+Reproduzierbarer 10-Epochen-Vergleich und vollständige längere Trainingsprotokolle aus denselben Anfangswerten.
+Auswertung über mehrere vorab festgelegte Starts, inklusive Streuung, Nichtkonvergenz und numerischer Warnungen.
+Lokale Optimierungsdiagnostik sowie globale KL- und Parameterverläufe; Code- und Herleitung-C-Abgleich.
+Ehrliche Aussage „stabilisiert / noch steigend / instabil / nicht entscheidbar“, KEINE Behauptung globaler Optimalität.
+4. Forschungsstrang H – Eigenständiger Nutzen des HMM
+Kernproblem: Ein HMM kann Prozesssequenzen sehr gut beschreiben, ohne automatisch für die Endqualität zusätzliche Informationen zu liefern. Die bisherigen PHYS_NIG- und HMM-Hybrid-Vergleiche waren in Merkmalen/Priors nicht vollständig kontrolliert. Deswegen konstruieren wir eine gepaarte Komponentenablation.
+Arm
+Input / Mechanik
+Wozu dient der Kontrast?
+H0
+Trainingsmittelwert aus denselben Trainingsringen.
+Trivialbaseline gegen Überkomplexität.
+H1
+Nur fest definierte physikalische Ringdeskriptoren + Bayesian-NIG-Kopf.
+Direkt erklärbare X→y-Abbildung.
+H2
+Nur HMM-Zustandsmomente + kompatibler Kopf; keine zusätzlichen Deskriptoren.
+Wert der latenten Zustandsinformation.
+H3
+Gleiche Deskriptoren wie H1 plus HMM-Zustandsmomente; gleiche Folds und Zielskalierung.
+Inkrementeller HMM-Beitrag bei identischer Descriptorbasis.
+H4 (optional)
+Einfaches zeitliches Aggregat oder statische Clustermerkmale ohne Markov-Dynamik.
+Ist der Gewinn spezifisch zeitlich/Markov, oder nur zusätzliche Komplexität?
+Fairness: dieselben ringweisen Folds und Trainingslabels; Featureanzahl und Priorstärken transparent abstimmen, Komplexitätsdifferenzen angeben. H3–H1 vergleicht die praktische inkrementelle Prognoseleistung, kann aber bei verschiedenen Posterioren keine kausale Attribution im strengen Sinne garantieren.
+Zusätzliche Diagnosen: Prozess-Logscore, Zustandswechsel, Segmentdauern, State Occupancy, Stabilität bei Seeds, zeitliche Phaseninterpretation und Rückbezug zu F2. Höherer Prozess-Logscore ist nicht gleich besserer Qualitäts-RMSE.
+Abschluss: zweikopfgetrennte gepaarte RMSE/MAE, ringweise Differenzen, Ähnlichkeiten von Zustandsfolgen, Komplexität, Seed-Streuung und begründete Ja-/Nein-/Uneindeutig-Antwort zum HMM-Zusatznutzen.
+5. Forschungsstrang B – Was liefert Bayes selbst?
+Bayesian-Inferenz muss als eigenständige wissenschaftliche Komponente untersucht werden. Ein Bayesian-Posterior erzeugt nicht automatisch bessere Punktprognosen; mögliche Vorteile liegen in Regularisierung, Integration von Parameterunsicherheit und probabilistischen Vorhersagen. Zugleich ist die implementierte Inferenz approximativ (strukturierte VI, nicht exaktes MCMC).
+B1 – Fairer Regressionsvergleich
+Gleiche beobachteten Deskriptoren und identische CV-Folds: konjugate NIG-Bayesian-Regression gegen passend regularisierte MAP-/Ridge-Regressionsvariante sowie, wenn methodisch sinnvoll, OLS. Die Regularisierungsstärke und das Optimierungsbudget der Vergleichsverfahren müssen fair und vorab definiert sein; MAP ist kein „Bayes-freier“ Vergleich, weil er ebenfalls Priors als Regularisierung enthält. Daher posteriorer Mittelwert gegen MAP und gegen rein datengetriebenes Ridge getrennt ausweisen.
+B2 – Prior-to-Posterior-Lernen
+Prior- und Posteriorparameter der Dirichlet-, Normal-Wishart- und NIG-Familien hinsichtlich Konzentration, Präzision, Varianz und Effective Sample Size interpretieren. Kontrollierte Variation weniger begründeter Priorstärken, keine nachträgliche Optimierung auf bereits offenem Outer-Test. Priorprädiktive Simulationen bzw. synthetische Plausibilität in physikalischen mm-Einheiten.
+B3 – Volle Bayesian-HMM versus Punkt-HMM (optional fortgeschritten)
+Nur wenn sauber implementierbar: Bayes-HMM mit globalen Variationsverteilungen gegenüber einem EM-/MAP-HMM mit gleicher K- und Emissionsstruktur. Das ist eine getrennte größere Modellfamilienablation; Regressionsarm B1 ersetzt diesen Systemvergleich nicht. Falls nicht umgesetzt, wird diese Lücke ausdrücklich dokumentiert.
+B4 – Bayes-Nutzen über Unsicherheitsbewertung
+Prädiktive Varianz, Intervallbreiten, standardisierte Residuen und proper Scores untersuchen, aber nur anhand einer tatsächlich gültigen prädiktiven Verteilung. Für den bestehenden Code sind Momentenapproximationen ausgewiesen, keine vollständig marginalisierten HMM-Parameter-Posterior-Samples und keine exakten Mischungsquantile. Keine unzulässigen NLL- oder 95-%-Kalibrierungsbehauptungen aus einer approximativen Normalverteilung.
+Abschluss: kontrollierte Punktprognoseablation, Prior-/Posterior-Befunde, vollständige Unsicherheitsgrenzen und präzise Antwort, welche Bayesian-Komponente belegbar nützt – und welche nicht.
+6. Forschungsstrang U – Semi-Supervised-Effekt [Teilfrage 2]
+Die semantisch entscheidende Zerlegung lautet: (i) strenges L-only, (ii) gemeinsames X-Preprocessing/Initialisierung mit U bei C=0 und (iii) exakt gleiche gemeinsame Konfiguration mit positiv gewichteter U-Prozess-ELBO. Nur der Kontrast (iii) minus (ii) isoliert näherungsweise den U-ELBO-Zusatzeffekt. Ein U-Label wird NIEMALS erzeugt oder trainiert.
+Vergleich
+Kontrolle
+Antwort
+Strict L-only vs Shared C=0
+Gleicher Vergleichsfold; Unterschied bei U-einbezogener X-Skalierung/Initialisierung ausdrücklich zulassen und benennen.
+Gesamteinfluss gemeinsamen X-Lernens; kein reiner U-Likelihood-Effekt.
+Shared C=0 vs Shared C=0,2
+Identische Merkmale, Skalierer, Initialisierung, Priors, Epochen, Seeds.
+Zusätzlicher Effekt der gewichteten U-Prozesslikelihood auf y-Vorhersagen.
+Lokal 0 vs 8/16 VI-Schritte
+Gleiche übrige Architektur; lokale Optimierungsqualität separat berichten.
+Hat die Qualitätslikelihood eine praktische Rückwirkung auf Zustandsverteilungen?
+Labelanzahl-Sensitivität (optional)
+Vorgeplante L-Subset-Muster, U-Definition eindeutig, keine Zielwerte an U weitergeben.
+Wie hängt ein möglicher SSR-Effekt von der verfügbaren Labelmenge ab?
+Pflichtmaterial: gepaarte ΔMSE/ΔMAE pro Ring, beide Zielgrößen einzeln, mittlere/mediane Unterschiede, Leave-one-ring-out-Sensitivität, Anteile mit Verbesserung und identische Fold-IDs. Die V4-CV auf acht wiederholt benutzten L-Ringen bleibt explorativ. Kein Signifikanzversprechen.
+7. Forschungsstrang G – Generalisierung [Teilfrage 3]
+G1 – Bereits vorhandene externe Evidenz korrekt bewahren
+Die Testauswertung vom 11.11. war für eine damals vorab festgelegte V1-Version unabhängig. Sie ist eine historische Bestätigungsbeobachtung, aber KEIN unabhängiger Nachweis der später nach weiteren Modelluntersuchungen entstandenen V5.2. DM07/08/11/15 werden niemals als neuer unberührter Testsatz bezeichnet.
+G2 – Interne Robustheit und fehlerorientierte Analyse
+Feste ringweise Entwicklungs-Folds, mehrere vorab registrierte Seeds, gepaarte Fehlerdifferenzen, Sensitivität einzelner Ringe, mögliche Ausreißer, Fehler gegen Prozessmerkmale, Unsicherheit gegen absoluten Fehler und mögliche Verteilungsverschiebungen analysieren. Resampling der Ringebene statt Zeitpunkte; n=8 transparent ausweisen. Mehrere CV-Wiederholungen bilden keine neue unabhängige Population.
+G3 – Frischer äußerer Nachweis als eigentlicher Zielstandard
+Idealfall: zusätzliche neu gefertigte Ringversuche oder unberührter externer Datensatz, dessen X und Qualitätswerte bisher für keine Entwicklungsentscheidung verwendet wurden. Vorab Protokoll, unveränderter Modellhash, Baselines, Messdefinition, Metriken und Umgang mit Ausfällen registrieren. Vorhersagen vor Öffnung der neuen Qualitätswerte speichern/versiegeln, danach einmalig auswerten. Auch neue Ringe desselben Versuchstags nur mit begründeter Unabhängigkeit bewerten.
+G4 – Transduktive Sekundärprüfung – nicht mit G3 verwechseln
+Die vier U-Ringe sind im Prozess-X bereits Teil des gemeinsamen Trainings; ihre bisher maskierten Zielwerte könnten – nur bei bestätigtem bisherigem Nichtgebrauch und eigener Protokollierung – als transduktive Zusatzanalyse dienen. Dies ist keine Generalisierung auf neue Prozesssequenzen und keine Ersatzbestätigung für G3.
+Abschluss: Unabhängige Generalisierung nur behaupten, wenn G3 tatsächlich durchgeführt wurde. Andernfalls sind interne Robustheitsbefunde, historische V1-Auswertung und die offene Übertragbarkeitsfrage vollständig, aber als Evidenzgrenze, darzustellen.
+8. Forschungsstrang P – Priors, Unsicherheit, Messphysik
+P1 Messdefinitionen und Kanaleinheiten: zwei grün markierte Original-Targets in all_targets (Außenunrundheit ovality.ovality_radial_mm und Höhenschlag planarity.height_deviation_mm); sechs zulässige Loggerkanäle; Bedeutung und Einheit von RWG55 ausdrücklich anhand Originalmessdokumentation kontrollieren. Keine Innenunrundheit als Target.
+P2 Physikalische Plausibilität: Vollkovarianzielle Emissionen können zeitliche Trends und Nicht-Gaussianität nicht beliebig modellieren; Zustandswechsel, Signalgrenzen und Descriptoren physikalisch begründet diskutieren.
+P3 Priorprüfungen: Normal-Wishart-Wirkung auf Kondition und Shrinkage, Dirichlet-Pseudohäufigkeiten, NIG-Skalen je Zielgröße. Prior-Predictive-Checks und empfindliche Bereiche berichten.
+P4 Unsicherheit: momentbasierte SD, Grenzen der integrierten Student-t-/Zustandsmischung, Intervallbreite, Coverage mit explizitem Nenner, ggf. korrekte prädiktive Stichproben für NLL/CRPS; keine Kalibrierung aus 4/4.
+P5 Bayes-Termini: das Modell hat verteilte globale Parameterposteriorfaktoren; „fully Bayesian“ betrifft die generative Formulierung, die tatsächliche Posteriorberechnung ist strukturierte VI und damit approximativ.
+9. Herleitungs- und Code-Abgleich als fortlaufende Pflicht
+Grundlage
+Was stammt aus der DM-Neufassung?
+Code-/Experiment-Schnittstelle
+A – Modellstruktur
+2 Qualitätsziele, volle Normal-Wishart-Emissionen, zwei NIG-Köpfe, Zustandsaufenthalt + physikalische Deskriptoren; U durch Marginalisierung.
+dynamic_quality_v2.py; fullcov_b1.py; two_head_b1.py; train/predict Wrapper.
+B – Lokale strukturierte VI
+Freie zeitabhängige Markov-Logits; exakte 1./2. Momente INNERHALB q(z), analytische Gradienten, zwei Qualitätsrückkopplungen.
+full_markov_b1.py; dynamic_markov_v2.py; lokale L-BFGS-B-Schritte.
+C – Globale VI / Training
+Gewichtete U-ELBO; konjugierte Updates; KL-Terme; F2-/Train-only-Skalierer, echte Trainingsschleife.
+dynamic_quality_v2.train; V5.5-Konvergenzprobe; CV4-/U-Ablationen.
+D – Prognose / Unsicherheit
+End-of-Process y-Vorhersage ohne neue Labels; Momentenapproximation; keine vollständige MC-Marginalisierung.
+dynamic_quality_v2.predict; trainierter V5.2-Release; Kalibrierungsdiagnostik.
+Alte A–D-Versionen bleiben wichtig als historische Entwurfsbasis. Sie behandeln teils SFA/3 Ziele/diagonale Emissionen und dürfen nicht ungeprüft als identische aktuelle Gleichungen übernommen werden. Herleitungsänderungen erhalten neue Versionsbezeichnung und einen dokumentierten Codeabgleich.
+10. Wissenschaftliche Begründungsmatrix – laufend zu pflegen
+Annahme
+Bisherige Grundlage
+Ungeklärte Begründung / Status
+Erforderlich
+F2-Zeitfenster, X6, Targets2
+Daten-/Prozessbezug, Original-Excel und Maschinendokumentation
+Weitgehend geprüft; Einheiten/Physik zu belegen
+P1, Herleitung A
+U-Labels maskieren, Leakage
+V5.1–5.4 QA, Dateihashes
+Technisch stark geprüft; Originalpickle enthält weitere Daten
+P2, U/G
+K=2 / HMM
+Zustands- und Strukturvergleiche
+Kein kontrollierter inkrementeller Nutzen final bewiesen
+H
+Vollkovarianzielle Emission + NW
+Numerik, Prior- und Strukturtests
+Prior- und Zeittrendempfindlichkeit weiter prüfen
+T4/P3
+Lokales q(z) / M2
+Exakte q-Momente, Gradienten
+Lokale Optimierungsqualität und Seeds offen
+T2/B
+Epochenbudget=10
+V5.4 +28,9777 letztes ELBO-Δ
+Konvergenz offen
+T1–T4
+C=0,2 und U-ELBO
+V4/V5.3 Ablationen
+Zusatznutzen klein, auf mehrfachen Daten
+U
+Bayes-Regressionskopf
+NIG, Posteriorform, Varianz
+Fairer MAP/Ridge-Vergleich und kalibrierte Vorhersage offen
+B1–B4
+Priors
+P0/Wishart/NIG Varianten
+Prior-Predictive/Sensitivitätsmatrix final offen
+B2/P3
+Posterior Predictive
+Momenten-SD / alte 4/4-Deckung
+Keine echte Mischungsquantil- oder Kalibrierungsbestätigung
+B4/P4
+Generalisierung
+Einmaliger V1-Test, V4 explorativ
+V5.2 ohne unabhängigen neuen Test
+G
+Reproduzierbarkeit
+67-Datei-Archiv und Modell-Pickle-SHA
+Technisch gut belegt; kein wissenschaftlicher Freeze
+Alle
+11. Priorisierte Experimentliste mit Abnahmekriterien
+ID
+Feld
+Versuch / Arbeitspaket
+Abschlusskriterium
+E01
+T1
+V5.5 Self-test + Preflight; 10→30 Epochen Train-only; Referenzhistorie reproduzieren
+JSON mit 30 ELBOs und identischen ersten 10; keine Testmetriken
+E02
+T1/T4
+Längere vorab fixierte Budgets bei gleicher Initialisierung; KL, Parameter-Deltas ergänzen
+Kurven, Stabilitäts-/Plateau-Bewertung mit Einschränkung
+E03
+T2
+Lokale 0/8/16/32 Schritt-Diagnose samt L-BFGS-B-Stopp/Gradient
+Prüfbericht lokale Qualität; keine Vermischung mit Label-RMSE-Wahl
+E04
+T3
+Mindestens drei vorab feste Seeds für identische Architektur
+Seed-Verteilung und label-switching-invariante Befunde
+E05
+H
+Gepaarte Descriptor-only / HMM-only / HMM+Descriptor-Ablation
+Gleiche Folds, fair dokumentierte Priors/Komplexität
+E06
+B
+NIG-Posterior-Mittel vs MAP/Ridge und ggf. Bayes-HMM vs MAP-HMM
+Getrennte Bayesian-Mehrwert-Aussagen; gleiche Trainingsinformation
+E07
+U
+Strict L-only / Shared C0 / Shared C0,2, identische übrige Stellgrößen
+Paarweise Ringergebnisse und isolierter U-Effekt
+E08
+P
+Prior-Predictive, finale Priorstärken, Parameter-/Unsicherheitsdiagnostik
+Physikalisch nachvollziehbare Priorbegründung und Intervalle
+E09
+G
+Robustheitsmatrix, Ausreißer-/Ring-/Seed-Sensitivität
+Offene Explorationsgrenzen; keine falsche externe Bewertung
+E10
+G
+Frisches, vorregistriertes neues Ringexperiment, soweit erreichbar
+Versiegelte Vorhersagen VOR Qualitätsöffnung und einmaliger Bericht; sonst offen
+E11
+Alle
+Herleitungen A–D + Originalpaper + Code-Quellenmatrix; Kapitel 4/5 überarbeiten
+Quellenstatus, Abbildungen, Negativbefunde, finale Forschungsantwort
+E12
+Alle
+Abschluss-Audit und ausdrückliche Zustimmung zum endgültigen Freeze
+Nur bei vollständig dokumentierten Punkten und bekannten Evidenzgrenzen
+12. Protokoll- und Anti-Leakage-Regeln für alle weiteren Experimente
+Jede Durchführung vor Start mit Experiment-ID, Forschungsfrage, Kontrast, erlaubten IDs, Seeds, Trainingsbudget, Versions-/Hashnachweis, Ausgabepfad und festgelegter Auswertungsmethode versehen.
+Originalcode und archiviertes Modell bleiben unverändert. Abweichungen als eigene Versuchsversionen führen; keine vorhandene Ergebnisdatei überschreiben.
+Historische Outer-Ringe DM07/08/11/15 niemals erneut für Hyperparameter-, Prior-, Feature- oder Trainingsbudgetauswahl verwenden. Neuen Test nur mit nachweislich neuen Ringen.
+Alle Qualitätsmetriken auf RINGEBENE bilden; keine Zeitpunkte als unabhängige Ringlabels behandeln. Außenunrundheit und Höhenschlag getrennt betrachten.
+Skalierer, Featureauswahl, Initialisierung und Priors foldlokal und ohne Validierungslabels bestimmen; bei U-Prozessdaten die transduktive Besonderheit benennen.
+Fairness zwischen Modellen bedeutet gleiche Trainingsinformation und Aufteilung, sorgfältig dokumentierte Hyperparameterwahl und keine nachträgliche Selektion aus vielen Versuchen ohne Einordnung.
+Paarweise Ringdifferenzen, Effektgrößen und Richtung der Resultate vor großem Signifikanzanspruch; bei n=8 nur breite, vorsichtig interpretierte Unsicherheit.
+Wenn eine Untersuchung aus Zeit-, Quellen- oder Datenmangel nicht abgeschlossen werden kann: als offen markieren, Konsequenz für Forschungsantwort ausweisen, nicht stillschweigend als erledigt behandeln.
+13. Abschluss-Gates: Wann dürfen wir das Modell fertigstellen?
+Gate
+Bedingung zum Haken setzen
+Stand heute
+GATE T – Training
+Konvergenz- und lokale VI-Diagnostik mit nachvollziehbaren Stabilitätsbefunden und Grenzen
+OFFEN
+GATE H – HMM
+Fairer, dokumentierter Zusatznutzenvergleich; Ja/Nein/uneindeutig wissenschaftlich beantwortet
+OFFEN
+GATE B – Bayes
+Punktvorhersage + Prior-/Posterior-/Unsicherheitsmehrwert von Bayes isoliert analysiert
+OFFEN
+GATE U – SSL
+Strict/C0/C>0 + Rückkopplung gepaart untersucht; Effekt kausal nicht überinterpretiert
+TEILWEISE
+GATE G – Generalisierung
+Interne Robustheit vollständig; externe neue Prüfung sofern verfügbar. Fehlende Unabhängigkeit offen bezeichnet
+OFFEN
+GATE P – Priors/Physik
+Originalquellen, Units, prior-/posteriorprädiktive Plausibilität und Intervalle geprüft
+OFFEN
+GATE M – Manuskript
+A–D-/Codeabgleich, Ergebnisse, Originalquellenstatus, 2 Zielgrößen und Diskussion konsistent
+OFFEN
+GATE F – Freigabe
+Begründungsmatrix und alle Evidenzgrenzen besprochen; Nutzer stimmt ausdrücklichem Freeze zu
+NICHT FREIGEGEBEN
+WICHTIG: Ein Gate kann auch mit einem begründeten Negativbefund abgeschlossen werden. Externe Generalisierung kann aber nicht durch interne Diagnostik ersetzt werden; ohne neue Ringe bleibt sie ausdrücklich unbelegt. Das Modell darf nicht als unabhängig validiert bezeichnet werden, bevor ein entsprechender Test existiert.
+14. Versionierte Forschungslogik und nächster Schritt
+Ablauf: [Referenzzustand sichern] → [E01 V5.5 Konvergenzvorprüfung] → [E02–E04 Trainings-Deep-Dive] → [E05 HMM-Nutzen] → [E06 Bayes-Nutzen] → [E07 SSL-U] → [E08 Priors/Unsicherheit] → [E09/E10 Generalisierung] → [E11 wissenschaftliche Synthese] → [E12 Nutzerfreigabe].
+Nächster konkreter Schritt: V5.5-Overlay nur nach bestandenen Self-test- und Preflight-Prüfungen für 30 Epochen ausführen. Bei Fehler keine unkontrollierte Alternative ausprobieren, sondern Original-Fehlerausgabe sichern und Skript gezielt korrigieren. Kein finaler Trainingslauf und keine neue Testauswertung vor Abschluss des Forschungsplans.
+Fortschrittszeile je Versuch (fortlaufend pflegen): Datum | Experiment-ID | Version/Hashes | erlaubte Ringe | Hypothese | Ergebnisdatei | Befund | Status [offen/läuft/geprüft/abgeschlossen] | Herleitung/Quellenstatus | nächste Entscheidung.
+15. Quellen- und Evidenzstatus
+Im lokalen Projekt eingesehen: BA_Wissenschaftlicher_Modell_Audit_und_Evaluationsplan_2026-11-12.docx; V5.2 Code main_bayesian_ssr_v52.py und final_core/dynamic_quality_v2.py; V5.5 convergence_probe_v55.py; JSON-Replay-/CV-Summary und Nutzer-Terminalausgaben.
+Bibliotheksdokumente mit inhaltlichen Auszügen geprüft: Herleitung_A_NEU_Modellstruktur_2026-11-11.docx; Herleitung_B_NEU_Strukturierte_VI_2026-11-11.docx; Herleitung_C_NEU_ELBO_Training_2026-11-11.docx; Herleitung_D_NEU_Posterior_Predictive_2026-11-11.docx; historische Master-Handovers.
+Direkte primäre Detailbelege für historische Außenergebnisse stammen aus dokumentierten OUTER_FINAL_SCORE_V1.json, NESTED_SUMMARY.json sowie CV4-Referenzdateien. Für jeden finalen Manuskriptsatz möglichst tatsächliche Originaldatei statt Handover-Zusammenfassung verwenden.
+Original-Literaturpaper (Rabiner 1989; Beal 2003; Shao et al. 2022; Shao, Ge & Song 2021; Mowbray et al. 2022 u. a.) wurden für DIESE Version des Forschungsplans nicht vollständig seitenweise überprüft. Keine daraus abgeleiteten konkreten Seitenzahlen als geprüft ausgeben.
+Die konkreten Roh-Excel-Messprotokolle und vollständigen Original-Manuskriptfassungen A–D wurden in diesem Schritt nicht erneut vollständig gelesen. Mathematische und physikalische Behauptungen werden vor endgültiger Zitierung an Originalen abgeglichen.
+VERBINDLICHER STATUS AM 12.11.2026: Forschungsplan erstellt; technische Referenz gesichert; wissenschaftliche Untersuchungen sind noch durchzuführen. KEINE FORMELLE FREIGABE DES HAUPTMODELLS.

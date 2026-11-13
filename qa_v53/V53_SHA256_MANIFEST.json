@@ -1,0 +1,11 @@
+{
+  "status": "SYNTHETIC_NUMERICAL_QA_ONLY",
+  "v52_unchanged": true,
+  "v52_provisional": true,
+  "files_sha256": {
+    "PRUEFBERICHT_V53_NUMERISCHE_VORPRUEFUNG_2026-11-12.docx": "86ff0b7589593c8074bec542738d4f424d935c8d437c659781028bcda3088781",
+    "README_V53_NUMERICAL_QA.md": "7d8ae424a5cbcab010dafc98f4e68f737fd7e9c68d8db8cfadb1a8d133fb022d",
+    "V53_QA_REFERENCE_LINUX.json": "6d82326060b24e1caa44b111b91de2c60332b8260b0817ca53f4daaad483bf10",
+    "test_numerical_v53.py": "bbfb7cfd2b13b0668db0035b88eb41a09a1ac559fb6467fb2d5010146b416e2b"
+  }
+}

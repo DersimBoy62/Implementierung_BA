@@ -1,0 +1,429 @@
+{
+  "dataset_sha256": "bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5",
+  "active_ring_count": 16,
+  "active_ring_ids": [
+    "DM01",
+    "DM02",
+    "DM04",
+    "DM05",
+    "DM06",
+    "DM07",
+    "DM08",
+    "DM09",
+    "DM10",
+    "DM11",
+    "DM12",
+    "DM14",
+    "DM15",
+    "DM16",
+    "DM17",
+    "DM18"
+  ],
+  "development_ring_count": 12,
+  "excluded_ids": [
+    "DM03",
+    "DM13"
+  ],
+  "locked_ids": [
+    "DM07",
+    "DM08",
+    "DM11",
+    "DM15"
+  ],
+  "locked_processes_accessed": false,
+  "targets": [
+    "ovality.ovality_radial_mm",
+    "planarity.height_deviation_mm"
+  ],
+  "target_container_in_verified_pickle": "zielwerte",
+  "feature_units": [
+    "%",
+    "%",
+    "m",
+    "m",
+    "m",
+    "m/s"
+  ],
+  "f2": {
+    "phase804": [
+      1,
+      2
+    ],
+    "LaserOK": 1,
+    "MessEin": 1,
+    "contiguous_original_rows": true,
+    "time_step_s": 0.1,
+    "time_absolute_tolerance_s": 0.002,
+    "phase_boundary": "exactly_one_2_to_1",
+    "features": [
+      "F_rad63",
+      "F_ax64",
+      "Ist_D150",
+      "Ist_s151",
+      "Ist_h152",
+      "RWG55"
+    ]
+  },
+  "rings": [
+    {
+      "ring_id": "DM01",
+      "raw_rows": 219,
+      "f2_rows": 148,
+      "f2_start_index": 51,
+      "f2_end_index": 198,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 19.8,
+      "median_time_step_s": 0.09999999999999964,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 12.8,
+      "feature_min": [
+        0.1,
+        1.9,
+        0.36791,
+        0.05081,
+        0.05507,
+        0.001
+      ],
+      "feature_max": [
+        42.8,
+        60.3,
+        0.42998,
+        0.06114,
+        0.06218,
+        0.0441
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM02",
+      "raw_rows": 490,
+      "f2_rows": 419,
+      "f2_start_index": 51,
+      "f2_end_index": 469,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 46.9,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 27.0,
+      "feature_min": [
+        23.9,
+        0.4,
+        0.37081,
+        0.03018,
+        0.05064,
+        0.0039
+      ],
+      "feature_max": [
+        44.5,
+        59.5,
+        0.72593,
+        0.05703,
+        0.06138,
+        0.0476
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM04",
+      "raw_rows": 898,
+      "f2_rows": 829,
+      "f2_start_index": 51,
+      "f2_end_index": 879,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 87.9,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 80.6,
+      "feature_min": [
+        25.3,
+        24.3,
+        0.33182,
+        0.06043,
+        0.05464,
+        0.0
+      ],
+      "feature_max": [
+        78.7,
+        80.9,
+        0.48703,
+        0.0799,
+        0.08166,
+        0.0142
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM05",
+      "raw_rows": 765,
+      "f2_rows": 694,
+      "f2_start_index": 51,
+      "f2_end_index": 744,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 74.4,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 64.6,
+      "feature_min": [
+        38.1,
+        0.4,
+        0.32946,
+        0.0398,
+        0.05976,
+        0.0001
+      ],
+      "feature_max": [
+        70.4,
+        66.9,
+        0.62688,
+        0.07718,
+        0.0815,
+        0.015
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM06",
+      "raw_rows": 1119,
+      "f2_rows": 1085,
+      "f2_start_index": 14,
+      "f2_end_index": 1098,
+      "f2_t0_s": 1.4,
+      "f2_tlast_s": 109.8,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 101.8,
+      "feature_min": [
+        25.7,
+        2.4,
+        0.32782,
+        0.04951,
+        0.04983,
+        0.0
+      ],
+      "feature_max": [
+        80.4,
+        75.7,
+        0.61338,
+        0.08096,
+        0.08204,
+        0.0148
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM09",
+      "raw_rows": 226,
+      "f2_rows": 155,
+      "f2_start_index": 51,
+      "f2_end_index": 205,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 20.5,
+      "median_time_step_s": 0.09999999999999964,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 12.2,
+      "feature_min": [
+        -0.7,
+        34.4,
+        0.36815,
+        0.05616,
+        0.05035,
+        0.0013
+      ],
+      "feature_max": [
+        30.6,
+        61.9,
+        0.43539,
+        0.06267,
+        0.06107,
+        0.0438
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM10",
+      "raw_rows": 451,
+      "f2_rows": 381,
+      "f2_start_index": 51,
+      "f2_end_index": 431,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 43.1,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 35.3,
+      "feature_min": [
+        41.5,
+        2.9,
+        0.33092,
+        0.04481,
+        0.06993,
+        0.0
+      ],
+      "feature_max": [
+        70.3,
+        74.1,
+        0.49234,
+        0.07875,
+        0.08191,
+        0.0181
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM12",
+      "raw_rows": 1364,
+      "f2_rows": 1293,
+      "f2_start_index": 51,
+      "f2_end_index": 1343,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 134.3,
+      "median_time_step_s": 0.10000000000000053,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 121.7,
+      "feature_min": [
+        28.8,
+        39.5,
+        0.32974,
+        0.05036,
+        0.0394,
+        0.0
+      ],
+      "feature_max": [
+        59.9,
+        89.5,
+        0.75419,
+        0.07773,
+        0.08088,
+        0.0152
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM14",
+      "raw_rows": 495,
+      "f2_rows": 424,
+      "f2_start_index": 51,
+      "f2_end_index": 474,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 47.4,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 38.6,
+      "feature_min": [
+        0.3,
+        19.9,
+        0.36533,
+        0.04573,
+        0.0398,
+        0.0
+      ],
+      "feature_max": [
+        40.6,
+        63.4,
+        0.62522,
+        0.06082,
+        0.06059,
+        0.0472
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM16",
+      "raw_rows": 1122,
+      "f2_rows": 1051,
+      "f2_start_index": 51,
+      "f2_end_index": 1101,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 110.1,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 86.7,
+      "feature_min": [
+        34.0,
+        0.8,
+        0.33028,
+        0.03973,
+        0.03972,
+        0.0
+      ],
+      "feature_max": [
+        64.2,
+        90.6,
+        0.92029,
+        0.07824,
+        0.08153,
+        0.0142
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM17",
+      "raw_rows": 734,
+      "f2_rows": 663,
+      "f2_start_index": 51,
+      "f2_end_index": 713,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 71.3,
+      "median_time_step_s": 0.10000000000000142,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 64.8,
+      "feature_min": [
+        38.5,
+        1.7,
+        0.33103,
+        0.04493,
+        0.05983,
+        0.0
+      ],
+      "feature_max": [
+        74.2,
+        69.1,
+        0.56601,
+        0.07898,
+        0.08181,
+        0.0152
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    },
+    {
+      "ring_id": "DM18",
+      "raw_rows": 369,
+      "f2_rows": 298,
+      "f2_start_index": 51,
+      "f2_end_index": 348,
+      "f2_t0_s": 5.1,
+      "f2_tlast_s": 34.8,
+      "median_time_step_s": 0.09999999999999964,
+      "phase_boundary_count": 1,
+      "phase_boundary_time_s": 30.9,
+      "feature_min": [
+        37.4,
+        3.8,
+        0.33083,
+        0.05505,
+        0.06985,
+        0.0001
+      ],
+      "feature_max": [
+        69.1,
+        64.5,
+        0.42135,
+        0.07878,
+        0.08167,
+        0.0166
+      ],
+      "missing_values": 0,
+      "quality_values_accessed": false
+    }
+  ]
+}

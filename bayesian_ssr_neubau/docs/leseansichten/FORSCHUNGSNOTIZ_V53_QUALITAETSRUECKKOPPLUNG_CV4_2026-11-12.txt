@@ -1,0 +1,125 @@
+V5.3 – Kontrollierte Ablation der lokalen Qualitätsrückkopplung
+Technischer und wissenschaftlicher Ergebnisvermerk | Originalergebnisse der vier gepaarten Entwicklungs-Folds | 12. November 2026
+STATUS: STUDIE ABGESCHLOSSEN – EXPLORATIV. Weder offizielles finales Haupttraining noch unabhängige externe Testauswertung. Die zehn mathematischen Kernmodule wurden bei diesem Versuch nicht geändert.
+1. Fragestellung und festgelegtes Versuchsdesign
+Untersucht wurde ausschließlich, ob die qualitätsabhängige lokale VI-Rückkopplung einen eigenständigen Beitrag zur Zustandsinferenz und Vorhersage liefert. Zwei sonst identische Varianten wurden je Fold separat über zehn Epochen trainiert: lokale VI-Schritte = 0 gegenüber 8. Beide Varianten behalten gelabeltes Qualitätslernen in den zwei Regressionsköpfen sowie die vier U-Prozessringe und deren Gewicht C=0,2 bei. Schritte=0 ist somit ausdrücklich KEIN strikt überwachtes Modell und KEIN C=0-Vergleich.
+Vorab festgelegte Konfiguration: K=2, volle HMM-Emissionskovarianz, M2-Pfadmerkmale, P0-Skalierung, zwei NIG-Qualitätsköpfe und unveränderte physikalische Priorvarianz 0,38526108747593474. Datengrundlage: 8 mehrfach analysierte gelabelte DM-Entwicklungsringe und 4 U-Ringe mit maskierten Qualitätswerten. Pro Fold 6 L plus 4 U im Training und 2 L ausschließlich zur internen Validierung.
+Fold
+Training L (6 Ringe)
+Validierung (2 Ringe)
+1
+DM06, DM09, DM12, DM16, DM17, DM18
+DM04, DM05
+2
+DM04, DM05, DM12, DM16, DM17, DM18
+DM06, DM09
+3
+DM04, DM05, DM06, DM09, DM17, DM18
+DM12, DM16
+4
+DM04, DM05, DM06, DM09, DM12, DM16
+DM17, DM18
+
+Datenprüfung: Alle Foldzuordnungen sind disjunkt; sämtliche acht gelabelten Entwicklungsringe erscheinen genau einmal als Validierungsring. X- und Deskriptorskalierer verwenden nur die jeweiligen Trainings-L/U-Ringe; y-Skalierung ausschließlich Trainings-L. DM07, DM08, DM11 und DM15 wurden in keiner Ergebnisauswertung verwendet. Da die acht L-Ringe bereits aus früheren Entwicklungsstudien bekannt sind, ist CV4 dennoch nicht unabhängig.
+2. Unabhängig nachgerechnete Fehlerkennzahlen
+Ziel / Metrik
+0 lokale Schritte
+8 lokale Schritte
+Differenz (8 − 0)
+Außenunrundheit RMSE [mm]
+0,536397489
+0,536395408
+-0.000002081
+Außenunrundheit MAE [mm]
+0,434281699
+0,434285481
++0.000003783
+Höhenschlag RMSE [mm]
+2,922888628
+2,922845508
+-0.000043120
+Höhenschlag MAE [mm]
+2,448358606
+2,448283585
+-0.000075021
+
+Die RMSE-Differenzen entsprechen –0,000388 % (Außenunrundheit) und –0,001475 % (Höhenschlag) relativ zur 0-Schritte-Variante. Bei jeder Zielgröße verbessert sich der absolute Fehler für 5 von 8 Ringen, bei 3 von 8 verschlechtert er sich. Die Unterschiede sind in dieser Untersuchung praktisch vernachlässigbar; es gibt keinen belastbaren empirischen Nachweis eines zusätzlichen Vorhersagenutzens durch acht lokale Schritte.
+3. Ringweise Paaranalyse
+Positive Differenz bedeutet Verschlechterung durch acht VI-Schritte, negative Differenz Verbesserung. Zur Lesbarkeit werden sehr kleine absolute Fehlerdifferenzen in µm angegeben (1 µm = 0,001 mm); dies ist KEINE Behauptung entsprechender Messauflösung.
+Fold
+Ring
+Δ absoluter Fehler außen [µm]
+Δ absoluter Fehler Höhe [µm]
+1
+DM04
+-0.0220
+-0.0980
+1
+DM05
+-0.0124
++0.0150
+2
+DM06
++0.0095
++0.1901
+2
+DM09
++0.0615
+-0.5457
+3
+DM12
++0.0037
+-0.0766
+3
+DM16
+-0.0050
+-0.0888
+4
+DM17
+-0.0024
+-0.0249
+4
+DM18
+-0.0026
++0.0286
+
+4. Tatsächliche Änderung der latenten Zustände
+Bei festgehaltenen globalen Parametern werden in 21 von 24 lokalen L-Ring-Fold-Untersuchungen Optimierungsschritte akzeptiert. Die größte absolute Änderung einer posterioren Zustandswahrscheinlichkeit beträgt 0,004406582 (Fold 2 / DM05). Bei DM09 zeigt sich, wenn im Training enthalten, eine nahezu deterministische Zustandsbelegung; dort wird keine lokale Änderung akzeptiert. Dies belegt die numerische Möglichkeit der Qualitätsrückkopplung im echten Prozessdatensatz, nicht aber einen praktischen Gütegewinn.
+Fold
+Akzeptierte L-Optimierungen
+Max |Δγ|
+ELBO-Differenz nach Ep. 10
+1
+5/6
+0,001452192
++0.073618
+2
+6/6
+0,004406582
++0.008363
+3
+5/6
+0,001023597
++0.445126
+4
+5/6
+0,001474444
++0.000141
+
+Alle vier 8-Schritte-Varianten haben nach Epoche 10 eine leicht höhere protokollierte ELBO. Im dritten Fold steigt sie während der letzten Epoche noch erheblich; auch in Fold 1 ist die letzte Verbesserung sichtbar. Ein belastbarer Konvergenznachweis liegt deshalb nicht vor. Modelländerungen oder zusätzliche Epochen dürfen nicht nachträglich anhand dieser acht Entwicklungslabels zur Verbesserung der Resultate ausgewählt werden.
+5. Protokollqualität und methodische Einschränkungen
+Das JSON-Feld „final_train_local_gain_sum“ bildet in den vier Originaldateien jeweils nur den local_gain der letzten Epoche ab und ist somit falsch als Summe bezeichnet. Aus den vollständigen Epochenhistorien ergeben sich für Folds 1–4 Summen von 0,000370000, 0,000950907, 0,000596193, 0,000353906. Diese Nachrechnung verändert keine Modelle, Vorhersagen oder Originaldateien. Für spätere Versionen Feld umbenennen oder getrennt die echte Epochensumme speichern; historische Dateien unverändert erhalten.
+Nicht zulässig sind Schlussfolgerungen wie „die Bayesian-SSR-Methode bringt nichts“, „U-Daten sind nutzlos“, „C=0 ist gleichwertig“ oder „die Unsicherheit ist kalibriert“. Die Ablation isoliert ausschließlich den zusätzlichen Effekt der qualitätsabhängigen lokalen Zustandsaktualisierung unter einer festgelegten Architektur. Beide Varianten nutzen weiterhin U-Prozessdaten, Bayesian-Regression und Qualitätslabels. Die separate Frage nach U-ELBO und Workflow-Effekten wurde in früheren kontrollierten Studien untersucht.
+Die Ergebnisse sind entwicklungsdatenabhängig und durch wiederholte historische Nutzung der acht L-Ringe nicht als unabhängige Generalisierungsschätzung interpretierbar. Bei n=8 sind keine belastbaren inferenzstatistischen Aussagen zur Robustheit über neue Ringserien möglich. Es wurde keine neue äußere Testbewertung durchgeführt.
+6. Konsequenz für Kapitel 4/5 und nächsten Freigabeschritt
+Kapitel 4: Das kontrollierte, gepaarte CV4-Design und die (nahezu unveränderten) Fehlerkennzahlen berichten. Zusätzlich 21/24 akzeptierte lokale Anpassungen und die kleinen Posteriorverschiebungen dokumentieren. Ergebnis ausdrücklich als Entwicklungsablation kennzeichnen.
+Kapitel 5: Mathematische Kopplung ist vorhanden, in dieser Entwicklungskonfiguration aber empirisch nur schwach wirksam. Mögliche Erklärungen – dominierende Prozesslikelihood, Zustandskonzentration, geringe Labelzahl oder stark regularisierte Qualitätskopplung – sind Hypothesen und nicht mit dieser Studie kausal nachgewiesen.
+Vorschlag: Ablation mit genau dieser Konfiguration als abgeschlossen archivieren, vorhandene Resultate nicht überschreiben. Vor einem finalen Modell-Freeze die separat geplanten numerischen Konvergenz-/Persistenz- und reproduzierbaren Trainings-/Vorhersagegates abarbeiten. Keine neuen K-/C-/Prior- oder Schrittzahl-Suchen anhand derselben acht L-Ringe. Die bisherigen 8 VI-Schritte können aus Architektur-/Vorabfestlegungsgründen im Kandidaten verbleiben; ein messbarer Genauigkeitsvorteil wurde hier nicht belegt.
+7. Daten- und Quellenstatus
+Vollständig programmatisch eingelesen: vier Originaldateien FOLD_1 bis FOLD_4_PAIRED_STEPS_0_8.json sowie die Datei V53_PAIRED_DEVELOPMENT_CV4_SUMMARY.json. Alle acht Vorhersage-Restfehler, RMSE und MAE unabhängig berechnet; Protokollidentität, Datensatz-/Konfigurationshashes, Folds und Trainingsskaler-Zuordnungen geprüft. Vorherige wissenschaftliche Originalpublikationen und Herleitungen A–D wurden in dieser Auswertung nicht erneut seitenweise geprüft.
+Verbindliche SHA256-Werte: Datensatz bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5; Konfiguration 88f9da6aa51be71db7968a8222cb36e5e4838b8a8431988bd7c54c09bace51ab. Original-JSON-Dateien nicht verändert.
+FOLD_1_PAIRED_STEPS_0_8.json: SHA256 27c44a63b7d421915df0c89f5512226e8ca98ff63d94bd3a99c717fb63961b56
+FOLD_2_PAIRED_STEPS_0_8.json: SHA256 152c55556a164a8d92b28d2e11adf6a0808a6fe2cad8410196ccc6f82106ff15
+FOLD_3_PAIRED_STEPS_0_8.json: SHA256 cd62778b633acf4db3f23889bacdfe303adfc50d897a805b8b94784f026e40eb
+FOLD_4_PAIRED_STEPS_0_8.json: SHA256 d9a7be1114217fc4e51b0e4b1f53e11468c39acf3285d3d10164ab684e42b00a
+V53_PAIRED_DEVELOPMENT_CV4_SUMMARY.json: SHA256 09ba3ffb33338aa5c45b8e461046a95b92097443c552877b26fb657a616e918d

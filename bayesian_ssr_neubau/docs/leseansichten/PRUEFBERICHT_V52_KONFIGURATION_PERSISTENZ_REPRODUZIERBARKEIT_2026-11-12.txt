@@ -1,0 +1,62 @@
+V5.2 — Konfiguration und Modellpersistenz
+Bayesian-SSR-Ringwalzmodell · technischer Entwicklungs- und Prüfbericht · 12. November 2026
+Kurzurteil. Status: V5.2-CODE ERSTELLT UND SYNTHETISCH GEPRÜFT; MATHEMATISCHER MODELLKERN UNVERÄNDERT; ENDGÜLTIGER MODELL-FREEZE NICHT FREIGEGEBEN.
+Ein neuer Einstiegspunkt kapselt eine vollständig an die registrierte V5-Konfiguration gebundene Pipeline. Modell, Skalierer und Sicherheits-Policy werden gemeinsam als ein Paket geschrieben; das Prüfmanifest und die Modellbytes werden vor der endgültigen atomaren Freigabe geprüft. Für fremde oder veränderte Artefakte wird die Deserialisierung verweigert. Es wurde kein neues Bayesian-HMM trainiert und keine historische Testgüte bewertet.
+1. Unveränderte wissenschaftliche Grundlage
+Feld
+Verbindlicher Stand
+Daten/Split
+16 aktive DM-Ringe; 8 L, 4 U mit maskierten Qualitätswerten; 4 historisch gesperrte Außenringe
+Modell
+Vollkovarianz-Bayesian-HMM, M2-Pfadmomente, zwei Normal-Inverse-Gamma-Regressionsköpfe
+Parameter
+K=2; C=0,2; P0; 10 Epochen; 8 lokale VI-Schritte; physikalische Priorvarianz 0,38526108747593474
+Zielgrößen
+ovality.ovality_radial_mm (Außenunrundheit); planarity.height_deviation_mm (Höhenschlag)
+Herkunft
+10 mathematische Kernmodule und V5.1-Eingangssicherheit byte-identisch
+2. Konfigurations-Freeze und Schemaabsicherung
+Die Originaldatei PROPOSED_MODEL_FREEZE.json ist nicht verändert worden. Ihre SHA256-Prüfsumme ist 88f9da6aa51be71db7968a8222cb36e5e4838b8a8431988bd7c54c09bace51ab. Alle 26 registrierten Einträge sind dadurch bytegenau gebunden. Zusätzlich werden Schlüsselmenge, Typen, Ringgruppen, Kanäle, zwei Qualitätsspalten, F2, P0, Deskriptorindices, Kernhashes und die im Code tatsächlich aktiven Methoden geprüft.
+Ein geändertes C, ein Boolean anstelle der Epochenzahl, ein zusätzlicher JSON-Schlüssel oder eine manipulierte Kernmodule-Datei werden vor Modellerzeugung oder Laden zurückgewiesen. Die V5.2-Prüfungen treffen noch keine neue wissenschaftliche Hyperparameterentscheidung.
+3. Speicherung und Ladekontrolle
+Schreibziel ist write-once: Ein bereits existierender Ausgabeordner – auch ein leerer – wird nicht überschrieben.
+Im Verzeichnis liegen TRAINED_MODEL.pkl (Modell, X-/Y-Skalierer, beide Deskriptor-Skalierer, Input-Policy) und TRAIN_MANIFEST.json.
+Staging-Ordner wird auf demselben Dateisystem erzeugt, synchronisiert und vollständig geprüft; erst danach wird der ganze Ordner atomar umbenannt.
+Vor dem Laden werden SHA256 von Modell, Konfiguration und Releasecode sowie Kernhashes, Trainingssplit und Softwareumgebung geprüft; nur die vorgeprüften Modellbytes werden deserialisiert.
+Der Export für neue Ringe enthält jetzt zusätzlich zum Modell-SHA den Manifest- und Environment-SHA; die V5.1-Prozesseingangsgates bleiben aktiv.
+4. Testnachweise
+Testsatz
+Ergebnis
+Aussagegrenze
+V5.2, synthetische Vertragsfälle
+19/19 bestanden
+Schema, Schreibtransaktion, Integrität, Fehlerfälle; Dummy-Modelle
+V5.1, unveränderte Sicherheitstests
+18/18 bestanden
+Keine reale Vorhersagegüte
+V5.1, zwölf reale L/U-Logger
+12/12 bitgenaue F2-Reproduktion
+Nur Datenfenster und Prozessmerkmale
+Mathematische Kernmodule
+10/10 SHA256-gleich
+Identität, nicht neuer numerischer Stresstest
+Neues Modelltraining / externe Güte
+0 / 0
+Bewusst nicht durchgeführt
+Die V5.2-Roundtrip-/Fehlertests verwenden ausdrücklich synthetische Python-Dummypakete und greifen nicht auf das Originaldaten-Pickle zu. Der F2-Vergleich nutzt das vorhandene vertrauenswürdige monolithische Pickle, deserialisiert das Gesamtobjekt, verwendet danach aber nur die zwölf zugelassenen Loggersequenzen; er wertet keine alten äußeren Testlabels aus.
+5. Versionen und Reproduzierbarkeit
+Im Manifest werden Python-Version/Implementierung, Betriebssystem, Maschinentyp, Wortbreite, Byteordnung sowie NumPy-, SciPy-, scikit-learn-, Numba- und threadpoolctl-Versionen festgehalten. Ein späteres Laden verlangt eine identische Laufzeitbeschreibung; dies ist eine bewusste Fail-closed-Regel und keine Zusicherung bitgenauer numerischer Gleichheit auf jeder Plattform.
+Die hiesigen Tests liefen unter Python 3.13.5/Linux. Die Windows-Projektumgebung (Python 3.11.9) muss lokal erneut durch die beigefügten Prüfkommandos bestätigt werden. Ohne diesen Windows-Nachweis ist noch kein plattformübergreifend freigegebener Lauf zu behaupten.
+6. Grenzen und Restarbeiten
+Pickle bleibt ein vertrauensabhängiges Python-Artefakt. Ein Hash im selben Verzeichnis wie das Artefakt liefert keine kryptografisch unabhängige Herkunftsauthentisierung; gegen gemeinsam manipulierte Dateien sind Signaturen/geschützte Vertrauensanker nötig.
+Bei hartem Abbruch kann ein verborgener temporärer Staging-Ordner zurückbleiben; ein regulär benannter unvollständiger Release-Ordner soll durch die atomare Verzeichnistransaktion vermieden werden.
+Die zehn mathematischen Kernmodule wurden in V5.2 nicht erneut hinsichtlich globaler Konvergenz und Grenzfallstabilität untersucht. V5.3 muss u.a. 0 versus 8 lokale VI-Schritte vergleichen.
+Epochenspezifische Wiederaufnahme-Checkpoints und deterministisches Thread-/BLAS-Locking sind noch nicht umgesetzt; hierfür sind weitere Tests erforderlich.
+Die Entwicklungs-RMSE früherer V4-/V5-Studien sind wegen wiederholter Labelnutzung explorativ; keine unabhängige Generalisierung und keine Online-Regelung belegt.
+7. Ausführung ohne Training auf dem Nutzerrechner
+.\.venv\Scripts\python.exe .\final_candidate_v52\main_bayesian_ssr_v52.py verify-config
+.\.venv\Scripts\python.exe .\final_candidate_v52\test_release_integrity_v52.py
+.\.venv\Scripts\python.exe .\final_candidate_v52\test_input_safety_v51.py
+.\.venv\Scripts\python.exe .\final_candidate_v52\test_development_logger_equivalence_v51.py --data input\DM_16_aktive_Ringe.pkl
+Die kommandierte V5.2-Funktion train wird zum jetzigen Forschungsstand ausdrücklich nicht ausgeführt. Als Nächstes folgt V5.3: mathematische Stabilität, Rückkopplung und Reproduzierbarkeit im dokumentierten Entwicklungsschema. Erst nach fachlicher Freigabe soll ein offizielles neues Trainingsartefakt erzeugt werden.
+Quellen-/Prüfstatus: Technisch am bereitgestellten V5.1-Quellpaket und den dokumentierten V5-/V5.1-Hashwerten geprüft; 19 neue synthetische V5.2-Tests real ausgeführt. Originalwissenschaftspublikationen und Herleitungen A–D in dieser technischen Erweiterung nicht erneut seitenweise verifiziert.

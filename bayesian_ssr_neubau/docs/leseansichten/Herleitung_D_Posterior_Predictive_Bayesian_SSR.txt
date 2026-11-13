@@ -1,0 +1,388 @@
+Herleitung D – Posterior Predictive und Qualitätsvorhersage unseres Bayesian-SSR-HMM
+Mathematische Modellentwicklung · Arbeitsstand D.1 · Fortsetzung der Herleitungen A, B und C · 29. Oktober 2026
+Mit Herleitung C haben wir den Trainingsalgorithmus unseres Modells entwickelt. Wir wissen nun, wie aus gelabelten und ungelabelten Ringsequenzen mittels strukturierter Variational Inference die approximierten Posteriorverteilungen der Modellparameter gelernt werden.
+Jetzt beantworten wir die letzte grundlegende Frage unserer Modellkonstruktion: Wie können wir nach dem Training aus einer vollständig beobachteten Ringwalzsequenz die drei Qualitätsgrößen vorhersagen, obwohl sowohl die HMM-Zustandsfolge als auch die Modellparameter weiterhin unsicher sind?
+Das ist der Gegenstand der Posterior Predictive Distribution. Wir möchten mehr erhalten als drei einzelne Regressionswerte. Unser Modell soll auch beschreiben, welche Qualitätswerte unter Berücksichtigung der verfügbaren Informationen plausibel sind und wie zuverlässig die jeweiligen Vorhersagen ausfallen.
+Herleitung D führen wir chronologisch durch. Wir entwickeln die mathematische Vorhersageverteilung, untersuchen ihre Berechnung und leiten anschließend daraus den konkreten Vorhersagealgorithmus sowie unsere spätere Evaluation ab.
+D.1 Ausgangspunkt: Was besitzen wir nach dem Training?
+Nach Herleitung C verfügen wir über die optimierten globalen Variationsfaktoren:
+q*Θ=q*π q*A q*Φ q*Ψ.
+Gleichung (D.1): Approximierter globaler Parameterposterior.
+Die Parametergruppen sind weiterhin:
+π: Wahrscheinlichkeiten für die Anfangszustände
+A: Übergangswahrscheinlichkeiten zwischen den HMM-Zuständen
+Φ: Mittelwerte und Varianzen unserer diagonalen Gauß-Emissionen
+Ψ: Bayesian-Regressionsparameter für die drei Endqualitätsgrößen
+Wichtig ist, was q*Θ bedeutet. Wir haben beim Training nicht lediglich einen festen Parametersatz ermittelt, sondern eine approximierte gemeinsame Verteilung über die unbekannten globalen Parameter. Diese Verteilung enthält das Wissen, das unser Modell aus den gelabelten und ungelabelten Trainingsringen gewonnen hat.
+Daneben haben wir während des Trainings für jeden Ring eine eigene lokale Zustandsverteilung gelernt: qϕi*Zi. Diese lokalen Verteilungen gelten jedoch für die jeweiligen Trainingsringe. Für einen neuen Ring sind die verborgenen Zustände noch unbekannt. Deshalb können wir nicht einfach eine bereits gespeicherte Zustandsverteilung eines anderen Rings verwenden. Wir müssen für die neue Prozesssequenz eine neue Zustandsinferenz durchführen.
+D.1.1 Welche Informationen erhalten wir über einen neuen Ring?
+Sei
+X*=x1*,…,xT**⊤∈RT*×d
+die vollständig aufgezeichnete Prozesssequenz eines neuen Rings. Seine drei Qualitätsgrößen
+y*=y1*y2*y3*
+sind unbekannt. Wir besitzen also eine ähnliche Datenstruktur wie bei unseren ungelabelten Trainingsringen. Der Unterschied liegt in der Verwendung: Jetzt möchten wir nicht primär die Modellparameter weiter trainieren, sondern die Qualität dieses konkreten Rings vorhersagen.
+Schematischer Informationsfluss: Trainierter Posterior q*Θ und neue Sequenz X* → probabilistische Zustandsinferenz pZ*∣X*,Θ → B1-Kopplung h*Z* → prädiktive Verteilung der drei Qualitätsgrößen.
+Wir betrachten weiterhin ausschließlich vollständige Ringsequenzen. Eine Qualitätsvorhersage während eines noch laufenden Walzvorgangs wäre eine zusätzliche Modellaufgabe und gehört derzeit nicht zu unserem Hauptpfad.
+Erstes Ergebnis: Für die Vorhersage benötigen wir sowohl den gelernten globalen Parameterposterior als auch eine neue probabilistische Inferenz der verborgenen Zustandsfolge des betreffenden Rings.
+D.2 Die mathematische Definition unserer Posterior-Predictive-Verteilung
+Bei einer gewöhnlichen Bayesian-Regression wird die Vorhersage für eine neue Eingabe erhalten, indem über die Unsicherheit der Modellparameter integriert wird. Für unser generatives HMM müssen wir zusätzlich über die unbekannte Zustandsfolge integrieren beziehungsweise summieren.
+Die gesuchte Verteilung lautet:
+py*∣X*,DL,DU.
+Gleichung (D.2): Zielverteilung der Qualitätsvorhersage.
+Zur Vereinfachung bezeichnen wir die gesamten beobachteten Trainingsdaten im Folgenden mit D=DL,DU.
+D.2.1 Zunächst betrachten wir bekannte Modellparameter
+Angenommen, wir würden sämtliche globalen Modellparameter Θ kennen. Dann müssten wir nur noch die unbekannte Zustandsfolge des neuen Rings berücksichtigen:
+py*∣X*,Θ=Z*​py*∣Z*,Ψ pZ*∣X*,π,A,Φ.
+Gleichung (D.3): Zustandsgemittelte Qualitätsverteilung bei gegebenen Modellparametern.
+Der erste Faktor beschreibt die Qualitätsverteilung, wenn eine bestimmte Zustandsfolge bekannt wäre. Der zweite Faktor beschreibt, wie wahrscheinlich diese Zustandsfolge aufgrund der beobachteten Loggerdaten ist. Wir betrachten also nicht nur die wahrscheinlichste Zustandsfolge, sondern gewichten grundsätzlich sämtliche möglichen Folgen nach ihrer Wahrscheinlichkeit. Das ist für die Zustandsunsicherheit entscheidend.
+D.2.2 Jetzt berücksichtigen wir die unbekannten Modellparameter
+In unserem Bayesian-Modell sind auch π,A,Φ,Ψ unbekannt. Daher müssen wir ihre Posteriorunsicherheit berücksichtigen:
+py*∣X*,D=∫Z*​py*∣Z*,Ψ pZ*,Θ∣X*,D dΘ.
+Gleichung (D.4): Bedingte Posterior-Predictive-Verteilung.
+Wir müssen sowohl unterschiedliche mögliche Zustandsfolgen als auch unterschiedliche plausible Modellparameter berücksichtigen.
+D.2.3 Eine wichtige Besonderheit unseres generativen Modells
+Da unser Modell auch die Prozesssequenzen X generativ beschreibt, enthält die neue beobachtete Sequenz X* selbst Informationen über die HMM-Parameter. Nach dem Bayes-Theorem gilt:
+pΘ,Z*∣X*,D=pX*,Z*∣Θ pΘ∣DpX*∣D.
+Gleichung (D.5): Gemeinsame Bedingung der globalen Parameter und neuen Zustandsfolge.
+Daraus folgt:
+py*∣X*,D=∫pΘ∣DZ*​pX*,Z*∣Θ py*∣Z*,Ψ dΘ∫pΘ∣D pX*∣Θ dΘ.
+Gleichung (D.6): Vollständige generative Bedingung auf die neue Ringsequenz.
+Die neue Prozesssequenz beeinflusst nicht nur, welche Zustandsfolgen plausibel sind. In der vollständig bedingten Bayesian-Verteilung kann sie auch die relative Wahrscheinlichkeit verschiedener HMM-Parametersätze verändern.
+In vielen praktischen Bayesian-Vorhersageverfahren wird stattdessen der nach dem Training unverändert verwendete Parameterposterior eingesetzt:
+pmody*∣X*,D=∫py*∣X*,Θ q*Θ dΘ.
+Gleichung (D.7): Modulare Vorhersageapproximation.
+Dieser Ausdruck ist eine mögliche modulare Vorhersageapproximation, aber nicht generell identisch mit Gleichung (D.6). Für unsere Implementierung unterscheiden wir beide Berechnungswege. Zuerst entwickeln wir die Zustandsprediktion bei gegebenen HMM-Parametern, danach die Integration globaler Parameterunsicherheit.
+D.3 Die Zustandsinferenz für einen neuen Ring
+Wir beginnen mit einem gegebenen HMM-Parametersatz η=π,A,Φ. Die Qualitätsparameter Ψ benötigen wir zunächst nicht, weil die Qualität des neuen Rings unbekannt ist. Unsere Aufgabe lautet pZ*∣X*,η.
+D.3.1 Warum können wir hier wieder Forward-Backward verwenden?
+Bei gelabelten Trainingsringen koppelt die beobachtete Qualität sämtliche latenten Zustände über den gemeinsamen Aufenthaltsvektor. Deshalb konnten wir ihre optimale lokale Variationsverteilung nicht durch gewöhnliches Forward-Backward berechnen.
+Bei einem neuen Ring liegt noch kein Qualitätswert vor. Damit entfällt der globale B1-Qualitätsfaktor aus der Zustandsinferenz:
+pX*,Z*∣η=πZ1*t=2T*AZt−1*,Zt*t=1T*pxt*∣Zt*,Φ.
+Gleichung (D.8): HMM-Joint-Verteilung für den neuen Ring.
+Das ist wieder die gewöhnliche HMM-Kettenstruktur. Bei gegebenen Parametern können wir ihre Zustandsmarginalen mittels Forward-Backward exakt berechnen. Diese Trennung zwischen Emissionswahrscheinlichkeit, Forward-Berechnung und Zustandsinferenz ist bei Beal (2003) beschrieben.
+D.3.2 Die Forward-Rekursion
+Wir definieren die Emissionswahrscheinlichkeit
+etk=pxt*∣Zt*=k,Φ=j=1dNxtj*∣μkj,σx,kj2.
+Mit der Forward-Variable ftk=px1:t*,Zt*=k∣η gilt am ersten Zeitpunkt:
+f1k=πke1k.
+Gleichung (D.9): Forward-Initialisierung.
+Für weitere Zeitpunkte:
+ftk=etkj=1Kft−1jAjk.
+Gleichung (D.10): Forward-Rekursion.
+Am Ende folgt die marginale Wahrscheinlichkeit der gesamten Prozesssequenz:
+pX*∣η=k=1KfT*k.
+Gleichung (D.11): Evidenz der neuen Prozesssequenz bei gegebenem HMM.
+Diese Größe sagt uns, wie plausibel die neue Ringsequenz unter einem bestimmten HMM-Parametersatz ist. Für lange Sequenzen verwenden wir jedoch skalierte Rekursionen oder den Log-Raum, damit die multiplizierten Wahrscheinlichkeiten nicht numerisch unterlaufen.
+D.3.3 Die Backward-Rekursion
+Wir definieren gtk=pxt+1:T**∣Zt*=k,η. Sie berücksichtigt Beobachtungen nach Zeitpunkt t. Am Ende gilt gT*k=1. Für frühere Zeitpunkte:
+gtj=k=1KAjk et+1k gt+1k.
+Gleichung (D.12): Backward-Rekursion.
+Die Forward-Rekursion verarbeitet Beobachtungen bis zum aktuellen Zeitpunkt, die Backward-Rekursion die danach folgenden. Da die gesamte Ringsequenz vorliegt, ist diese beidseitige Inferenz passend.
+D.3.4 Die Zustandswahrscheinlichkeiten
+Aus den Forward- und Backward-Größen folgt:
+γt*k;η=pZt*=k∣X*,η=ftkgtkl=1Kftlgtl.
+Gleichung (D.13): Geglättete Zustandswahrscheinlichkeit.
+Wir erhalten dadurch für jeden Zeitpunkt eine Wahrscheinlichkeitsverteilung über die verborgenen Zustände. Diese können wir später als Zustandswahrscheinlichkeitskurven oder Heatmaps für reale Ringsequenzen visualisieren.
+
+Illustrative Zustandswahrscheinlichkeiten eines Rings. Keine Ringwalz-Messwerte.
+D.3.5 Warum bestimmen wir nicht einfach die wahrscheinlichste Zustandsfolge?
+Der Viterbi-Algorithmus könnte eine einzelne wahrscheinlichste Zustandsfolge liefern. Diese wäre für Visualisierungen interessant. Für unsere Bayesian-Qualitätsvorhersage wäre es jedoch problematisch, sie als sicher festzulegen, weil die übrigen möglichen Zustandsfolgen verworfen würden. Das widerspräche dem B1-Ziel. Daher verwenden wir für die eigentliche Vorhersage die probabilistische Zustandsverteilung; eine Viterbi-Folge kann ergänzend dargestellt werden.
+D.4 Wie erhalten wir die Unsicherheit der gesamten Zustandsfolge?
+Hier knüpfen wir an die Momentenrekursion aus Herleitung B an. Wir möchten aus der neuen Prozesssequenz nicht nur Zustandswahrscheinlichkeiten pro Zeitpunkt erhalten, sondern Momente möglicher gesamter Zustandsaufenthalte.
+h*Z*=1T*t=1T*eZt*.
+Gleichung (D.14): Relativer Zustandsaufenthaltsvektor.
+Dazu benötigen wir:
+mh*=Eh*∣X*,D
+Gleichung (D.15): Erwarteter Aufenthaltsvektor.
+Hh*=Eh*h*⊤∣X*,D
+Gleichung (D.16): Zweites Aufenthaltsmoment.
+Noch ist zu klären, wie die globale Parameterunsicherheit integriert wird. Zunächst betrachten wir Momente bei festen HMM-Parametern η.
+D.4.1 Die vollständige Zustandsverteilung ist weiterhin eine Markov-Kette
+Bei gegebenen HMM-Parametern besitzt auch pZ*∣X*,η eine Markov-Faktorisierung, deren Übergänge beobachtungsabhängig und zeitabhängig sein können:
+pZ*∣X*,η=ρ*Z1*t=2T*Qt*Zt*∣Zt−1*.
+Gleichung (D.17): Strukturierter Zustandsposterior für den neuen Ring.
+Die bedingten Übergangswahrscheinlichkeiten können aus den gemeinsamen Zustandswahrscheinlichkeiten der Forward-Backward-Inferenz bestimmt werden. Damit können wir dieselben Momentenrekursionen wie in Herleitung B verwenden.
+D.4.2 Berechnung der Aufenthaltsmomente
+Für den additiven Zählvektor Ct*=s=1teZs* erhalten wir am Ende aus den Rekursionen:
+mh*η=1T*k=1KcT*k.
+Gleichung (D.18): Erster Aufenthaltsmoment bei gegebenem HMM.
+Hh*η=1T*2k=1KRT*k.
+Gleichung (D.19): Zweiter Aufenthaltsmoment bei gegebenem HMM.
+Dabei sind ctk und Rtk die Hilfsgrößen aus Herleitung B. Es folgt:
+Covh*∣X*,η=Hh*η−mh*ηmh*η⊤.
+Gleichung (D.20): Aufenthaltskovarianz bei gegebenem HMM.
+Unsere drei Qualitätsgrößen hängen über dieselbe latente Zustandsfolge zusammen. Wenn unklar bleibt, wie lange der Ring einen bestimmten Prozesszustand durchlaufen hat, kann dies gleichzeitig alle drei Qualitätsvorhersagen beeinflussen.
+Zweites Ergebnis: Die Zustandsmomente für einen neuen Ring können wir mit denselben Rekursionen bestimmen, die beim Training unserer B1-Architektur entwickelt wurden.
+D.5 Wie berücksichtigen wir die Unsicherheit der globalen HMM-Parameter?
+Bisher haben wir die Zustandsinferenz bei festem η betrachtet. Beim Training haben wir jedoch die globale HMM-Variationsverteilung qH*η=q*πq*Aq*Φ gelernt.
+D.5.1 Warum reicht es nicht, einfach Mittelwerte einzusetzen?
+Wir könnten die Posterior-Erwartungswerte der Modellparameter verwenden, z. B. A=Eq*A. Das gäbe eine gewöhnliche HMM-Inferenz mit festem Parametersatz, würde aber die Unsicherheit der Übergangs- und Emissionsparameter weitgehend vernachlässigen. Als einfaches Ausgangsmodell denkbar, aber keine vollständige Integration der Parameterunsicherheit.
+D.5.2 Die Parameterverteilung nach Beobachtung eines neuen Rings
+Unter unserem approximierten Trainingsposterior definieren wir:
+qHη∣X*=qH*η pX*∣η∫qH*η′ pX*∣η′ dη′.
+Gleichung (D.21): Bedingte Gewichtung der HMM-Parameter anhand der neuen Ringsequenz.
+Die neue Sequenz verändert damit die relative Gewichtung plausibler HMM-Parameter gemäß ihrer marginalen Beobachtungslikelihood.
+D.5.3 Monte-Carlo-Approximation
+Wir ziehen S Parametersätze ηs∼qH*η, für s=1,…,S. Für jeden berechnen wir Ls=pX*∣ηs und die normierten Gewichte:
+ws=Lsv=1SLv.
+Gleichung (D.22): Normierte Parametergewichte.
+Numerisch bestimmen wir sie mit logarithmierten Sequenzwahrscheinlichkeiten und Log-Sum-Exp. Für jeden Parametersatz berechnen wir die Aufenthaltsmomente, die wir gewichtet mitteln:
+mh*≈s=1Sws mh*ηs.
+Gleichung (D.23): Parameterintegrierter erster Aufenthaltsmoment.
+Hh*≈s=1Sws Hh*ηs.
+Gleichung (D.24): Parameterintegrierter zweiter Aufenthaltsmoment.
+Diese Größen berücksichtigen die Variation der Zustandsfolgen und der HMM-Parameter.
+D.5.4 Was ist der Nachteil?
+Bei langen Prozesssequenzen kann pX*∣η zwischen Parametersätzen extrem stark variieren, sodass ein einzelnes Sample nahezu das gesamte Gewicht erhält. Wir überwachen daher die Effective Sample Size:
+ESS=1s=1Sws2.
+Gleichung (D.25): Effektive Stichprobengröße der Monte-Carlo-Gewichte.
+Bei gleichmäßigen Gewichten beträgt ESS S; bei einem dominierenden Gewicht nähert sich ESS eins. Der Berechnungsweg ist deshalb noch nicht endgültig festgelegt.
+D.5.5 Einfachere VI-basierte Vorhersage
+Wir können den gelernten globalen Variationsposterior festhalten und eine strukturierte lokale Zustandsverteilung berechnen:
+qVIZ*∣X*∝exp​EqH*ηlogpX*,Z*∣η.
+Gleichung (D.26): Neue lokale VI-Zustandsinferenz mit erwarteten Log-Potenzialen.
+Dieser Ausdruck hat eine HMM-Kettenstruktur; deshalb können wir mit den erwarteten Log-Potenzialen Forward-Backward verwenden. Das entspricht dem VB-HMM-Prinzip von Beal (2003).
+Der Unterschied: Diese effizientere Variante approximiert die Zustandsverteilung bei festem globalen Variationsposterior und führt nicht die vollständige zusätzliche Gewichtsaktualisierung der globalen HMM-Parameter aus D.21 durch.
+Vorläufige Implementierungsrichtung: Die VI-basierte Variante ist unser erster praktischer Vorhersagealgorithmus; die aufwendigere Monte-Carlo-Integration behalten wir als Erweiterung und Vergleichsmöglichkeit.
+Drittes Ergebnis: Es gibt zwei mathematisch verschiedene Wege, die HMM-Parameterunsicherheit prädiktiv einzubeziehen: eine näher an der vollständig bedingten generativen Vorhersage und eine effizientere strukturierte VI-Vorhersage.
+D.6 Die Bayesian-Qualitätsvorhersage bei gegebenen Zustandsaufenthalten
+Wir haben die Zustandsverteilung des neuen Rings behandelt. Nun benötigen wir die eigentliche Regressionsvorhersage. Aus Herleitung A gilt:
+yr*∣h*,βr,σy,r2∼Nβr⊤h*,σy,r2.
+Die globalen Regressionsparameter besitzen den gelernten Normal-Invers-Gamma-Variationsfaktor:
+q*σy,r2=InvGammaar,br,
+q*βr∣σy,r2=NKβr,σy,r2Vr.
+Die Größen ar,br,βr,Vr stammen aus unserem abgeschlossenen Training.
+D.6.1 Integration der unsicheren Regressionskoeffizienten
+Wir nehmen vorübergehend an, h* sei gegeben. Die Regressionskoeffizienten bleiben trotzdem unsicher. Wir integrieren sie aus:
+pyr*∣h*,σy,r2,D≈∫pyr*∣h*,βr,σy,r2 q*βr∣σy,r2 dβr.
+Weil beide Verteilungen normalverteilt sind, erhalten wir:
+yr*∣h*,σy,r2,D∼N​βr⊤h*, σy,r21+h*⊤Vrh*.
+Gleichung (D.27): Integration der Regressionskoeffizienten.
+Der erwartete Qualitätswert ist βr⊤h*. Die Varianz enthält den ursprünglichen Residualanteil σy,r2 und zusätzlich die mit Vr beschriebene Unsicherheit der Regressionskoeffizienten.
+D.6.2 Integration der unbekannten Fehlervarianz
+Auch die Fehlervarianz besitzt eine Invers-Gamma-Verteilung. Nach ihrer Integration entsteht eine Student-t-Verteilung:
+yr*∣h*,D ∼ t2ar​βr⊤h*, sr2h*.
+Gleichung (D.28): Bayesian-Student-t-Predictive bei gegebenen Aufenthaltsanteilen.
+sr2h*=brar1+h*⊤Vrh*.
+Gleichung (D.29): Student-t-Skalenparameter zum Quadrat.
+Hier bezeichnet t2arμ,s2 eine Student-t-Verteilung mit 2ar Freiheitsgraden, Lageparameter μ und Skalenparameter zum Quadrat s2. Dieser Skalenparameter ist nicht generell gleich der tatsächlichen Varianz. Das Zeichen ∼ hebt die Verwendung unseres approximierten globalen Variationsposteriors hervor.
+Ändern wir dadurch unsere Wahl von Gauß-Emissionen? Nein. Die Prozessemissionen bleiben diagonal gaußverteilt; auch die bedingte Qualitätslikelihood ist normalverteilt. Die Student-t-Verteilung entsteht erst durch das Bayesian-Integrieren unbekannter Koeffizienten und Varianzen.
+D.6.4 Erwartungswert und Varianz der Student-t-Vorhersage
+Für ar>1/2 existiert ein endlicher Erwartungswert:
+Eyr*∣h*,D=βr⊤h*.
+Gleichung (D.30): Bedingter prädiktiver Erwartungswert.
+Für ar>1 existiert auch die Varianz:
+Varyr*∣h*,D=brar−11+h*⊤Vrh*.
+Gleichung (D.31): Bedingte prädiktive Varianz.
+Damit können wir Erwartungswert und Varianz analytisch berechnen, wenn die Aufenthaltsanteile gegeben sind. Weil sie in B1 selbst unbekannt bleiben, müssen wir ihre Unsicherheit zusätzlich integrieren.
+Viertes Ergebnis: Die Unsicherheit der Regressionsparameter lässt sich unter unserem Normal-Invers-Gamma-Modell analytisch integrieren. Bei gegebenen Aufenthaltsanteilen ergibt sich eine Student-t-Qualitätsverteilung.
+D.7 Die vollständige B1-Posterior-Predictive-Verteilung
+Jetzt verbinden wir die Verteilung möglicher Aufenthaltsanteile mit den Student-t-Qualitätsverteilungen. Das Ergebnis ist eine prädiktive Mischung.
+D.7.1 Integration der Zustandsunsicherheit
+Für Qualitätsgröße r gilt:
+pyr*∣X*,D=EpZ*∣X*,Dt2ar​yr*;βr⊤h*Z*,sr2h*Z*.
+Gleichung (D.32): Mischung von Qualitätsverteilungen über die Zustandsunsicherheit.
+pZ*∣X*,D bezeichnet die gewählte approximierte prädiktive Zustandsverteilung. Für die effiziente Hauptvariante P1 ist dies qVIZ*∣X*. Bei P2 verwenden wir die über D.21 bedingt gemischte Zustandsverteilung.
+Anschaulich: Mehrere Zustandsfolgen können für denselben Ring plausibel sein. Jede davon besitzt einen eigenen Aufenthaltsvektor; dieser führt zu einer Student-t-Verteilung für den Qualitätswert. Die endgültige Verteilung entsteht durch die probabilistisch gewichtete Mischung.
+
+Konzeptionelle Mischung mehrerer bedingter Qualitätsdichten (synthetische Kurven).
+Die resultierende Mischung muss keine einzelne Normal- oder Student-t-Verteilung sein. Sie kann asymmetrisch, breit oder mehrgipflig ausfallen. Das ist für die Intervalle wichtig.
+D.7.2 Wie erhalten wir eine einzelne Qualitätsvorhersage?
+Für RMSE, MAE und Scatter-Plots benötigen wir einen einzelnen Punktwert. Bei quadratischem Fehler ist der prädiktive Erwartungswert naheliegend. Wegen der linearen Regression gilt:
+yr*=βr⊤mh*.
+Gleichung (D.33): Punktschätzung der Qualitätsgröße r.
+Für alle drei Qualitätsgrößen:
+y*=B mh*.
+Gleichung (D.34): Dreidimensionale Punktschätzung.
+Dabei ist B die 3×K-Matrix aus den Posterior-Mittelwerten der drei Koeffizientenvektoren.
+Dies ist kein Rückfall zu B2. Für einen linearen bedingten Erwartungswert ist die Verwendung der erwarteten Aufenthaltsanteile korrekt. Bei der Unsicherheitsberechnung und der vollständigen prädiktiven Dichte behalten wir jedoch die Verteilung und ihr zweites Moment bei. B2 würde dagegen die Eingabeunsicherheit bereits im Training auf feste Werte reduzieren.
+D.7.3 Berechnung der gesamten prädiktiven Varianz
+Aus dem Satz der totalen Varianz folgt VarY=EVarY∣H+VarEY∣H.
+Damit erhalten wir für unsere Qualitätsgröße r:
+Varyr*∣X*,D=​brar−11+trVrHh*+βr⊤Hh*−mh*mh*⊤βr.
+Gleichung (D.35): Vollständige prädiktive Varianz bei integriertem B1-Zustand.
+Voraussetzung: ar>1. Die Varianz lässt sich in drei Beiträge zerlegen:
+Vrpred=​brar−1⏟Residualunsicherheit+brar−1trVrHh*⏟Regressionsparameterunsicherheit+βr⊤Covh*βr⏟Aufenthaltsunsicherheit.
+Gleichung (D.36): Drei Beiträge zur prädiktiven Varianz.
+Der erste Beitrag ist die verbliebene Qualitätsstreuung. Der zweite stammt aus der Posteriorunsicherheit der Regressionskoeffizienten. Der dritte entsteht aus den unsicheren latenten Zustandsaufenthalten.
+Diese Zerlegung ist unter unserer gewählten Variationsfaktorisierung gültig. Sie ist jedoch keine uneingeschränkt perfekte Trennung zwischen aleatorischer und epistemischer Unsicherheit: Die Aufenthaltsunsicherheit kann Zustandsmehrdeutigkeit und HMM-Parameterunsicherheit umfassen.
+Fünftes Ergebnis: Die B1-Architektur ermöglicht eine explizite prädiktive Unsicherheitszerlegung. Wir können untersuchen, welche Modellkomponenten bei bestimmten Ringen zur Unsicherheit beitragen.
+D.8 Gemeinsame Vorhersage unserer drei Qualitätsgrößen
+Wir haben die bedingte Qualitätskovarianz bewusst diagonal gewählt:
+Σy=diagσy,12,σy,22,σy,32.
+Das bedeutet nicht, dass die endgültigen Qualitätsvorhersagen unkorreliert sein müssen. Alle drei Qualitäten hängen vom gleichen unbekannten Aufenthaltsvektor ab.
+D.8.1 Warum können trotz diagonaler Kovarianz Abhängigkeiten entstehen?
+Für zwei Qualitätsgrößen gilt y1*=β1⊤h*+ε1 und y2*=β2⊤h*+ε2. Weil beide auf denselben h* zurückgreifen, entsteht nach der Integration der Zustandsunsicherheit eine Kovarianz:
+Covyr*,ys*∣X*,D=βr⊤Covh*βs, r≠s.
+Gleichung (D.37): Gemeinsame Qualitätskovarianz über die Zustandsunsicherheit.
+Definieren wir Σh*=Hh*−mh*mh*⊤, dann ergibt sich:
+Σpred*=​diagr=13​brar−11+trVrHh*+B Σh* B⊤.
+Gleichung (D.38): Dreidimensionale prädiktive Kovarianzmatrix.
+Diese Matrix gehört zu R3×3. Der erste Term ist diagonal, der zweite kann Nichtdiagonalelemente besitzen. Die bedingten Qualitätsfehler bleiben diagonal, aber die gemeinsame latente Unsicherheit koppelt die Endqualitätsvorhersagen.
+Russell und Reale (2022) begründen die allgemeine Bedeutung multivariater prädiktiver Unsicherheit; unsere Formel D.38 ist die eigene Ableitung für unsere B1-HMM-Struktur. Die diagonale bedingte Kovarianz kann weiterhin keine zusätzlichen direkten Fehlerkorrelationen erfassen.
+D.8.2 Erste unabhängige numerische Prüfung aus der bisherigen Entwicklung
+Im bisherigen Arbeitsstand wurde die prädiktive Kovarianzformel anhand eines kurzen synthetischen Beispiels verglichen: zwei HMM-Parametersätze, je zwei Zustände, vier Beobachtungen sowie drei beispielhafte Normal-Invers-Gamma-Regressionsfaktoren. Formel D.38 wurde mit vollständiger Aufzählung der kurzen Zustandsfolgen und dem Satz der totalen Kovarianz verglichen. Die berichtete größte absolute Differenz lag bei ungefähr 1,25⋅10−16.
+Die beispielhafte Matrix lautete:
+Σpred≈0,6188−0,08520,0757−0,08520,2101−0,03590,0757−0,03590,1938.
+Dieses Beispiel ist ein synthetischer mathematischer Funktionstest, kein Ergebnis mit Ringwalzdaten. Die ursprünglichen Testparameter sind in diesem Überblick nicht vollständig reproduziert; der Test muss später im Implementierungsprotokoll unabhängig dokumentiert und wiederholt werden.
+Sechstes Ergebnis: Wir besitzen neben drei einzelnen prädiktiven Varianzen eine mathematisch hergeleitete gemeinsame Kovarianzmatrix der drei Qualitätsgrößen.
+D.9 Wie erhalten wir konkrete Vorhersageintervalle?
+Unsere endgültige Qualitätsverteilung ist eine Mischung von Student-t-Verteilungen über mögliche Aufenthaltsanteile. Sie wird nicht immer durch Mittelwert und Varianz ausreichend beschrieben. Deshalb berechnen wir prädiktive Intervalle aus ihrer tatsächlichen beziehungsweise simulierten Verteilung.
+D.9.1 Simulation aus der Posterior-Predictive-Verteilung
+Für die VI-Hauptvariante haben wir qVIZ*∣X*. Wir ziehen ganze Zustandsfolgen Z*s∼qVIZ*∣X* und berechnen jeweils h*s=hZ*s. Danach ziehen wir für jede Qualitätsgröße:
+yr*s∼t2ar​βr⊤h*s, sr2h*s.
+Gleichung (D.39): Simulation eines Qualitätswertes aus der bedingten Student-t-Predictive.
+Die Regressionsparameter und Fehlervarianzen wurden dabei analytisch integriert. Pro Durchlauf erhalten wir einen Qualitätsvektor y*s=y1*s,y2*s,y3*s⊤. Da die drei Werte im selben Durchlauf denselben Aufenthaltsvektor verwenden, bleibt die latente Qualitätskopplung erhalten.
+D.9.2 Wie ziehen wir eine vollständige Zustandsfolge?
+Aus qVIZ*∣X*=ρ*Z1*t=2T*Qt*Zt*∣Zt−1* ziehen wir zunächst Z1*s∼Categoricalρ*, danach rekursiv Zt*s∼CategoricalQt*Zt−1*s,:.
+Bei festem HMM-Parametersatz ηs können wir alternativ die bedingte Zustandsfolge mit Forward Filtering Backward Sampling (FFBS) aus pZ*∣X*,ηs ziehen.
+D.9.3 Das prädiktive Intervall
+Für S prädiktive Samples einer Qualitätsgröße erhalten wir das zentrale 90-%-Intervall aus den empirischen Quantilen:
+Ir,90%=Q0,05yr*,Q0,95yr*.
+Gleichung (D.40): Zentrales 90-%-Vorhersageintervall.
+Dieses Intervall enthält unter der prädiktiven Modellverteilung 90 % ihrer Wahrscheinlichkeitsmasse. Dass später auch ungefähr 90 % der tatsächlichen Messungen darin liegen, ist eine empirische Kalibrierungsfrage und muss anhand zurückgehaltener Ringe geprüft werden.
+D.9.4 Warum nicht einfach y±1,645σ?
+Eine solche Konstruktion passt zu einer Normalapproximation. Unsere Mischung von Student-t-Verteilungen kann jedoch schwerere Enden, Asymmetrie und mehrere Gipfel besitzen. Deswegen verwenden wir für unsere Hauptauswertung Intervalle aus simulierten Quantilen oder einer numerischen Auswertung der Mischung. Mittelwert und Varianz bleiben als interpretierbare Kennwerte nützlich.
+D.10 Die vollständig bedingte prädiktive Simulation als Erweiterung
+Bei der aufwendigeren P2-Variante ziehen wir ηs∼qH*η, gewichten sie mit ws∝pX*∣ηs und ziehen daraus Zustandsfolgen aus pZ*∣X*,ηs.
+Die zugehörige gemeinsame prädiktive Qualitätsdichte können wir approximieren durch:
+py*∣X*,D≈s=1Swsr=13t2ar​yr*;βr⊤h*s,sr2h*s.
+Gleichung (D.41): Gewichtete prädiktive Qualitätsmischung für P2.
+Jede Produktkomponente nutzt dieselbe gezogene Zustandsfolge. Mehrere Zustandssamples pro HMM-Parametersatz können die Monte-Carlo-Streuung reduzieren. Diese Variante berücksichtigt die bedingte Gewichtung der HMM-Parameter aufgrund der neuen Sequenz, kostet aber mehr Rechenzeit und kann an degenerierten Gewichten leiden.
+Vorläufige Implementierungsentscheidung
+****P1 – Strukturierte VI-Predictive**** — Festes globales q*Θ; neue lokale HMM-VI; integrierte Student-t-Regression. Rolle: Hauptkandidat der ersten Implementierung
+****P2 – Bedingte Monte-Carlo-Predictive**** — HMM-Parameter sampeln, nach neuer Sequenz gewichten, Zustandsfolgen simulieren. Rolle: Erweiterung und Referenzvergleich
+****P3 – Plug-in-Predictive**** — HMM-Parameter durch Posterior-Mittelwerte ersetzen. Rolle: Diagnose- oder Ablationsvariante
+Wir empfehlen P1 als erste vollständige Implementierung, P2 nach erfolgreicher Validierung und P3 als Vergleich, um die Bedeutung der Parameterunsicherheit sichtbar zu machen.
+D.11 Wie bewerten wir unsere Qualitätsvorhersagen?
+Für die Bachelorarbeit wollen wir vor allem innerhalb unserer eigenen Bayesian-HMM-SSR-Architektur experimentieren. Wir untersuchen, welche Modellentscheidungen die prädiktive Genauigkeit, die Unsicherheit und die Stabilität beeinflussen. Die Posterior-Predictive-Verteilung bietet mehr Möglichkeiten als eine reine Punktschätzung.
+D.11.1 Bewertung der drei Punktschätzungen
+Für jeden Ring des zurückgehaltenen Testdatensatzes berechnen wir yi=yi1,yi2,yi3⊤ und vergleichen ihn mit der tatsächlichen Qualitätsmessung. Für jede Qualitätsgröße r berechnen wir getrennt:
+MAEr=1Ntesti=1Ntestyir−yir.
+Gleichung (D.42): Mean Absolute Error je Qualitätsgröße.
+RMSEr=1Ntesti=1Ntestyir−yir2.
+Gleichung (D.43): Root Mean Squared Error je Qualitätsgröße.
+Rr2=1−i​yir−yir2i​yir−yr2.
+Gleichung (D.44): Bestimmtheitsmaß je Qualitätsgröße.
+yr ist der Mittelwert der tatsächlich gemessenen Qualitätsgröße im Evaluationsdatensatz. Bei konstanter Zielgröße ist R2 nicht definiert. Diese Kennzahlen bewerten Punktschätzungen, nicht die Güte der Unsicherheitsverteilung.
+D.11.2 Negative Log-Likelihood
+Die Negative Log-Likelihood (NLL) bewertet, wie viel Wahrscheinlichkeitsdichte die prädiktive Verteilung der tatsächlich gemessenen Qualität zuordnet:
+NLL=−1Ntesti=1Ntestlogpyi∣Xi,D.
+Gleichung (D.45): Durchschnittliche multivariate Negative Log-Likelihood.
+Eine geringe NLL benötigt plausible erwartete Werte und eine angemessene Unsicherheitsverteilung. Ein Modell mit sehr schmaler Dichte bei hohen tatsächlichen Fehlern wird stark bestraft. Für unsere Student-t-Mischung verwenden wir die vollständige gemeinsame prädiktive Dichte; nach der Zustandsmarginalisierung dürfen wir die drei Qualitätsgrößen nicht unbesehen als unabhängig behandeln. Praktisch verwenden wir Log-Sum-Exp.
+D.11.3 Kalibrierung und Intervallabdeckung
+Für jedes Testbeispiel berechnen wir beispielsweise ein zentrales 90-%-Intervall und ermitteln die empirische Abdeckung:
+Coverager,90%=1Ntesti=1Ntest1yir∈Iir,90%.
+Gleichung (D.46): Empirische marginale Intervallabdeckung.
+Bei hinreichend vielen repräsentativen Testfällen erwarten wir für ein kalibriertes Modell ungefähr die nominelle Abdeckung. Wir können Intervalle mit 50 %, 80 %, 90 % und 95 % betrachten.
+
+Illustrative Kalibrierungskurve, keine tatsächlichen Ringwalz-Ergebnisse.
+Eine hohe Abdeckung allein genügt nicht. Das Modell könnte die Werte mit übermäßig breiten Intervallen abdecken. Deshalb bewerten wir Kalibrierung und Intervallbreite gemeinsam. Marginale 90-%-Intervalle für drei Zielgrößen garantieren darüber hinaus keine gemeinsame 90-%-Abdeckung aller drei Größen gleichzeitig.
+D.11.4 Fehler und vorhergesagte Unsicherheit
+Eine weitere anschauliche Untersuchung lautet: Sind Vorhersagen tatsächlich ungenauer, wenn das Modell eine hohe Unsicherheit angibt?
+Wir stellen beispielsweise den absoluten Fehler eir=yir−yir gegen die prädiktive Standardabweichung
+sirpred=Varyir∣Xi,D
+dar. Ergänzend können wir Ringe nach Unsicherheit gruppieren und die durchschnittlichen Fehler vergleichen. Es ist nicht zu erwarten, dass jeder einzelne Fehler streng mit der vorhergesagten Standardabweichung zunimmt; relevant ist der statistische Zusammenhang über viele Ringe.
+Dies entspricht der in Gelman et al. (2020) und Gabry et al. (2019) hervorgehobenen Bedeutung von posterior-prädiktiven Checks, Kalibrierung und unabhängiger Bewertung. Posterior Predictive Checks und Testdatensatz-Evaluation erfüllen dabei unterschiedliche Aufgaben.
+D.12 Gezielte Experimente innerhalb unserer eigenen Methode
+Wir wollen nicht wahllos fremde Algorithmen gegeneinanderstellen, sondern unser eigenes Modell systematisch untersuchen. Dazu verändern wir gezielt einzelne mathematische oder algorithmische Eigenschaften und prüfen ihren Einfluss auf Genauigkeit, Unsicherheit und Stabilität.
+E1 – Unlabeled-Gewichtung — C zwischen 0 und 1. Untersuchte Ergebnisse: MAE, RMSE, NLL, Coverage
+E2 – Anzahl der Zustände — K variieren. Untersuchte Ergebnisse: Zustandsstruktur, Genauigkeit, Rechenzeit
+E3 – Labelverfügbarkeit — Anteile von DLtrain verändern. Untersuchte Ergebnisse: Lernkurven und Nutzen von DU
+E4 – Priorstärke — Unterschiedlich informative Priors. Untersuchte Ergebnisse: Posteriorunsicherheit, Kalibrierung, Stabilität
+E5 – Prädiktive Inferenz — P1, P2 und P3. Untersuchte Ergebnisse: Vorhersageunterschiede, Unsicherheit, Aufwand
+E6 – Zustandsrepräsentation — Relative Aufenthalte und mögliche additive Sequenzstatistiken. Untersuchte Ergebnisse: Informationsgehalt der latenten Dynamik
+E7 – Initialisierung und VI — Seeds und Konvergenzeinstellungen. Untersuchte Ergebnisse: ELBO, Laufzeit, Ergebnisstreuung
+D.12.1 Warum ist der Faktor C interessant?
+Der Hauptpfad verwendet C=1. Für die Evaluation können wir den Einfluss ungelabelter Ringe reduzieren, beispielsweise mit
+C∈{0; 0,1; 0,25; 0,5; 0,75; 1}.
+Diese Werte sind geplante Versuchsbedingungen, keine ermittelten Optima. Unsere Hypothese lautet: Zusätzliche Prozessinformation aus DU kann die Qualitätsvorhersage verbessern, muss dies jedoch nicht bei jeder Datenlage oder Gewichtung tun. Neben der Punktgenauigkeit prüfen wir die Auswirkungen auf NLL, Kalibrierung und Intervallbreite.
+D.12.2 Zustandsanzahl K
+Bei zu wenigen Zuständen könnte die Dynamik grob bleiben, bei sehr vielen Zuständen steigen Parameterzahl, Aufwand und die Gefahr kaum besetzter oder schwer interpretierbarer Zustände. Deshalb untersuchen wir mehrere kleine und mittlere K und visualisieren RMSE, NLL, Laufzeit und beispielhafte Zustandswahrscheinlichkeiten.
+D.12.3 Untersuchung der B1-Qualitätskopplung
+Derzeit verwenden wir relative Zustandsaufenthalte hiZi. Später könnten zusätzliche additive Statistiken wie absolute Aufenthaltszählungen oder Übergangshäufigkeiten hilfreich sein. Solche Änderungen verändern jedoch die Qualitätslikelihood und möglicherweise die Momentenrekursion. Wir dürfen sie nicht ohne neue Erwartungswert- und Gradientenherleitung in das bestehende Modell einsetzen. In der ersten Implementierung bleiben wir bei den relativen Aufenthaltsanteilen.
+D.12.4 Vergleich P1, P2 und P3
+P1 verwendet strukturierte VI, P2 berücksichtigt die zusätzliche sequenzbedingte Gewichtung globaler HMM-Parameter, P3 nutzt Posterior-Mittelwerte. So können wir innerhalb desselben Modelltyps prüfen, ob aufwendigere prädiktive Inferenz die Genauigkeit, Kalibrierung und Intervallbreite verbessert. Der Vergleich sollte erst beginnen, nachdem P1 zuverlässig funktioniert.
+D.13 Unser vollständiger Vorhersagealgorithmus
+Wir können die mathematischen Ergebnisse nun zu einem implementierungsnahen Verfahren zusammenführen.
+D.13.1 Eingaben und Ausgaben
+X* — T*×d. Verwendung: Neue Ringsequenz
+q*π — Dirichlet. Verwendung: Anfangszustände
+q*A — Dirichlet-Zeilen. Verwendung: Übergänge
+q*Φ — Normal-Invers-Gamma. Verwendung: Prozessemissionen
+q*Ψ — Drei NIG-Faktoren. Verwendung: Qualitätsregression
+qVIZ*∣X* — Strukturierte Markov-Verteilung. Verwendung: Neue Zustandsinferenz
+mh* — Länge K. Verwendung: Erwartete Aufenthaltsanteile
+Hh* — K×K. Verwendung: Zweiter Aufenthaltsmoment
+y* — Länge 3. Verwendung: Qualitäts-Punktschätzung
+Σpred* — 3×3. Verwendung: Prädiktive Kovarianz
+Ysamples* — S×3. Verwendung: Simulation und Intervalle
+D.13.2 Ablauf der Hauptvariante P1
+Gelernten Posterior laden: q*Θ aus dem Training.
+Neuen Ring vorbereiten: dieselben auf Trainingsdaten angepassten Transformationen auf X* anwenden.
+Zustandsinferenz: angepasstes Forward-Backward mit erwarteten Log-Potenzialen.
+Aufenthaltsmomente: mh* und Hh* über die Rekursion aus Herleitung B berechnen.
+Analytische Qualitätsmomente: y* und Σpred* bestimmen.
+Prädiktive Simulation: ganze Zustandsfolgen ziehen und daraus drei Qualitätswerte generieren.
+Finale Vorhersage: Punktschätzungen, Kovarianz, Unsicherheitsintervalle und ggf. Samples zurückgeben.
+
+Implementierungsnaher Vorhersageablauf der Variante P1.
+Python-naher Pseudocode
+# Herleitung D - Hauptvariante P1# Pseudocode; Hilfsfunktionen sind noch zu implementieren.def posterior_predictive_ring(X_new, q_global, preprocess, n_samples):    # 1. Gleiche Vorverarbeitung wie beim Training    X = preprocess.transform(X_new)    # 2. Neue lokale Zustandsverteilung ohne Qualitätslabel    q_state = variational_forward_backward(        sequence=X,        q_hmm=q_global.hmm    )    # 3. Aufenthaltsmomente    m_h, H_h = occupation_moments(q_state)    # 4. Qualitätsparameter aus trainiertem Posterior    beta_mean, V, a, b = get_quality_posterior(q_global)    # 5. Punktvorhersagen    y_mean = beta_mean @ m_h    # 6. Prädiktive Varianz und Kovarianz    state_cov = H_h - outer(m_h, m_h)    residual_and_beta_var = [        b[r] / (a[r] - 1) * (1 + trace(V[r] @ H_h))        for r in range(3)    ]    y_cov = diag(residual_and_beta_var)    y_cov += beta_mean @ state_cov @ beta_mean.T    # 7. Komplette prädiktive Samples    predictions = []    for s in range(n_samples):        Z = sample_markov_path(q_state)        h = occupation_fraction(Z)        y = sample_quality_student_t(            h=h,            beta_mean=beta_mean,            V=V,            a=a,            b=b        )        predictions.append(y)    # 8. Prädiktive Intervalle aus Samples    intervals = predictive_quantiles(predictions)    # 9. Rücktransformation in physikalische Einheiten    return inverse_transform_outputs(        y_mean, y_cov, intervals, predictions    )
+Der Pseudocode ist näher an einer späteren Implementierung als das ursprüngliche Übersichtsblockschaltbild, enthält aber noch keine vollständige Behandlung numerischer Sonderfälle. Für eine analytische Kovarianz müssen die zweiten Momente der Qualitätsverteilungen endlich sein. Wenn die Zielgrößen standardisiert wurden, müssen Kovarianz und Intervalle korrekt in physikalische Einheiten zurücktransformiert werden.
+D.14 Was müssen wir vor der endgültigen Implementierung überprüfen?
+Wir besitzen nun eine vollständige mathematische Vorhersagestruktur. Ihre praktische Funktion muss jedoch durch unabhängige Tests validiert werden.
+D.14.1 Mathematische und numerische Prüfungen
+Zustandsinferenz: Forward-Backward kurzer HMMs gegen vollständige Enumeration
+Aufenthaltsmomente: mh,Hh gegen direkte Momente aus allen kurzen Zustandsfolgen
+Student-t-Integration: Analytische Qualitätsmomente gegen NIG-Simulation
+Prädiktiver Mittelwert: Analytischen Mittelwert gegen Monte-Carlo-Mittelwert
+Prädiktive Kovarianz: Matrixformel gegen direkte Mischungsberechnung
+Prädiktive Intervalle: Quantile bei steigender Samplezahl stabil?
+Gewichtete P2-Vorhersage: ESS und Gewichtskonzentration
+Probabilistische Evaluation: NLL, Coverage und Intervallbreite unabhängig verifizieren
+Die vorhandene synthetische Prüfung der Kovarianzformel ist ein erster positiver Teiltest, ersetzt aber nicht die Validierung des gesamten Codes.
+D.14.2 Physikalische Bedeutung der Qualitätsgrößen
+Äußere Unrundheit, innere Unrundheit und Höhenschlag sind physikalisch nichtnegative Qualitätsgrößen. Die Gauß- und Student-t-basierten Vorhersagen können grundsätzlich auch negative Werte zulassen. Bei standardisierten Zielgrößen sind negative standardisierte Werte normal; nach Rücktransformation können jedoch auch unplausible physikalisch negative Werte entstehen.
+Deshalb prüfen wir später, ob solche Vorhersagen auftreten und in welchem Umfang. Mögliche spätere Alternativen wären geeignete Transformationen oder andere Zielverteilungen. Eine Änderung würde aber die bisher hergeleitete Qualitätslikelihood und eventuell die konjugierten Updates verändern. Für die erste Modellversion behalten wir die Gauß-Qualitätslikelihood bei und dokumentieren die physikalische Plausibilität als Modellcheck.
+D.14.3 Vorhersagen bei ungewöhnlichen Ringsequenzen
+Ringsequenzen können von den Trainingsdaten abweichen. Als zusätzliche Diagnose betrachten wir die Prozesssequenzwahrscheinlichkeit pX*∣η oder eine sinnvolle sequenzlängenbezogene Größe. Eine geringe Wahrscheinlichkeit ist ein Hinweis auf ein ungewöhnliches Modellverhalten, aber kein automatischer Beleg für einen großen Qualitätsfehler. Diesen Zusammenhang müssen wir empirisch untersuchen.
+D.15 Ergebnisse der Herleitung D
+Neue Ringsequenz: X*∈RT*×d
+Neue Zustandsinferenz: Forward-Backward bzw. strukturierte VI
+Aufenthaltsverteilung: Erste und zweite Momente aus Herleitung B
+Bayesian-Qualitätsregression: Analytische NIG-Integration
+Bedingte Qualitätsverteilung: Student-t-Verteilung
+Vollständige B1-Vorhersage: Mischung über unsichere Aufenthaltsanteile
+Punktschätzung: y*=Bmh*
+Prädiktive Kovarianz: Analytisch aus Zustands- und Parametermomenten
+Vorhersageintervalle: Simulation der prädiktiven Mischung
+Evaluation: Punktgenauigkeit, NLL, Kalibrierung und Zustandsdiagnostik
+Implementierung: P1 Hauptkandidat, P2 Erweiterung, P3 Diagnose
+Drei zentrale mathematische Ergebnisse für das spätere Blockschaltbild
+1. Prädiktiver Erwartungswert
+y*=B mh*.
+2. Vollständige prädiktive Kovarianz
+Σpred*=​diagr=13​brar−11+trVrHh*+BHh*−mh*mh*⊤B⊤.
+3. Vollständige prädiktive Qualitätsmischung
+py*∣X*,D=EpZ*∣X*,D​r=13t2ar​yr*;βr⊤h*Z*,sr2h*Z*.
+Die genaue prädiktive Zustandsverteilung hängt davon ab, ob wir P1 oder P2 verwenden.
+D.16 Quellenkontrolle und eigene mathematische Beiträge
+Beal (2003) — Bayesian-HMM-Zustandsinferenz, Forward-Backward, Variational Inference. Abgrenzung: Keine B1-Endqualitätsregression
+Shao et al. (2022), P112 — Bayesian-HMM-SSR und probabilistische Qualitätsmodellierung. Abgrenzung: Zeitbezogene statt ringweiser Endqualität
+Mowbray et al. (2022) — Batchsequenzen und Endqualitätsvorhersage. Abgrenzung: Kein identisches fully Bayesian B1-SSR-HMM
+Russell & Reale (2022) — Multivariate prädiktive Unsicherheit. Abgrenzung: Keine identische B1-Kovarianzformel
+Gelman et al. (2020) — Posterior Predictive Checks, Modellprüfung, Validierung. Abgrenzung: Kein konkreter Ringwalzalgorithmus
+Gabry et al. (2019) — Visualisierung und Bewertung prädiktiver Verteilungen. Abgrenzung: Keine HMM-Kopplung
+Unsere Herleitung D — B1-Zustandsmischung, Student-t-Qualität und gemeinsame Kovarianz. Abgrenzung: Eigene mathematische Adaption; nicht an Ringwalzdaten validiert
+Die Grundlagen der HMM-Inferenz und Modellprüfung wurden aus den Originalquellen abgeglichen. Die NIG-Integration folgt der konjugierten Bayesian-Regression. Die gemeinsame Student-t-Mischung und prädiktive Kovarianzformel sind Ableitungen aus unserer gewählten B1-Faktorisierung und keine unverändert aus P112 übernommenen Resultate. Separate Supplements oder Softwareimplementierungen genau unserer Modellkombination sind nicht vollständig geprüft.
+Gesamtstand unserer Modellentwicklung nach A, B, C und D
+****A – Modellkonstruktion: Gemeinsames generatives Bayesian-Modell mit HMM, B1-Qualitätskopplung, Priors und DL+DU
+****B – Posteriorapproximation: Strukturierte Markov-VI, Aufenthaltsmomente und erwartete Qualitätslikelihood
+****C – Training: ELBO, konjugierte globale Updates, numerische lokale B1-Optimierung
+****D – Vorhersage: Neue Zustandsinferenz, Student-t-Mischung, drei Qualitätswerte und prädiktive Unsicherheit
+****Nächste Phase – Implementierungsprüfung: Algorithmus integrieren, Blockschaltbild finalisieren, synthetische Tests und Experimente
+Abschließende Bewertung
+Wir haben einen durchgängigen mathematischen Entwurf unseres Bayesian-SSR-Modells vom generativen Prozessmodell bis zur posterior-prädiktiven Qualitätsverteilung. Das Standard-HMM beschreibt die Prozessdynamik, diagonale Gauß-Emissionen begrenzen die Komplexität, und die vollständige latente Zustandsfolge beeinflusst über Aufenthaltsanteile die drei Qualitätsgrößen. Globale Unsicherheit bleibt durch Bayesian-Posteriorfaktoren erhalten.
+Die B1-Qualitätskopplung berücksichtigt die ersten und zweiten Zustandsmomente; die Vorhersage erfasst auch gemeinsame prädiktive Qualitätsunsicherheit. Noch offen ist die Validierung des vollständig integrierten Trainings- und Vorhersagealgorithmus. Synthetische Gleichungstests ersetzen keine empirische Bestätigung des Gesamtmodells. Die P1-Vorhersage ist ausdrücklich eine VI-Approximation; die bedingtere P2-Integration ist als Erweiterung dokumentiert.
+Nächster Schritt: Herleitungen A–D in das endgültige implementierungsnahe Blockschaltbild überführen und anschließend den gesamten Algorithmus zunächst auf kurzen synthetischen Sequenzen testen. Erst nach dieser Prüfung sollte die Architektur als endgültiger Implementierungspfad freigegeben werden.

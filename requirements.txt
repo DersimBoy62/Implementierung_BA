@@ -1,0 +1,5 @@
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.3
+numba>=0.59
+optuna>=3.5  # optional, only for later optuna_inner.py --run

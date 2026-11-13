@@ -1,0 +1,92 @@
+{
+  "freeze_id": "DM-V5-MAIN-PROPOSED-2026-11-12-v0",
+  "freeze_status": "PROVISIONAL_USER_APPROVAL_PENDING",
+  "scientific_evidence": "exploratory repeated CV of 8 previously reused development labels, not independent confirmation",
+  "dataset_sha256": "bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5",
+  "labeled_ring_ids": [
+    "DM04",
+    "DM05",
+    "DM06",
+    "DM09",
+    "DM12",
+    "DM16",
+    "DM17",
+    "DM18"
+  ],
+  "unlabeled_ring_ids": [
+    "DM01",
+    "DM02",
+    "DM10",
+    "DM14"
+  ],
+  "never_use_for_selection_ids": [
+    "DM07",
+    "DM08",
+    "DM11",
+    "DM15"
+  ],
+  "input_feature_set": "V1_Kern_6",
+  "input_columns": [
+    "F_rad63",
+    "F_ax64",
+    "Ist_D150",
+    "Ist_s151",
+    "Ist_h152",
+    "RWG55"
+  ],
+  "process_window": "F2",
+  "process_scaling": "P0 pooled timepoint mean/std over labeled and U training rings only",
+  "quality_targets": [
+    "ovality.ovality_radial_mm",
+    "planarity.height_deviation_mm"
+  ],
+  "target_scaling": "train-labeled only mean/std, separately for two heads",
+  "physical_descriptor_indices": {
+    "outside": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      10
+    ],
+    "height": [
+      0,
+      2,
+      4,
+      7,
+      11
+    ]
+  },
+  "physical_descriptor_scaling": "standard mean/std over labeled and U training rings only",
+  "model": "full-covariance Bayesian Gaussian-Wishart HMM with M2 late-minus-early state occupancy and separate Bayesian NIG quality heads",
+  "K": 2,
+  "C": 0.2,
+  "physical_var": 0.38526108747593474,
+  "state_var_source": "dynamic_quality_v2.Spec.prior_variances",
+  "epochs": 10,
+  "local_steps": 8,
+  "random_seed": 20261111,
+  "core_math_file_sha256": {
+    "compare_dynamic_quality_cv4.py": "90a6f474081c5ab4d11f81da5ebf86d9841efa8119eaf4c8d61ee95bd9c51eab",
+    "compare_two_head_cv4.py": "79ef34dbb97981425e4d28d0765d172f9b8d932855302864b099556ab2882467",
+    "dm_data.py": "cafe07406e125c253d7cf9de0aef9440c68a90810a0d60d839451852c36598b1",
+    "dynamic_markov_v2.py": "db481edcad1497e448cd6b63591da08fe8e189962346837eda0d5973f66d5924",
+    "dynamic_quality_v2.py": "fdfecbe62c12271cbbecdb269cfe69be56c1097755c2cb9d7d4bc6e73beb2348",
+    "full_markov_b1.py": "3509e7e0c529f57492708619b46025163ab283a2ece2a7286ec32d67c540afba",
+    "fullcov_b1.py": "701b0dfa099338e24226736fb6f1d263ad103d94ffa10b12a298770b0b739aab",
+    "quality_link_challenge.py": "1a69d044f2c22fec843e53c75d2820f2d19d35677829040df9fe8260dd858197",
+    "two_head_b1.py": "75705fe3090ca78d7b062f182ae991503d51b12e8081126a18cb99fc427c539b",
+    "vb_b1.py": "d59ba4caaabfdb1ca2079ceefc14b918ac6eef83e90a2d7abe231d7be91e1e7f"
+  },
+  "alternative_models": [
+    "K2/P0/M2/C0.1/prior0.3852610875",
+    "K3/P0/M2/C2.0/prior0.4732915362"
+  ],
+  "pending_research_checks": [
+    "verify RWG55 channel physical semantics against original metrology documentation",
+    "external validation with new truly unseen rings",
+    "check final prior choice 0.385261 is exploratory and coupled to trial22",
+    "verify prediction input export schema on new logger file"
+  ]
+}

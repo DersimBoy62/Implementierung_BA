@@ -1,0 +1,127 @@
+{
+  "release": "Bayesian-Bachelor-V5.1-Input-Safety-2026-11-12",
+  "status": "PRE-FREEZE, DEVELOPMENT ONLY",
+  "training_run": "NONE IN V5.1 RELEASE",
+  "core_mathematics": {
+    "all_10_sha256_match_v5": true,
+    "files": {
+      "compare_dynamic_quality_cv4.py": true,
+      "compare_two_head_cv4.py": true,
+      "dm_data.py": true,
+      "dynamic_markov_v2.py": true,
+      "dynamic_quality_v2.py": true,
+      "full_markov_b1.py": true,
+      "fullcov_b1.py": true,
+      "quality_link_challenge.py": true,
+      "two_head_b1.py": true,
+      "vb_b1.py": true
+    }
+  },
+  "qa": {
+    "synthetic_contract_tests": 18,
+    "original_development_F2_bitwise_identical": 12,
+    "historical_outer_test_evaluations": 0
+  },
+  "files": [
+    {
+      "path": "CLOSEOUT_TEMPLATE.json",
+      "sha256": "c7a92f6500dcacdd5544d3d9ad5f627659c78637d633b0ec1edf6285e6360137",
+      "size_bytes": 416
+    },
+    {
+      "path": "DEVELOPMENT_INPUT_POLICY_V51.json",
+      "sha256": "ca79e214f1c5c8c5807adf86e957124e3c721bd166734a7eba9e9de8dff8b0ca",
+      "size_bytes": 1705
+    },
+    {
+      "path": "PROPOSED_MODEL_FREEZE.json",
+      "sha256": "88f9da6aa51be71db7968a8222cb36e5e4838b8a8431988bd7c54c09bace51ab",
+      "size_bytes": 3065
+    },
+    {
+      "path": "PRUEFBERICHT_V51_EINGANGSSICHERHEIT_KAPITEL4_5_2026-11-12.docx",
+      "sha256": "e3f15b68e0d0765845bf0334234b5581711488b75da3415ececd06232862c377",
+      "size_bytes": 43498
+    },
+    {
+      "path": "README_V51_INPUT_SAFETY.md",
+      "sha256": "b2258c05c1665b102791c32d345e16f8783164d86d629020682c77618f9cdc3b",
+      "size_bytes": 7044
+    },
+    {
+      "path": "V51_QA_RESULTS.json",
+      "sha256": "a704aa16ba20d64780de94515e181b9ccc07430118c5f91bad6326fa9d5d52c1",
+      "size_bytes": 3266
+    },
+    {
+      "path": "final_core/compare_dynamic_quality_cv4.py",
+      "sha256": "90a6f474081c5ab4d11f81da5ebf86d9841efa8119eaf4c8d61ee95bd9c51eab",
+      "size_bytes": 8567
+    },
+    {
+      "path": "final_core/compare_two_head_cv4.py",
+      "sha256": "79ef34dbb97981425e4d28d0765d172f9b8d932855302864b099556ab2882467",
+      "size_bytes": 6945
+    },
+    {
+      "path": "final_core/dm_data.py",
+      "sha256": "cafe07406e125c253d7cf9de0aef9440c68a90810a0d60d839451852c36598b1",
+      "size_bytes": 4993
+    },
+    {
+      "path": "final_core/dynamic_markov_v2.py",
+      "sha256": "db481edcad1497e448cd6b63591da08fe8e189962346837eda0d5973f66d5924",
+      "size_bytes": 6803
+    },
+    {
+      "path": "final_core/dynamic_quality_v2.py",
+      "sha256": "fdfecbe62c12271cbbecdb269cfe69be56c1097755c2cb9d7d4bc6e73beb2348",
+      "size_bytes": 6310
+    },
+    {
+      "path": "final_core/full_markov_b1.py",
+      "sha256": "3509e7e0c529f57492708619b46025163ab283a2ece2a7286ec32d67c540afba",
+      "size_bytes": 7077
+    },
+    {
+      "path": "final_core/fullcov_b1.py",
+      "sha256": "701b0dfa099338e24226736fb6f1d263ad103d94ffa10b12a298770b0b739aab",
+      "size_bytes": 10644
+    },
+    {
+      "path": "final_core/quality_link_challenge.py",
+      "sha256": "1a69d044f2c22fec843e53c75d2820f2d19d35677829040df9fe8260dd858197",
+      "size_bytes": 14042
+    },
+    {
+      "path": "final_core/two_head_b1.py",
+      "sha256": "75705fe3090ca78d7b062f182ae991503d51b12e8081126a18cb99fc427c539b",
+      "size_bytes": 8546
+    },
+    {
+      "path": "final_core/vb_b1.py",
+      "sha256": "d59ba4caaabfdb1ca2079ceefc14b918ac6eef83e90a2d7abe231d7be91e1e7f",
+      "size_bytes": 16129
+    },
+    {
+      "path": "input_safety_v51.py",
+      "sha256": "3af23eacf61151b106c9135ef5674c455ae6c80d8877007355a975b440f48af9",
+      "size_bytes": 12703
+    },
+    {
+      "path": "main_bayesian_ssr_v51.py",
+      "sha256": "6d8f99e6b800d1b931916c565df698c9c2c024e7496a405b3d57a02039856286",
+      "size_bytes": 12218
+    },
+    {
+      "path": "test_development_logger_equivalence_v51.py",
+      "sha256": "267edd98367e1d5db437d96ff2f971a3572690618db91d22c3cf498f0fa8ddef",
+      "size_bytes": 2531
+    },
+    {
+      "path": "test_input_safety_v51.py",
+      "sha256": "e23584d4209e2a8a0e511228890c13cc9f5ce1649650874e8053d2b2562cad9c",
+      "size_bytes": 8651
+    }
+  ]
+}

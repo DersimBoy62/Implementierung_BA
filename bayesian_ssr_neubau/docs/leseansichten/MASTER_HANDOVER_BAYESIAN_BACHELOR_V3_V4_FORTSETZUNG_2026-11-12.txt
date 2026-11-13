@@ -1,0 +1,1307 @@
+BAYESIAN BACHELORMASTER-ÜBERGABE – FORTSETZUNG V3/V4
+Optuna-Suchstudien · kontrollierte Semi-Supervised-Ablationen · U-Gewicht C · Seed-/Split-Sensitivität · verschachtelte 4×3-CV · Einzelring- und Unsicherheitsdiagnostik
+Verbindlicher Übergabestand: 12. November 2026, nach Abschluss der 4×3-Nested-Optuna-CV und der Analyse ihrer 32 äußeren Vorhersagen, vor den beiden alternativen C-Dosis-Splits.
+Dieses Dokument SCHLIESST an „MASTER_HANDOVER_BAYESIAN_BACHELOR_V2_FORTSETZUNG_2026-11-11.docx“ an. Frühere Übergaben werden nicht ersetzt und die abgeschlossene Ausgangs-/Outer-Test-Version wird nicht überschrieben.
+SOFORTÜBERNAHME – bitte zuerst lesen
+Arbeitsstand: Optuna 5.0.0 wurde auf dem Nutzer-PC bestätigt. V3 Structural-16, V3 Extended-24, C/Prior-Faktoriell-12, Strict-vs-SSL, Seed- und Split-Sensitivität, kanonische C-Dosis-Kurven und V4 Nested-Optuna 4×3 sind erfolgreich abgeschlossen; finale V4-Einzelringdaten liegen original vor.
+Wichtigster V4-Befund: gepoolte Outer-Entwicklungs-RMSE (mm) Strict [0,6541; 3,1756], SSL [0,5453; 3,2100], Shared C=0 [0,5503; 3,2633]. SSL verbessert die Außen-RMSE ggü. Strict um 16,6 %; beim Höhenschlag ist der RMSE um 1,1 % höher.
+Zusätzlicher ELBO-Effekt C>0 ggü. Shared C=0, bei gleichen SSL-Struktur-/Priorparametern: −0,9 % Außen-RMSE, −1,6 % Höhen-RMSE; je 5/8 Ringe mit kleinerem absoluten Fehler. Höhengewinn ist nahezu vollständig von DM09 getragen.
+U-Gewicht C ist die priorisierte Forschungsfrage: C ist ein Faktor auf den ELBO-Prozessbeitrag U; C=0 mit gemeinsamen U-Skalierern/K-Means ist NICHT gleich Strict Supervised.
+Offen: die zwei alternativen C-Dosis-Pairings 20261114 und 20261115 ausführen, zusammenfassen und für Kapitel 4/5 diskutieren; nicht voreilig weitere Optuna-Experimente oder äußeren Test starten.
+Die alten vier Test-Ringe DM07/DM08/DM11/DM15 wurden bereits in V1 geöffnet. Sie dürfen NIE erneut als unberührter Test für V2–V4, Optuna oder neue Modellwahl verwendet werden. Alle neuen Studien verwenden acht mehrfach analysierte Entwicklungsringe und sind explorativ.
+Leseschlüssel, Reproduzierbarkeit und Quellenstatus
+Kennzeichen
+Belegart / Bedeutung
+[LOG]
+Terminalausgabe des Nutzers: ausgeführte Tests, Messwerte oder Modelle.
+[ORIGINAL]
+Originale V4-CSV/JSON-Dateien vom Nutzer in /mnt/data; vollständig eingelesen und quantitativ abgeglichen.
+[CODE/README]
+Vorhandene lokale Python-/README-/DOCX-Artefakte verifiziert; funktionale Details aus Code bzw. Text.
+[INFERENZ]
+Wissenschaftliche Deutung der Resultate, kein experimentell bewiesener Kausalmechanismus.
+[OFFEN]
+Noch nicht ausgeführt, nicht zu behaupten.
+[QUELLEN]
+Fachliteratur gemäß früherer Quellenprüfung; hier keine Neuverifikation exakter Buch-/PDF-Seiten.
+
+Zahlendarstellung: CV-RMSE aus Nutzerausgaben teils vierstellig gerundet; die V4-Ringwerte und gepoolten Kennzahlen stammen aus NESTED_SUMMARY.json bzw. OUTER_PREDICTIONS.csv mit voller numerischer Genauigkeit. Nicht über die verfügbaren Resultate hinaus exakte Posterior- oder Signifikanz-Aussagen behaupten.
+Inhaltsübersicht
+Bereich
+Abschnitte
+I · Forschungsstand
+1–4: Daten- und Modellgrenzen, Chronologie, Optuna-Methode
+II · V3-Experimente
+5–10: Structural/Extended, C/Prior, Strict, Seeds, Splits, C-Dosis
+III · V4-Nested-CV
+11–15: CV-Design, aggregierte und einzelne Ergebnisse, U-Nutzen, Unsicherheiten
+IV · Auswertung/Weitergabe
+16–23: Kapitel 4/5, Bias, offene Aufgaben, Befehle, Dateien, Quellen
+Anhänge
+A–D: 24 Optuna-Trials; C-Dosis-Vollwerte; Ringmetriken; Übernahme-Text
+
+1. Projektidentität und Grenzen
+Projekt „Bayesian Bachelor“: Entwicklung einer voll-bayesschen Semi-Supervised Regression für den Ringwalzprozess. Pro Ring wird die ganze multivariate Zeitreihe x₁:T verarbeitet; Vorhersage zweier endgültiger ringweiter Qualitätsgrößen: (1) Unrundheit am Außendurchmesser, (2) Höhenschlag, beide in Millimetern. Innenunrundheit ist nach Betreuerentscheidung KEIN Zielwert. Keine Pseudo-Labeling-Pipeline.
+Die wissenschaftliche Zielfrage hat zwei Stufen: (a) Lässt sich die Endqualität aus Prozesssignalen vorhersagen und in welchem Umfang verbessern zusätzliche ungelabelte Prozessdaten die Regression? (b) Inwiefern könnte eine valide Vorhersage später Prozessentscheidungen unterstützen? Bisher sind nur Vorhersagen untersucht; eine reale Prozessoptimierung, Intervention oder geschlossener Qualitätsregelkreis wurde NICHT experimentell belegt.
+Die V1-Abschluss- und Outer-Test-Evaluation bleibt eingefroren und getrennt. V2/V3/V4 sind danach begonnene Forschung. Jede Entscheidung anhand derselben acht Entwicklungsringe kann trotz verschachtelter CV zu adaptiver Verzerrung führen. Die V4-Außenfolds sind lediglich innerhalb des jeweiligen neuen Tuning-Laufs geschützt; sie sind historisch nicht „nie gesehen“.
+2. Datenbestand und Einheiten
+Kategorie
+Ring-IDs / Vorgabe
+16 aktive DM-Ringe
+DM01/DM02/DM04–DM12/DM14–DM18; DM03 (Versuch abgebrochen), DM13 (unzureichendes Prozessfenster) ausgeschlossen.
+Gelabelte Entwicklungsringe L
+DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18 – acht Ringe.
+U-Ringe
+DM01, DM02, DM10, DM14 – nur X in Trainingssicht, U-Qualitätswerte maskiert.
+Frühere Outer-Test-Ringe
+DM07, DM08, DM11, DM15 – bereits 11.11.2026 in V1 bewertet; TABU für neue Wahl.
+Eingangsprozesse
+F_rad63, F_ax64, Ist_D150, Ist_s151, Ist_h152, RWG55; 0,1-s-Prozessfenster, sechs Kanäle.
+Zielwerte
+Außenunrundheit („outer_roundness_mm“); Höhenschlag („height_runout_mm“).
+Pickle SHA256
+bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5
+
+Ringweises Splitten: alle Zeitpunkte desselben Rings bleiben gemeinsam. Die Qualitätsskaler und physikalischen Kopf-Merkmale werden nur foldlokal anhand gelabelter Trainingsringe angepasst. U-Label-Zugriff ist explizit maskiert. Gemeinsame Prozessskalierung und K-Means im Shared-Zweig dürfen U-Prozesssequenzen sehen; der strikte Zweig nicht.
+3. Modell- und Hyperparameterdefinition
+Bayesian-HMM: erster-Ordnung Markov-Struktur für latente Zustände, volle Gauß-Wishart-Emissionskovarianzen, Dirichlet-artige Übergangs-/Anfangs-Priors, strukturierte lokale Markov-Variationsinferenz und zwei getrennte ringweite Normal-Inverse-Gamma-Qualitätsköpfe. Qualitätsmerkmale verbinden physikalische Signalzusammenfassungen mit posterioren Zustandsrepräsentationen; M2 ergänzt frühe/späte Zustandsbelegungs-Kontraste. Frühere mathematische Herleitungen A–D und V2-Moment-Rekursionen befinden sich in den älteren Dokumenten und bleiben einzeln versioniert.
+Zeichen
+Definition / Auswirkung
+K
+Anzahl HMM-Zustände. Nicht automatisch reale physikalisch benannte Prozessphasen.
+M0/M2
+M0: Zustandsanteile plus physikalische Features; M2: zusätzlich zeitliche Kontraste früher/später Belegungsanteile.
+P0
+Prozessskalierung über gepoolte Trainingszeitpunkte.
+P2
+Robuste gepoolte Skalierung über Median und IQR; frühere P1-Ringgleichgewichtung war nicht generell günstig.
+C
+Multiplikativer Faktor des ungelabelten Prozess-ELBO-Beitrags; keine Quote ungelabelter Ringe.
+physical_var
+Priorvarianz der physikalischen Qualitätskopf-Koeffizienten; verändert Regularisierung.
+Strict L only
+Nur sechs bzw. innere vier L-Trainingsringe für Scaler/K-Means/Training/Qualitätsköpfe.
+Shared C=0
+U-Prozessdaten für Prozessskalierung/K-Means, aber ohne zusätzlichen U-ELBO-Term.
+SSL C>0
+Wie Shared, zusätzlich gewichtete U-Prozessbeiträge in der ELBO; U-Y weiterhin maskiert.
+
+Das frühere eingefrorene V1-Protokoll war K=3, zehn Epochen, acht lokale VI-Schritte und C=1. V3 experimentierte zusätzlich mit K, Skalierung und Priorvarianz. Die V4-Nested-CV fixiert P0/M2 und variiert K∈{2,3}, physical_var∈[0,2;0,8] sowie im SSL-Arm C=0 oder C∈[0,05;2].
+4. Chronologie seit dem letzten Master-Handover [LOG]
+Datum
+Schritt
+Status
+11.11.
+Optuna 5.0.0 in Projekt-.venv verifiziert.
+BESTANDEN
+11.11.
+V3 Structural: 7 synthetische Tests, Smoke, 16 Trials × CV4.
+ABGESCHLOSSEN
+11.11.
+V3 Extended: 24 Trials × CV4, Pareto-Menge.
+ABGESCHLOSSEN
+11.11.
+C/Prior-2×3-Ablation: 12 CV4-Kombinationen.
+ABGESCHLOSSEN
+11.11.
+Strikt überwacht vs Shared C0 vs SSL für Trials 13/22.
+ABGESCHLOSSEN
+11.–12.11.
+3-Seeds-Vergleich, 2 Kandidaten × 2 Trainingsarme × CV4.
+ABGESCHLOSSEN
+12.11.
+2 neue ringweise Split-Paarungen, Strict/Shared/SSL.
+ABGESCHLOSSEN
+12.11.
+C-Dosis-Kurve auf originaler CV4-Aufteilung, 10 C-Stufen/Kandidat.
+ABGESCHLOSSEN
+12.11.
+V4 verschachtelte 4×3-CV, 16 Optuna-Trials je äußerem Fold und Arm.
+ABGESCHLOSSEN
+12.11.
+Original-JSON + 2 CSV ausgewertet; Ringfehler-/Unsicherheitsbericht.
+ABGESCHLOSSEN
+noch offen
+C-Dosis-Kurven auf Pairings 20261114 und 20261115.
+NICHT BERICHTET
+
+5. V3 Structural-Optuna – Sucheffizienz
+Protokoll: K={2,3,5,8}, P={P0,P2}, Variante={M0,M2}, C=1 und physical_var=0,25 fix. Optuna TPESampler mit zwei getrennten (normalisierten) Qualitäts-RMSE-Zielen, 4 identische Entwicklungsfolds, 10 Epochen, 8 lokale Schritte, Seed 20261111. 7/7 synthetische Tests und echte Smoke-Integration bestanden. 16/16 Trials mit SQLite-Berichten ausgeführt.
+Die 16 Optuna-Trials enthielten nur 8 UNTERSCHIEDLICHE der 16 möglichen Kombinationen. Mehrfach wiederholt wurden unter anderem P0/M0/K3 und P2/M2/K3. Die gemeldeten 7 Pareto-Trials entsprachen nur 2 verschiedenen Konfigurationen: P0/M0/K3 (0,5529; 3,2026) und P2/M2/K3 (0,5645; 3,0419). Die manuelle Vollsuche mit 16/16 Konfigurationen war hier vollständiger.
+Manuelle Pareto-Konfiguration
+RMSE Außen (mm)
+RMSE Höhe (mm)
+P0/M0/K2
+0,5629
+2,9956
+P0/M2/K3
+0,5522
+3,1767
+P2/M0/K3
+0,5606
+3,0258
+
+Interpretation: In einem schon vollständig bekannten kleinen diskreten Suchraum kann Optuna bei gleichen Bedingungen keine noch nie geprüfte bessere Kombination außerhalb des Gitters erzeugen. Der Methodenvergleich betrifft hier insbesondere Stichprobeneffizienz, wiederholte Vorschläge und Explorationsverhalten; nicht generelle Überlegenheit/Unterlegenheit von TPE.
+6. V3 Extended-Optuna – 24 abgeschlossene Trials
+Suchraum erweitert: K={2,3,5,8}, P={P0,P2}, M={M0,M2}, C logarithmisch 0,25–2, physical_var logarithmisch 0,05–1. 24/24 vollständige Vier-Fold-Trials, 6 Optuna-Pareto-Trials; bei ungeeigneter Skalierung und kleinem N keine unkritische Siegerbehauptung.
+Trial
+K / P / M
+C
+Priorvar.
+Außen-RMSE
+Höhen-RMSE
+4
+5 / P0 / M2
+0,27895
+0,56384
+0,5302
+3,3446
+12
+3 / P0 / M0
+0,25240
+0,54298
+0,5334
+3,1334
+13
+3 / P0 / M2
+0,25053
+0,47329
+0,5338
+3,0997
+17
+2 / P0 / M2
+0,32721
+0,36113
+0,5434
+2,9238
+21
+3 / P0 / M2
+0,30722
+0,64142
+0,5355
+3,0923
+22
+2 / P0 / M2
+0,36845
+0,38526
+0,5413
+2,9238
+
+Wichtige Optuna-Kandidaten für Folgeexperimente waren Trial 13 (K3, P0, M2, C=0,2505335699, physical_var=0,4732915362) und Trial 22 (K2, P0, M2, C=0,3684500650, physical_var=0,3852610875). Beide waren vor den C-/Prior-Ablationen ausgewählt. Trial 17 hat marginal niedrigeren gerundeten Höhen-RMSE; die tatsächlichen Werte aus JSON wären für feine Gleichstandsbehauptungen nötig.
+Im Vergleich zur manuellen besten Außen-RMSE 0,5522 erreichte der beste V3-Optuna-Außenwert 0,5302 (ca. −4,0 %). Der beste V3-Höhenwert 2,9238 liegt gegenüber 2,9956 bei etwa −2,4 %. Es sind adaptiv ausgewählte Entwicklungsminima, keine unabhängigen Effektschätzer.
+7. Faktorielle C-/Prior-Ablation – 12 vollständige CV4-Modelle
+Versuchsdesign: innerhalb Trial 13 und Trial 22 K/P0/M2 konstant; variiert wurden C ∈ {0, Optuna-C, 1} × physical_var ∈ {0,25, Optuna-physical_var}. Exakte Parameter nur in den zugehörigen JSON-/Studienberichten; Rundung hier auf vier Dezimalstellen.
+7.1 Trial 13 – C×Prior, RMSE in mm
+C
+physical_var
+Außen
+Höhe
+0,0000
+0,2500
+0,5581
+3,2301
+0,2505
+0,2500
+0,5528
+3,1367
+1,0000
+0,2500
+0,5522
+3,1767
+0,0000
+0,4733
+0,5388
+3,1768
+0,2505
+0,4733
+0,5338
+3,0997
+1,0000
+0,4733
+0,5312
+3,1621
+
+7.2 Trial 22 – C×Prior, RMSE in mm
+C
+physical_var
+Außen
+Höhe
+0,0000
+0,2500
+0,5648
+3,2361
+0,3685
+0,2500
+0,5672
+2,9539
+1,0000
+0,2500
+0,5673
+3,0233
+0,0000
+0,3853
+0,5509
+3,1924
+0,3685
+0,3853
+0,5413
+2,9238
+1,0000
+0,3853
+0,5402
+3,0048
+
+Interpretation [INFERENZ]: Höhere untersuchte physical_var verbesserte bei beiden Kandidaten die Außen-RMSE unter den jeweils drei festgehaltenen C-Stufen. Kleinere positive C-Werte waren für den Höhenschlag günstiger als C=1; die Außenverbesserung war bei C=1 teils geringfügig größer. C=0 bleibt durch gemeinsame Vorverarbeitung KEIN Strict-Supervised-Kontrollfall.
+Sicherheitsvorkehrung: Eine versehentliche Wiederholung in denselben nichtleeren Ausgabeordner lieferte absichtlich FileExistsError("Output directory occupied; never overwrite"). Der erste vollständige Versuch war erfolgreich; dieser Fehler bedeutet keine fehlgeschlagene Modellierung.
+8. Strict-L vs Shared C=0 vs SSL – echte Trennung des U-Nutzens
+Sicherheitstests: 7/7 bestanden. Zwei Kandidaten × vier Folds strikt überwacht neu trainiert; 12 vorherige Ablationswerte wiederverwendet, alte Berichte nicht überschrieben.
+Kandidat
+Trainingsarm
+Außen-RMSE
+Höhen-RMSE
+Trial13 / K3
+Strict
+0,6926
+3,0016
+
+Shared C=0
+0,5388
+3,1768
+
+SSL Cselected
+0,5338
+3,0997
+
+SSL C=1
+0,5312
+3,1621
+Trial22 / K2
+Strict
+0,6598
+2,9219
+
+Shared C=0
+0,5509
+3,1924
+
+SSL Cselected
+0,5413
+2,9238
+
+SSL C=1
+0,5402
+3,0048
+
+Bei beiden Modellen ergibt das Shared-Setup (U nur Scaler/KMeans, kein U-ELBO) gegenüber Strict bereits viel geringere Außenfehler; der größte Unterschied zwischen vollständigem SSL und Strict kann NICHT allein dem positiven ELBO-Gewicht C zugeschrieben werden. Beim Höhen-RMSE waren die beiden Strict-Varianten besser als ihre jeweiligen SSL-Cselected-Gegenstücke. Keine allgemeine SSL-Überlegenheit für den Höhenschlag behaupten.
+Gepaarte Differenzen ΔMSE= MSE(erster Arm)−MSE(zweiter Arm), negativ = erster Arm besser: Trial13 SSL-Optuna minus Shared C0 [−0,0054;−0,4840] mm², bessere Ringe [6;6], Leave-one-ring-out-Richtung stabil [ja;ja]. Trial22 [−0,0105;−1,6428] mm², bessere Ringe [3;5], Richtung nicht stabil [nein;nein]. Vorsicht mit einzelringgetriebenen Verbesserungen.
+9. Seed-Robustheit – drei Initialisierungen
+Drei festgelegte Seeds 20261111, 20261112, 20261113; pro Kandidat strikt überwacht und SSL Cselected auf identischen vier Entwicklungsfolds. 7/7 Sicherheits-/Mathematiktests bestanden. Für den Referenzseed mussten die vorher gespeicherten Ringvorhersagen reproduziert werden; das wurde erreicht. Die Seeds beeinflussen in diesem Code primär die HMM-K-Means-Initialisierung, nicht alle denkbaren Unsicherheitsquellen.
+9.1 Trial 13: RMSE nach Initialisierungsseed
+Seed
+Außen Strict
+Außen SSL
+Höhe Strict
+Höhe SSL
+20261111
+0,6926
+0,5338
+3,0016
+3,0997
+20261112
+0,6925
+0,5358
+3,0022
+3,0996
+20261113
+0,6926
+0,5352
+3,0016
+3,0955
+
+9.2 Trial 22: RMSE nach Initialisierungsseed
+Seed
+Außen Strict
+Außen SSL
+Höhe Strict
+Höhe SSL
+20261111
+0,6598
+0,5413
+2,9219
+2,9238
+20261112
+0,6598
+0,5413
+2,9219
+2,9238
+20261113
+0,6610
+0,5413
+2,9227
+2,9238
+
+Befund: Bei diesen drei Initialisierungen bleibt das Vorzeichen des SSL-vs-Strict-Vergleichs für Außenunrundheit stabil. K2-Höhe bleibt praktisch gleich; K3-Höhe mit SSL schlechter. Das ist ein Stabilitätsscreening, KEINE unabhängige Bestätigung oder formale Unsicherheitsquantifizierung über neue Ringe.
+10. Split-Sensitivität – Original und zwei neue Validierungspaarungen
+Vorgegeben waren die vier ursprünglichen Validierungspaare [DM04/DM05], [DM06/DM09], [DM12/DM16], [DM17/DM18] und zwei neue vollständige Aufteilungen desselben Acht-Ring-Pools. 7/7 synthetische Tests bestanden; der foldlokale Order-Patch wurde nach jedem Test zurückgesetzt. Die neuen Splits enthalten KEINE zusätzlichen Versuchsringe.
+Aufteilung
+Vier äußere Validierungspaare
+canonical
+DM04–DM05; DM06–DM09; DM12–DM16; DM17–DM18
+20261114
+DM09–DM04; DM05–DM17; DM06–DM16; DM18–DM12
+20261115
+DM05–DM16; DM04–DM06; DM17–DM12; DM09–DM18
+
+10.1 Trial 13 – drei Aufteilungen (RMSE Außen/Höhe)
+Split
+Strict
+Shared C0
+SSL Optuna-C
+canonical
+0,6926 / 3,0016
+0,5388 / 3,1768
+0,5338 / 3,0997
+20261114
+0,5700 / 3,1416
+0,5614 / 3,3991
+0,5532 / 3,3402
+20261115
+1,2461 / 4,7152
+0,4759 / 3,5378
+0,4689 / 3,5537
+
+10.2 Trial 22 – drei Aufteilungen (RMSE Außen/Höhe)
+Split
+Strict
+Shared C0
+SSL Optuna-C
+canonical
+0,6598 / 2,9219
+0,5509 / 3,1924
+0,5413 / 2,9238
+20261114
+0,5693 / 3,0322
+0,5693 / 3,3171
+0,5663 / 3,3008
+20261115
+1,1639 / 4,4561
+0,4850 / 3,4491
+0,4678 / 3,2310
+
+Interpretation: SSL-Außenfehler niedriger als Strict in 3/3 Aufteilungen beider Kandidaten; SSL-Höhenfehler niedriger als Strict nur in 1/3. Gegenüber Shared C0 verbessert SSL außen in 3/3, Höhe bei Trial13 in 2/3 und Trial22 in 3/3. Der Strict-Arm verschlechtert sich besonders im Split 20261115 stark; mögliche Entlastung durch U-Prozessinformationen ist eine plausible Hypothese, kein kausaler Beweis.
+11. U-Gewicht C – kanonische Dosis-Wirkungs-Kurven
+Diese Untersuchung ist zentral für die Bachelorarbeit: K, P0/M2 und physical_var werden pro Kandidat FIX gehalten; variiert wird nur C. Für Trial13 pv=0,4732915362, für Trial22 pv=0,3852610875. C-Werte: 0; 0,05; 0,1; 0,2; 0,35; 0,5; 0,75; 1; 2; plus der jeweilige exakte Optuna-C-Altanker. Wiederverwendung geprüfter Referenzen bei C=0 und Cselected, sonst neuer CV4-Lauf. 8/8 synthetische Tests bestanden.
+11.1 C-Profil Trial 13, canonical
+C
+Außen-RMSE mm
+Höhen-RMSE mm
+vs. C=0: beide kleiner?
+0
+0,5388
+3,1768
+nein
+.05
+0,5423
+3,2207
+nein
+.1
+0,5319
+3,1421
+ja
+.2
+0,5324
+3,0929
+ja
+.250534
+0,5338
+3,0997
+ja
+.35
+0,5357
+3,1138
+ja
+.5
+0,5359
+3,1230
+ja
+.75
+0,5335
+3,1482
+ja
+1
+0,5312
+3,1621
+ja
+2
+0,5262
+2,9483
+ja
+
+11.2 C-Profil Trial 22, canonical
+C
+Außen-RMSE mm
+Höhen-RMSE mm
+vs. C=0: beide kleiner?
+0
+0,5509
+3,1924
+nein
+.05
+0,5360
+3,0063
+ja
+.1
+0,5306
+2,9112
+ja
+.2
+0,5364
+2,9228
+ja
+.35
+0,5413
+2,9221
+ja
+.36845
+0,5413
+2,9238
+ja
+.5
+0,5408
+2,9269
+ja
+.75
+0,5408
+2,9551
+ja
+1
+0,5402
+3,0048
+ja
+2
+0,5253
+3,0706
+ja
+
+Minima nach bloßer Betrachtung der kanonischen Kurven: Trial13 Außen UND Höhe bei C=2 (0,5262/2,9483 mm); Trial22 Außen bei C=2 (0,5253 mm), Höhe bei C=0,1 (2,9112 mm). Da C=2 obere Suchgrenze war und diese Werte auf bereits mehrfach bekannten acht Entwicklungsringen liegen, nicht als allgemeines C-Optimum deklarieren. Die Kurven sind nicht monoton; der gemeinsame optimale C-Wert für beide Ziele ist modell- und datenabhängig.
+[OFFEN] Die vorab geplanten identischen C-Kurven auf zwei alternativen Splits 20261114 und 20261115 wurden bis zum Handover nicht durch Terminalausgaben bestätigt. Sie sind NICHT mit dem bereits ausgeführten Split-Sensitivitätsvergleich zu verwechseln: dort wurden nur C0 und Cselected statt aller C-Stufen gerechnet.
+12. V4: Verschachtelte Optuna-CV – mathematisches Studienprotokoll
+Motivation: Das wiederholte Optuna-Tuning auf denselben vier Validierungsfolds liefert optimistische Schätzungen für den adaptiv gewählten Modellkandidaten. Die neue Nested-CV trennt deshalb innere Hyperparameterwahl und äußere Bewertung innerhalb eines festgelegten Durchlaufs. Das ist methodisch konsistent mit Varma/Simon (2006) und Cawley/Talbot (2010); die genaue 4×3-Umsetzung ist unsere eigene Studienentscheidung.
+Element
+Gefrorene Definition
+Außen
+4 Folds à 2 ringweise Validierungsringe; verbleiben je 6 L zum äußeren Training.
+Innen
+3 Folds à 2 innere Validierungsringe aus den 6 L, je 4 L zum inneren Training.
+Separate Arme
+Strict: nur L; Shared-U Optuna: U-X für Scaler und Initialisierung; ggf. positiver U-ELBO.
+Optuna
+16 Trials pro Arm und äußerem Fold → 4 × 2 × 16 × 3 = 384 innere Modellfits.
+Äußere Fits
+Streng überwacht und SSL jeweils mit rein innerlich gewählten Parametern neu gefittet; Shared C0 mit SSL-Struktur/Prior; L-Train-Mittelwert.
+Suchraum
+P0/M2 fix; K∈{2,3}; Priorvarianz 0,2–0,8; SSL C=0 oder 0,05–2 (log); 10 Epochen, 8 lokale Schritte.
+Zieldefinition
+Je Kopf innerer RMSE relativ zum inneren Train-L-Mittelwert-RMSE; Pareto-Auswahl: minimax, dann Summe, K, C, Trialnummer.
+äußere Metrik
+Ein gepoolter ringweiser RMSE/MAE aus acht äußeren held-out Vorhersagen.
+
+WICHTIGER EVALUIERUNGSVORBEHALT: Die acht Ringe waren bereits vorher an Strukturwahl und wiederholten Analysen beteiligt. Innerhalb der V4-CV darf das äußere Paar zwar während des inneren Trainings nicht zur Auswahl dienen, ist aber nicht historisch völlig unberührt. V4 ist deshalb eine methodisch strengere EXPLORATIVE Schätzung und kein frischer externer Test.
+[LOG] 9/9 synthetische Sicherheitstests bestanden; echter Smoke 1×1×1 erfolgreich; vollständiger 4×3-Lauf bis OUTER 4 abgeschlossen. Der Nutzer lieferte anschließend die drei Originalberichte NESTED_SUMMARY.json, OUTER_PREDICTIONS.csv und INNER_SELECTED_BY_OUTER_FOLD.csv. Diese wurden zahlenmäßig widerspruchsfrei gelesen.
+13. V4-Nested-CV: gepoolte Endergebnisse [ORIGINAL]
+Verfahren
+RMSE außen
+RMSE Höhe
+MAE außen
+MAE Höhe
+Train-L-Mittelwert
+0,9775
+3,5503
+0,8851
+2,9249
+Strict Supervised
+0,6541
+3,1756
+0,5799
+2,7290
+Shared U, C=0
+0,5503
+3,2633
+0,4739
+2,7108
+Bayesian-SSL + Optuna
+0,5453
+3,2100
+0,4534
+2,6563
+
+SSL vs. Strict: Außen-RMSE −16,6 %; Höhen-RMSE +1,1 % (SSL schlechter). Außen-MAE −21,8 %; Höhen-MAE −2,7 %. Im Gesamt-RMSE gewinnt SSL bei Außen, aber Strict bei Höhe. Die Richtung eines anderen Fehlermaßes darf diese Differenz nicht verbergen.
+SSL vs. Shared C0 (gleiche K-/Priorwahl): Außen-RMSE −0,90 %, Höhen-RMSE −1,63 %, Außen-MAE −4,3 %, Höhen-MAE −2,0 %. Diese kleine zusätzliche Differenz ist besser geeignet, den U-ELBO-Beitrag zu isolieren, als der große Unterschied zwischen zwei vollständig verschieden trainierten Modellarmen. Jedoch ist Shared C0 NICHT separat mit eigenem Optuna-Budget optimiert.
+Kontrast
+Δ MSE Außen / Höhe (mm²)
+Verbesserte Ringe Außen/Höhe
+LOO-Richtung stabil?
+SSL − Strict
+-0,13044 / 0,21971
+4/8 ; 4/8
+ja / nein
+Shared C0 − Strict
+-0,12501 / 0,56478
+4/8 ; 4/8
+ja / nein
+SSL − Shared C0
+-0,00542 / -0,34507
+5/8 ; 5/8
+ja / ja
+SSL − Mittelwert
+-0,65805 / -2,30049
+6/8 ; 4/8
+ja / ja
+
+Definition ΔMSE: erste Variante minus zweite, negativ bedeutet geringerer gepoolter quadratischer Fehler. Leave-one-ring-out-Richtungsprüfung bedeutet nur, ob das Vorzeichen der aggregierten Differenz beim Weglassen eines der acht Ringe erhalten bleibt; keine formale Unsicherheitsgrenze, kein statistischer Signifikanztest.
+14. V4: per-Fold-Auswertung und exakt von Optuna gewählte Parameter
+Fold / Val-Ringe
+Außen Strict
+Außen SSL
+Höhe Strict
+Höhe SSL
+1 · DM04, DM05
+0,4874
+0,5076
+4,3635
+4,2075
+2 · DM06, DM09
+0,9165
+0,6435
+3,6957
+4,1195
+3 · DM12, DM16
+0,3703
+0,3984
+1,9469
+1,7313
+4 · DM17, DM18
+0,7047
+0,5992
+1,9619
+1,8830
+
+Foldzählung: Außen-SSL verbessert RMSE in 2 von 4 Folds (2, 4); Höhen-SSL in 3 von 4 (1, 3, 4). Fold 2 verschlechtert Höhe erheblich, obwohl Außen verbessert wird. Gepoolter RMSE aus acht Ringresiduen ist die offizielle Gesamtmetrik, NICHT der einfache Mittelwert der vier Fold-RMSEs.
+Fold
+Validierungsringe
+K Strict
+Prior Strict
+K SSL
+C SSL
+Prior SSL
+1
+DM04, DM05
+3
+0,20174
+3
+0,051496
+0,20545
+2
+DM06, DM09
+3
+0,20669
+3
+0,094271
+0,24270
+3
+DM12, DM16
+3
+0,20130
+3
+0,110629
+0,20019
+4
+DM17, DM18
+3
+0,20212
+2
+0,050900
+0,46140
+
+Streng überwacht wählt in 4/4 Folds K=3 und nahezu identische Priorvarianzen um 0,20. SSL wählt K=3 in Folds 1–3 und K=2 in Fold 4. SSL wählt positive, kleine C-Werte (0,051496; 0,094271; 0,110629; 0,050900). Diese liegen näher am unteren Rand als die später beobachteten C-Dosis-Minima der kanonischen V3-Kurven. Wegen innerem Trainingsumfang von nur vier L und historischen Datenentscheidungen kein „universell optimales C“ behaupten.
+15. V4-Einzelringvorhersagen und Unsicherheiten [ORIGINAL]
+Original-CSV enthält pro Arm und Ring vorhergesagte Außen-/Höhenwerte, Residuuen, prädiktive SD und Fold. Die nächste Tabelle benutzt ABSOLUTE Ringfehler; sie beschreibt die Verteilung der Modellverbesserung, nicht nur einen Gesamtwert.
+Ring
+Außen |err| Strict → SSL
+Höhe |err| Strict → SSL
+C0−SSL Δ|err| außen
+C0−SSL Δ|err| Höhe
+DM04
+0,688 → 0,716
+6,013 → 5,821
+0,004
+0,039
+DM05
+0,038 → 0,056
+1,386 → 1,236
+0,003
+0,015
+DM06
+1,036 → 0,910
+4,361 → 4,563
+0,003
+-0,044
+DM09
+0,779 → 0,008
+2,881 → 3,623
+0,148
+0,360
+DM12
+0,213 → 0,223
+1,490 → 0,285
+-0,003
+0,066
+DM16
+0,479 → 0,517
+2,315 → 2,432
+0,011
+-0,024
+DM17
+0,658 → 0,631
+2,685 → 2,561
+-0,000
+-0,007
+DM18
+0,749 → 0,566
+0,701 → 0,731
+-0,003
+0,033
+
+SSL verbessert die absoluten Fehler gegenüber Strict bei Außen 4/8 und Höhe 4/8 Ringen. Auffällig ist DM09: Außenfehler 0,7788 → 0,0080 mm; ca. 58,1 % der gesamten Außen-ΔMSE-Verbesserung SSL vs Strict sind durch diesen einen Ring bedingt. Der Außen-ΔMSE-Vorteil bleibt beim rechnerischen Ausschluss von DM09 erhalten. Bei SSL vs Shared C0 trägt DM09 ca. 99,2 % der positiven Höhen-MSE-Differenz; ohne DM09 ist der verbleibende Höhenvorteil nahezu null, aber dem Vorzeichen nach noch positiv.
+Bei Unsicherheiten wurde z=|Vorhersagefehler|/prädiktive SD berechnet: SSL-Außen 7/8 mit z≤1, 8/8 z≤1,96; SSL-Höhe 6/8 mit z≤1, 7/8 z≤1,96. DM04-Höhe ca. z=2,26. Normale 95%-Intervalldeutung (±1,96σ) ist hier nur heuristisch, da prädiktive Fehlerverteilung/Kalibrierung mit N=8 nicht verifiziert ist. Nicht „95 % Konfidenz gewährleistet“ formulieren.
+
+Abbildung A. Äußere absolute Vorhersagefehler je Ring, Strict / Shared C0 / SSL (Quelle: originale V4-Nested-CSV).
+
+Abbildung B. Höhenschlag-Fehler je Ring, gleiche Arme (Quelle: originale V4-Nested-CSV).
+
+Abbildung C. Ringweiser Beitrag zur ΔMSE SSL minus Shared C0; negative Werte = SSL-Vorteil.
+16. Wissenschaftliche Gesamtaussagen – genaue Reichweite
+Experimentell beobachtet
+Darf / darf nicht daraus geschlossen werden
+Entwicklungs-Nested-CV: Außen SSL < Strict
+Beleg für einen günstigeren Entwicklungs-RMSE des SSL-Workflows; kein unabhängiger Generalisierungsnachweis.
+Höhen-RMSE SSL > Strict, Höhen-MAE SSL < Strict
+Ziel-/Metrikkonflikt offen beschreiben, keine pauschale SSL-Überlegenheit.
+SSL vs Shared C0: kleine RMSE-Vorteile
+Zusätzlicher U-ELBO-Beitrag liefert unter fixierter SSL-Struktur einen messbaren explorativen Unterschied.
+DM09 dominiert Einzelringvergleiche
+Ringweise Robustheit und Sensitivitätsanalyse zwingend neben gepoolten Werten.
+Seed-Stabilität bei 3 Seeds
+Numerische Robustheit der getesteten Initialisierungen; nicht robust gegen neue Prozesschargen bewiesen.
+Mehrere Split-Pairings
+Stärkere Veränderung der Auswertung als Seed-Variationen; historische Wiederverwendung bleibt.
+C-Kurven nicht monoton
+Günstiger C-Bereich kann von K, Prior, Zielgröße und Folds abhängen.
+Bayesian prädiktive SD verfügbar
+Unsicherheit modellseitig berechenbar; Kalibrationsqualität auf 8 Ringen nicht abgesichert.
+Qualitätsvorhersage möglich
+Keine experimentell validierte Prozessoptimierung oder Intervention.
+
+17. Direkte Verwendung in Kapitel 4 – Versuchsplanung und Ergebnisse
+Empfohlene Abschnitte für das neu strukturierte Kapitel 4 der Bachelorarbeit; die konkrete Gliederung des aktuellen Hauptdokuments muss vorher geprüft werden, keine bestehende Gliederung ungefragt überschreiben:
+Datengrundlage: 16 aktive DM-Versuche; genaue acht L, vier U, vier früheres Outer; zwei Qualitätsgrößen, sechs Prozesskanäle, Ring-Split; Ausschlüsse DM03/DM13 und Leakage-Sicherung.
+Modell und Referenzen: Bayesian HMM mit zwei Qualitätsköpfen, M2, volle Emissionskovarianz, priorphysikalische Regularisierung; streng überwachte und Shared-C0-Kontrollen sowie Mittelwert.
+Manuelle Studien und Optuna: zuerst 16/16 K-Raster, dann Structural-16 vs Extended-24, Pareto-Aussagen, Wiederholung von Trials, Suchraum/TPE-Budget.
+Ablationen: C×Prior 12 CV4-Läufe, Strict/Shared/SSL-Vergleich, 3 Initialisierungen, 3 Split-Pairings, C-Dosis 10 Stufen auf Originalsplit und später weitere Splits.
+Validierung: V4 verschachtelt 4 äußere × 3 innere Folds; vollständige Trennung der jeweiligen outer folds; 16 Trials je Arm und äußerem Fold; acht äußere Vorhersagen.
+Ergebnisse: RMSE/MAE über acht Ringe, fold-/ringweise Tabellen, Pareto-Wahl, K/C/Prior pro Fold, Unsicherheit und ΔMSE-Ablation. Graphiken A–C ggf. in die Thesis-Vorlage übertragen.
+Ergebnisprüfung: ursprüngliche äußere Testauswertung wurde zeitlich vor V2–V4 durchgeführt; neuer externer Test ist nicht verfügbar, keine erneute Testwahl.
+Für Kapitel 4 gut geeignete Grafiken: C-RMSE-Kurven je K und Split (nach Abschluss weiterer Splits), paritätische Ist-vs.-Vorhersage-Diagramme beider Zielgrößen, Fehlerbalken je Ring, ΔMSE gegen Shared C0 und Unsicherheitsdiagnostik. In der Master-Übergabe sind nur die bereits berechneten Grafiken als validierter Stand wiedergegeben; weitere Diagramme wären neu zu erstellen.
+18. Direkte Verwendung in Kapitel 5 – Diskussion und Forschungsbeitrag
+Forschungsfrage A: U-Prozessinformationen verbessern in dieser Entwicklung vor allem die Außenunrundheit, aber Effekte sind gemischt nach Ring und Fehlerkennzahl.
+Forschungsfrage B: Der größte Vorteil des gesamten Shared/SSL-Workflows gegenüber Strict entsteht bereits in gemeinsamer Skalierung und Initialisierung; der isolierte zusätzliche U-ELBO-Beitrag ist kleiner. Strikte Interpretation je Ablationsstufe.
+Gewicht C: positive U-Gewichtung nicht automatisch besser bei jedem C, K oder Ziel; in V4 werden kleine positive Gewichte gewählt, in der kanonischen V3-C-Kurve teilweise C=2. Unterschied zwischen Optimierungs-/Validierungsprotokollen diskutieren.
+Datenmenge und Overfitting: 8 gelabelte Entwicklungsringe, je innerem Fold nur 4 L zum Training, mehrfach exploriert; keine formale Signifikanz oder generalisierbare Überlegenheit behaupten.
+Unsicherheits- und Bayesian-Aspekt: posterioren-/prädiktiven Unsicherheiten als Mehrwert gegenüber deterministischen Prognosen zeigen, deren Güte erst mit größeren Teststichproben prüfen.
+Prozessnutzen als Ausblick: verlässliche Endqualitätsprognosen können potenziell frühe Qualitätskontrolle, Parameterdiagnose und spätere Prozessunterstützung ermöglichen; bisher wurde kein Walzparameter aktiv optimiert oder eine Regelgüte gemessen.
+Negative und inkonsistente Resultate gehören in die Diskussion: Höhenschlag-RMSE gegenüber Strict nicht verbessert, starker DM09-Einfluss, unterschiedliche Split-Ergebnisse, Optuna-Wiederholungen, Suchraumgrenzen.
+19. Forschungsintegrität, Leakage und historische Testnutzung
+Risiko
+Verbindliche Sicherung
+Zeitreihenleakage
+Schnitt auf Ringebene; nie zufällige Messzeitpunkte desselben Rings train/val verteilen.
+U-Qualitätsleakage
+Nur U-Prozesskanäle in Fit, U-Y im Entwicklungsloader auf NaN bzw. maskiert.
+Val-Skalierung
+Ziel-/physikalische Kopfscaler immer foldlokal ausschließlich aus Trainings-L.
+Alte Testlabels
+DM07/08/11/15 im V1 bereits gesehen; aus V3/V4 Entwicklungsansicht ausgeschlossen.
+Äußere Nested-Validierung
+Pro Fold aus innerer Optuna-Parameterwahl ausgeschlossen; erst danach fitten/scoren.
+Overfitting durch experimentellen Umfang
+V3/V4 und Ringdiagnostik als explorativ, keine nachträgliche Test-Unabhängigkeit behaupten.
+Keine Kausaleffekte
+U-C0 und SSL sowie Strict unterscheiden mehrere mögliche Mechanismen; saubere kontrollierte Kontraste führen.
+Protokoll-/Dateischutz
+Hashprüfungen, unveränderliche Berichte, volle SQLite-Studie, neue Ergebnisordner.
+Statistische Unsicherheit
+N=8 zu klein für kalibrierte Intervalle, robuste Testsignifikanz oder starke Produktionsaussagen.
+
+20. Verbindlicher offener Punkt: Zwei C-Dosis-Pairings
+Die kanonischen C-Kurven sind vollständig. Als NÄCHSTES müssen die exakt gleichen C-Stufen für Pairings 20261114 und 20261115 ausgeführt werden, so dass sich die C-Abhängigkeit auf drei vordefinierten vollständigen Aufteilungen betrachten lässt. Die beiden Resultatverzeichnisse sind NICHT durch diesen Handover als bereits existierend bestätigt. Die Nested-CV hat vorzeitig stattgefunden und ist ebenfalls abgeschlossen; das ändert die noch offene C-Studienaufgabe nicht.
+PowerShell: Befehle aus dem Projektwurzelverzeichnis „Implementierung_BA“, mit der bereits installierten virtuellen Umgebung und unveränderten Eingangsordnern ausführen:
+.\.venv\Scripts\python.exe scan_u_weight_dose_v3.py `
+  --study results\optuna_v3\EXTENDED_TPE_CV4_01 `
+  --ablation results\optuna_v3\FACTORIAL_C_PRIOR_TRIAL13_22_V1 `
+  --strict results\optuna_v3\STRICT_VS_SHARED_C0_VS_SSL_V1 `
+  --seed-results results\optuna_v3\SEED_ROBUSTNESS_CV4_V1 `
+  --split-results results\optuna_v3\SPLIT_SENSITIVITY_V1 `
+  --pairing 20261114 `
+  --out results\optuna_v3\C_DOSE_SPLIT_20261114_V1
+.\.venv\Scripts\python.exe scan_u_weight_dose_v3.py `
+  --study results\optuna_v3\EXTENDED_TPE_CV4_01 `
+  --ablation results\optuna_v3\FACTORIAL_C_PRIOR_TRIAL13_22_V1 `
+  --strict results\optuna_v3\STRICT_VS_SHARED_C0_VS_SSL_V1 `
+  --seed-results results\optuna_v3\SEED_ROBUSTNESS_CV4_V1 `
+  --split-results results\optuna_v3\SPLIT_SENSITIVITY_V1 `
+  --pairing 20261115 `
+  --out results\optuna_v3\C_DOSE_SPLIT_20261115_V1
+Wenn beide Läufe erfolgreich abgeschlossen wurden, alle drei Kurven summarisch auswerten:
+.\.venv\Scripts\python.exe summarize_u_weight_dose_v3.py `
+  --canonical results\optuna_v3\C_DOSE_CANONICAL_V1 `
+  --split-a results\optuna_v3\C_DOSE_SPLIT_20261114_V1 `
+  --split-b results\optuna_v3\C_DOSE_SPLIT_20261115_V1 `
+  --out results\optuna_v3\C_DOSE_ALL_SPLITS_SUMMARY_V1.json
+Fehlerfall: Ein erneuter Start in einem bereits nichtleeren Ausgabeordner kann absichtlich FileExistsError liefern. Weder löschen noch überschreiben; vorhandene Ergebnisse prüfen und neuen Namen nur bei bewusst neuem Versuch verwenden. Laufprotokolle und JSONs anschließend zum Vergleich hochladen.
+21. Was nach der C-Dosis-Studie wissenschaftlich sinnvoll wäre [OFFEN]
+Auswertung aller drei vordefinierten C-Kurven je Kopf, Kandidat und Ring; mögliche Robustheit von positiven C-Bereichen sowie Grenzen an C=0 und C=2. Keine nachträgliche Neudefinition des „besten“ C allein aus alten Labels als unabhängiger Erfolg.
+Vergleich der U-ELBO-Dosis-Effekte mit den nur-Shared-C0-Effekten und den neu erhaltenen Nested-CV-Optuna-C-Werten. Unterschiede von Modellgröße, Prior, innerer Labelzahl und Folds als mögliche Erklärungen kennzeichnen.
+Prüfen, ob gezielte Priorvarianten pro Zielgröße mathematisch sinnvoll sind; jedes neue experimentelle Design vorab registrieren, um die schon sehr hohe Anpassung an die acht L-Ringe nicht weiter ungeprüft zu vergrößern.
+Bei Verfügbarkeit neuer unabhängiger DM-Ringe: unveränderte final festgelegte Konfigurationen einmalig vorhersagen und transparent berichten. Nur dann unabhängige neue Prognoseaussagen begründbar.
+Für praktische Prozessoptimierung: Entscheider-/Interventionsgröße und Erfolgskriterium definieren, Kausalität, Stellgrößen und zeitliche Verfügbarkeit der Prognose prüfen; keine erreichte Prozessverbesserung ohne reale Evaluation behaupten.
+22. Code-/Ergebnisinventar: exakte Dateien und Pfade
+Artefakt
+Windows-Datei / Status
+Optuna V3
+optuna_ssr_development.py; test_optuna_ssr_development.py; summarize_optuna_development.py [CODE/README].
+V3 Steuerung
+ablate_optuna_v3.py; test_ablate_optuna_v3.py [CODE/README].
+Strict-Kontrolle
+compare_strict_supervised_v3.py; test_compare_strict_supervised_v3.py [CODE/README].
+Seed-Tests
+compare_seed_robustness_v3.py; test_seed_robustness_v3.py [CODE/README].
+Split-Tests
+compare_split_robustness_v3.py; test_split_robustness_v3.py [CODE/README].
+C-Dosis
+scan_u_weight_dose_v3.py; summarize_u_weight_dose_v3.py; test_u_weight_dose_v3.py [CODE/README].
+Nested-CV V4
+nested_optuna_cv_v4.py; test_nested_optuna_cv_v4.py [CODE/README].
+V3 Structural
+results/optuna_v3/STRUCTURAL_TPE_CV4_01 [LOG: 16 Trials].
+V3 Extended
+results/optuna_v3/EXTENDED_TPE_CV4_01 [LOG: 24 Trials].
+C-Prior-Ablation
+results/optuna_v3/FACTORIAL_C_PRIOR_TRIAL13_22_V1 [LOG: 12 Varianten].
+Strict vs SSL
+results/optuna_v3/STRICT_VS_SHARED_C0_VS_SSL_V1 [LOG].
+Seed-Robustheit
+results/optuna_v3/SEED_ROBUSTNESS_CV4_V1 [LOG].
+Split-Sensitivität
+results/optuna_v3/SPLIT_SENSITIVITY_V1 [LOG].
+C-Dosis canonical
+results/optuna_v3/C_DOSE_CANONICAL_V1 [LOG: zwei Kurven].
+V4 Nested komplett
+results/optuna_v4/NESTED_4OUT_3IN_16TRIALS_V1 [LOG + ORIGINAL: 4 äußere Folds].
+V4 Endbericht
+NESTED_SUMMARY.json; OUTER_PREDICTIONS.csv; INNER_SELECTED_BY_OUTER_FOLD.csv [ORIGINAL im Chat].
+V4 Ringauswertung
+FORSCHUNGSNOTIZ_NESTED_OPTUNA_EINZELRINGE_UNSICHERHEIT_KAPITEL4_5_2026-11-12.docx; CSV + 3 PNG.
+V3/4 Archivstand
+Vorherige ZIP-Versionen, README-Dateien und Master-Handover V2 unverändert aufbewahren.
+
+Die Dateien liegen im Windows-Ordner C:\Users\umutj\OneDrive\Dokumente\PA und BA\Implementierung_BA. Die V4 Original-CSV/JSON wurden dieser Unterhaltung als Dateien beigefügt und liegen hier zusätzlich unter /mnt/data/ vor. Kopierpfade sind Bezugspunkte für die Reproduktion, nicht die Behauptung, dass Cloud-/OneDrive-Inhalte jederzeit vom Assistenten direkt erreichbar sind.
+23. Wissenschaftliche Quellenbasis und Prüfstatus
+Quelle
+Bedeutung / Originalstatus
+Shao et al. (2022), Journal of Process Control 111, 59–74
+Semisupervised Bayesian-HMM-Soft-Sensor. Original-PDF lokal vorhanden; in früherer V2-Quellenbasis geführt, hier keine erneute Seitenextraktion.
+Shao, Ge & Song (2021), IEEE Transactions on Cybernetics
+Semisupervised Bayesian Gaussian Mixture Modeling, Original-PDF lokal vorhanden; nicht gleichzusetzen mit unserer konkreten HMM-Qualitätskopplung.
+Mowbray et al. (2022), DOI 10.1016/j.chemolab.2022.104616
+Probabilistische Soft-Sensor-Qualitätsvorhersage, Original-PDF lokal vorhanden; keine geprüften Einzelseiten neu eingefügt.
+Bergstra et al. (2011), Algorithms for Hyper-Parameter Optimization
+Grundlage für TPE/sequentielle HPO; bibliografischer Anker in V3-README; nicht als Nachweis von Ringwalz-Resultaten ausgeben.
+Varma & Simon (2006), BMC Bioinformatics 7:91
+CV-Selektionsbias und Trennung inner/äußerer Evaluation; bibliografischer Link in V4-README.
+Cawley & Talbot (2010), JMLR 11, 2079–2107
+Overfitting bei Modellwahl und Auswahlbias; methodische Basis der Nested-CV-Diskussion.
+Optuna 5.0.0, offizielle API
+Auf Nutzer-PC verfügbar und tatsächlich ausgeführt; TPE-Sampler, Multi-Objective und SQLite-Persistenz.
+Pohle et al. (2017), JABES 22, 270–293
+Vorsicht bei HMM-Zustandszahlschätzung; bibliografisch früher erfasst, keine neuen Detailseitenprüfungen.
+
+Quellenstatus-Schlüssel: „Original lokal vorhanden“ heißt, dass die Originaldatei für die Fortsetzung im bekannten Arbeitsbestand liegt; NICHT, dass jede konkrete Zahl oder Seitenzahl erneut am 12.11. gegen das Papier geprüft wurde. Die verwendeten K-/C-/Prior-Suchräume, genau 4×3 Folds, 16/24-Trial-Budgets und das spezifische Ring-VI-Kopplungsmodell sind EIGENE methodische Setzungen und dürfen nicht als unmittelbare Originalpaper-Formel ausgegeben werden. Für die abgabereife Bachelorarbeit Originalseiten vor jeder exakten Literaturbehauptung nochmals prüfen.
+Externe Einstiegsadressen (als Anker, keine heute neu recherchierten Webseiten): Varma & Simon https://doi.org/10.1186/1471-2105-7-91 ; Cawley & Talbot https://www.jmlr.org/papers/v11/cawley10a.html ; Optuna TPE https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html ; TPE Bergstra 2011 https://papers.nips.cc/paper_files/paper/2011/file/86e8f7ab32cfd12577bc2619bc635690-Paper.pdf
+ANHANG A – Alle 24 V3-Extended-Optuna-Trials
+Quelle: vollständiges vom Nutzer übermitteltes Terminalprotokoll „Eingefügter Text(3).txt“. Reihenfolge = tatsächliche Trial-Nummer; CV4-RMSE in mm; C und physical_var hier gerundet, JSON hat höhere Präzision.
+Trial
+K
+Prep
+M
+C
+phys.var
+RMSE außen
+RMSE Höhe
+0
+8
+P2
+M0
+1,2131
+0,2180
+0,6032
+3,5220
+1
+2
+P2
+M2
+1,2895
+0,1350
+0,6634
+3,2376
+2
+8
+P0
+M0
+0,3256
+0,0867
+0,7163
+3,5111
+3
+3
+P0
+M0
+0,7744
+0,1353
+0,6120
+3,2195
+4
+5
+P0
+M2
+0,2790
+0,5638
+0,5302
+3,3446
+5
+5
+P0
+M2
+1,3196
+0,5222
+0,5346
+3,3219
+6
+3
+P0
+M0
+0,4061
+0,1378
+0,6078
+3,2139
+7
+2
+P2
+M0
+1,9070
+0,0729
+0,7867
+3,2472
+8
+5
+P0
+M2
+0,5596
+0,9641
+0,5395
+3,2879
+9
+5
+P0
+M2
+0,5547
+0,8774
+0,5370
+3,2984
+10
+5
+P2
+M2
+0,6790
+0,3136
+0,5557
+3,3349
+11
+3
+P0
+M0
+0,4436
+0,9499
+0,5435
+3,1315
+12
+3
+P0
+M0
+0,2524
+0,5430
+0,5334
+3,1334
+13
+3
+P0
+M2
+0,2505
+0,4733
+0,5338
+3,0997
+14
+3
+P0
+M2
+0,2780
+0,4147
+0,5354
+3,1069
+15
+5
+P0
+M2
+0,3497
+0,2888
+0,5479
+3,3714
+16
+8
+P0
+M2
+0,2508
+0,6147
+0,5470
+3,4479
+17
+2
+P0
+M2
+0,3272
+0,3611
+0,5434
+2,9238
+18
+2
+P2
+M2
+0,4126
+0,2495
+0,5749
+3,0977
+19
+2
+P0
+M2
+0,3500
+0,3727
+0,5423
+2,9244
+20
+2
+P0
+M2
+0,4958
+0,1884
+0,5981
+2,9769
+21
+3
+P0
+M2
+0,3072
+0,6414
+0,5355
+3,0923
+22
+2
+P0
+M2
+0,3685
+0,3853
+0,5413
+2,9238
+23
+5
+P0
+M2
+0,3876
+0,4583
+0,5328
+3,3823
+
+ANHANG B – Alle acht äußeren V4-Ringvorhersagen je Trainingsarm
+Aus OUTER_PREDICTIONS.csv und NESTED_SUMMARY.json; je Zelle Vorhersage in mm und vorzeichenbehaftetes Residuum in mm. Konvention Residuum = Vorhersage minus Istwert. Tabellen dienen der Rückverfolgbarkeit, nicht einer weiteren Hyperparameterwahl.
+B. Strict Supervised
+Ring
+Fold
+ŷ Außen
+e Außen
+ŷ Höhe
+e Höhe
+DM04
+1
+1,8153
+0,6882
+13,1326
+6,0132
+DM05
+1
+2,3037
+-0,0382
+14,3701
+-1,3861
+DM06
+2
+1,8231
+-1,0362
+12,4470
+-4,3607
+DM09
+2
+0,4053
+-0,7788
+13,5705
+-2,8811
+DM12
+3
+2,5471
+0,2127
+9,7089
+-1,4898
+DM16
+3
+2,9669
+-0,4786
+12,9718
+-2,3155
+DM17
+4
+2,2652
+0,6579
+14,2555
+2,6846
+DM18
+4
+1,7783
+0,7486
+12,9818
+-0,7011
+
+B. Shared U, C=0
+Ring
+Fold
+ŷ Außen
+e Außen
+ŷ Höhe
+e Höhe
+DM04
+1
+1,8467
+0,7196
+12,9788
+5,8594
+DM05
+1
+2,2826
+-0,0594
+14,5053
+-1,2509
+DM06
+2
+1,9460
+-0,9132
+12,2895
+-4,5181
+DM09
+2
+1,0284
+-0,1557
+12,4690
+-3,9827
+DM12
+3
+2,5549
+0,2205
+11,5495
+0,3508
+DM16
+3
+2,9166
+-0,5289
+12,8799
+-2,4073
+DM17
+4
+2,2377
+0,6305
+14,1242
+2,5532
+DM18
+4
+1,5929
+0,5632
+12,9187
+-0,7641
+
+B. Bayesian-SSL + Optuna
+Ring
+Fold
+ŷ Außen
+e Außen
+ŷ Höhe
+e Höhe
+DM04
+1
+1,8428
+0,7157
+12,9399
+5,8206
+DM05
+1
+2,2856
+-0,0564
+14,5201
+-1,2361
+DM06
+2
+1,9491
+-0,9101
+12,2450
+-4,5626
+DM09
+2
+1,1921
+0,0080
+12,8290
+-3,6227
+DM12
+3
+2,5576
+0,2232
+11,4836
+0,2849
+DM16
+3
+2,9281
+-0,5174
+12,8555
+-2,4317
+DM17
+4
+2,2378
+0,6306
+14,1315
+2,5605
+DM18
+4
+1,5957
+0,5660
+12,9515
+-0,7314
+
+B. Train-L-Mittelwert
+Ring
+Fold
+ŷ Außen
+e Außen
+ŷ Höhe
+e Höhe
+DM04
+1
+2,0767
+0,9495
+14,1665
+7,0472
+DM05
+1
+2,0767
+-0,2652
+14,1665
+-1,5897
+DM06
+2
+1,9810
+-0,8782
+12,4359
+-4,3717
+DM09
+2
+1,9810
+0,7969
+12,4359
+-4,0158
+DM12
+3
+1,6915
+-0,6428
+13,5648
+2,3661
+DM16
+3
+1,6915
+-1,7540
+13,5648
+-1,7225
+DM17
+4
+2,2154
+0,6081
+13,7701
+2,1992
+DM18
+4
+2,2154
+1,1857
+13,7701
+0,0873
+
+ANHANG C – Detailübersicht der einzelnen V4-Nested-Werte
+Train-L-Mittelwert: RMSE außen 0,977472 mm, Höhe 3,550303 mm; MAE außen 0,885067 mm, Höhe 2,924917 mm; N=8 Ringe.
+Strict Supervised: RMSE außen 0,654093 mm, Höhe 3,175601 mm; MAE außen 0,579899 mm, Höhe 2,729000 mm; N=8 Ringe.
+Shared U, C=0: RMSE außen 0,550296 mm, Höhe 3,263316 mm; MAE außen 0,473870 mm, Höhe 2,710825 mm; N=8 Ringe.
+Bayesian-SSL + Optuna: RMSE außen 0,545346 mm, Höhe 3,210009 mm; MAE außen 0,453418 mm, Höhe 2,656303 mm; N=8 Ringe.
+Die originalen numerischen Werte und die exakten Qualitäts-Labels verbleiben in den gelieferten drei V4-Berichtsdateien. Die auf ältere Optuna-V3-Stichproben bezogenen Daten sind nur in Nutzerausgaben/README und deren jeweiligen Ergebnisordnern vorhanden; in dieser Fortsetzungsdatei sind sie tabellarisch übernommen, nicht stillschweigend durch neue Schätzungen ersetzt.
+ANHANG D – Sicherheitstests und dokumentierte Prüfungen
+Komponente
+Bestandene Tests laut Nutzer
+Optuna V3
+7/7 synthetisch; Structural-Smoke und Structural 16/16; Extended 24/24.
+C×Prior-V3
+7/7 synthetisch; 12/12 kontrollierte CV4-Konfigurationen.
+Strict-vs-SSL-V3
+7/7 synthetisch; beide K-Kandidaten × 4 Folds streng überwacht.
+Seed-V3
+7/7 synthetisch; drei Seeds, K2/K3, Strict/SSL, referenzidentischer Seed reproduziert.
+Split-V3
+7/7 synthetisch; zwei alternative Pairings vollständig verglichen.
+C-Dose-V3
+8/8 synthetisch; canonical 20/20 C-Konfigurationen/Kandidaten gezählt, teils geprüfte Reuse.
+Nested-V4
+9/9 synthetisch; Smoke; komplette 4×3-CV mit 16 Trials pro Arm und Outer-Fold.
+V4-Einzelringe
+Drei Originalquellen vollständig eingelesen, 32 Vorhersagezeilen, 8 innerlich gewählte Parameterkombinationen; RMSE/MAE abgeglichen.
+Offene C-Splits
+Pairings 20261114/20261115: KEINE eingereichten Voll-Dosis-Berichte; nicht als erledigt markieren.
+
+ABSCHLIESSENDE ÜBERGABEANWEISUNG – Text für neuen Chat
+Ich führe den Forschungsstand aus der Word-Datei MASTER_HANDOVER_BAYESIAN_BACHELOR_V3_V4_FORTSETZUNG_2026-11-12.docx fort. Sie ergänzt das vorherige Handover V2 vom 11.11.2026. Bitte lies zuerst Sofortübernahme und Abschnitte 1–3, 11–16, 19–23. Die V3-Optuna-Studien, C/Prior-Ablation, Strict-vs-SSL, Seeds, Split-Sensitivität, kanonische C-Dosis und V4 Nested-Optuna-CV sind abgeschlossen. Der alte V1-Test DM07/08/11/15 ist tabu. Unmittelbar offen sind die zwei vollständigen C-Dosis-Splits 20261114 und 20261115; anschließend die drei C-Kurven vergleichend für Kapitel 4/5 auswerten. Bitte immer explizit zwischen Strict-L-only, Shared C0 und SSL C>0 unterscheiden, negative Ergebnisse dokumentieren, Label-Leakage verhindern und Prognosegenauigkeit nicht mit bewiesener Prozessoptimierung gleichsetzen. Keine zusätzlichen Versuche ohne klaren Erkenntnisgewinn. Bei Quellen immer Originalstatus und tatsächlich geprüfte Seiten transparent markieren.
+Provenienz dieser Übergabe
+MASTER_HANDOVER_BAYESIAN_BACHELOR_V2_FORTSETZUNG_2026-11-11.docx  |  SHA256 62cd0b7258ad3c0bb11ec4ee9cbb89301aadcd13d7b3a6eb278498c69998d2fc  |  56325 Bytes
+Eingefügter Text(3).txt  |  SHA256 8b6e071bb69503359ec25d585eda2855ff01a09f385cf6a0648e7a7e839c9cca  |  11031 Bytes
+Eingefügter Text(4).txt  |  SHA256 7473e90d0e4fbf029035c2172e65c4e8b1ebcff6c48242995d4927bf9834119f  |  40253 Bytes
+NESTED_SUMMARY.json  |  SHA256 39f4af35aded57048cfbc6afb287e401e79af3bf98ff7bcd9b5775a173af77c0  |  17680 Bytes
+OUTER_PREDICTIONS.csv  |  SHA256 6831deff4ab1c16a3f2306f2c9fc291e20f8eef6bfa58c891b3341aeef00c8d9  |  4351 Bytes
+INNER_SELECTED_BY_OUTER_FOLD.csv  |  SHA256 51e5321f69a59cfc984cd16e86f7fe87c937b103a3fd369827e09ac708f1c7f1  |  882 Bytes
+RINGWEISE_FEHLERDIAGNOSTIK_NESTED_V4.csv  |  SHA256 6c0b20e878f069fe552a6c249e46f7f9b5a65673a08e4eed3d5701f6474ff887  |  3305 Bytes
+Ende der Fortsetzung. Historische Zahlendateien, manuelle-Raster-Anhänge und vorangegangene Master-Handover bleiben weiterhin eigenständige Originale.

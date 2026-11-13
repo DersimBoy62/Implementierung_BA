@@ -1,0 +1,5572 @@
+{
+  "status": "LOCAL_EXPLORATORY_REPLAY_NOT_WINDOWS_VERIFIED",
+  "reference_max_abs_ELBO_diff": 9.946234058588743e-08,
+  "selected_epoch_ring_diagnostics": [
+    {
+      "epoch": 1,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.00019533271864709576,
+            0.9998046672772416
+          ],
+          "dominant_state_mass": 0.9998046672772416,
+          "posterior_expected_switches": 0.0395798510743212,
+          "posterior_expected_switch_rate": 0.00026925068758041634,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 0.0016127988808337496,
+          "mean_max_gamma": 0.9998046672772414,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              5.328196070643372e-06,
+              0.9999946717983477
+            ],
+            [
+              6.805027518997725e-05,
+              0.9999319497197698
+            ],
+            [
+              0.0005164973279985534,
+              0.9994835026703189
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.0005111691299783212,
+          "max_xi_marginal_inconsistency": 3.5937919307116317e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.0004354360653747861,
+            0.9995645639363965
+          ],
+          "dominant_state_mass": 0.9995645639363965,
+          "posterior_expected_switches": 0.16278656230250615,
+          "posterior_expected_switch_rate": 0.0003894415366088664,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 0.0028620694929298238,
+          "mean_max_gamma": 0.9995645639363968,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.0012947339216001514,
+              0.9987052660866687
+            ],
+            [
+              8.322457812631432e-06,
+              0.9999916775480528
+            ],
+            [
+              1.4257751255900757e-07,
+              0.9999998574135919
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.0012945913355054072,
+          "max_xi_marginal_inconsistency": 1.4591661212648432e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9999791850108963,
+            2.081498910046293e-05
+          ],
+          "dominant_state_mass": 0.9999791850108963,
+          "posterior_expected_switches": 0.02809629868461037,
+          "posterior_expected_switch_rate": 3.3932727879964214e-05,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 0.00020847142069249235,
+          "mean_max_gamma": 0.9999791850108966,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999948223202473,
+              5.177679755581077e-06
+            ],
+            [
+              0.9999865331134844,
+              1.346688651551649e-05
+            ],
+            [
+              0.9999561429420404,
+              4.3857057948207475e-05
+            ]
+          ],
+          "early_late_state_distribution_TV": 3.8679378199761276e-05,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9150586736106792,
+            0.08494132638932256
+          ],
+          "dominant_state_mass": 0.9150586736106792,
+          "posterior_expected_switches": 1.1971071968315925,
+          "posterior_expected_switch_rate": 0.0017274274124554005,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.001443001443001443,
+          "mean_marginal_state_entropy_nats": 0.011740458943333615,
+          "mean_max_gamma": 0.9951506736896951,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.008645533141210375,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999912087019828,
+              8.791298025576822e-06
+            ],
+            [
+              0.9999728159420955,
+              2.7184057905771655e-05
+            ],
+            [
+              0.7448443228758802,
+              0.25515567712411985
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.25514688582609846,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9675786803548543,
+            0.03242131964514826
+          ],
+          "dominant_state_mass": 0.9675786803548543,
+          "posterior_expected_switches": 1.1924373502964374,
+          "posterior_expected_switch_rate": 0.0011000344559930235,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0009225092250922509,
+          "mean_marginal_state_entropy_nats": 0.004943624120927983,
+          "mean_max_gamma": 0.9981322071203969,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003686635944700461,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999790257039307,
+              2.0974296069240907e-05
+            ],
+            [
+              0.9999481002689329,
+              5.189973107089844e-05
+            ],
+            [
+              0.9026294974593913,
+              0.09737050254061258
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.0973495282445414,
+          "max_xi_marginal_inconsistency": 1.3322676295501878e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            2.4993821298711643e-05,
+            0.9999750061786999
+          ],
+          "dominant_state_mass": 0.9999750061786999,
+          "posterior_expected_switches": 0.005555225364725537,
+          "posterior_expected_switch_rate": 3.6072891978737253e-05,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 0.00023610963278929232,
+          "mean_max_gamma": 0.9999750061787004,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              3.911382105830858e-06,
+              0.9999960886178936
+            ],
+            [
+              4.066560290470074e-06,
+              0.999995933439709
+            ],
+            [
+              6.782724111162071e-05,
+              0.9999321727588869
+            ]
+          ],
+          "early_late_state_distribution_TV": 6.391585900622946e-05,
+          "max_xi_marginal_inconsistency": 1.1102230246251565e-16
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.943219100327947,
+            0.05678089969046055
+          ],
+          "dominant_state_mass": 0.943219100327947,
+          "posterior_expected_switches": 1.030320829218002,
+          "posterior_expected_switch_rate": 0.002711370603205268,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.002631578947368421,
+          "mean_marginal_state_entropy_nats": 0.00644254304355636,
+          "mean_max_gamma": 0.9973069457419359,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.005249343832020997,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999962465251908,
+              3.75349728042462e-06
+            ],
+            [
+              0.9999991024761211,
+              8.975469880327914e-07
+            ],
+            [
+              0.8296619519825286,
+              0.17033804802711316
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.1703342945362475,
+          "max_xi_marginal_inconsistency": 7.898126597183364e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7710018207935164,
+            0.22899817920648638
+          ],
+          "dominant_state_mass": 0.7710018207935164,
+          "posterior_expected_switches": 1.8740065929771252,
+          "posterior_expected_switch_rate": 0.0014504694992083012,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0007739938080495357,
+          "mean_marginal_state_entropy_nats": 0.010977764904352958,
+          "mean_max_gamma": 0.996361461666608,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0069605568445475635,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999970181202187,
+              2.981879781580751e-05
+            ],
+            [
+              0.9988593626530039,
+              0.0011406373469975656
+            ],
+            [
+              0.3141759185253587,
+              0.6858240814746459
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.6857942626768292,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.00016350454980809494,
+            0.9998364954658404
+          ],
+          "dominant_state_mass": 0.9998364954658404,
+          "posterior_expected_switches": 0.07487532935006175,
+          "posterior_expected_switch_rate": 0.00017701023487012233,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 0.0007431030781551505,
+          "mean_max_gamma": 0.9998364954658395,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.00046082943294900553,
+              0.9995391705904142
+            ],
+            [
+              2.0958224994881262e-05,
+              0.9999790417974102
+            ],
+            [
+              6.617304365923356e-06,
+              0.9999933826967552
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.00045421211746204157,
+          "max_xi_marginal_inconsistency": 1.2331247134511614e-12
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6951037218550015,
+            0.304896278144996
+          ],
+          "dominant_state_mass": 0.6951037218550015,
+          "posterior_expected_switches": 1.3406653002679128,
+          "posterior_expected_switch_rate": 0.0012768240954932502,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0009523809523809524,
+          "mean_marginal_state_entropy_nats": 0.011309081396018696,
+          "mean_max_gamma": 0.9953967076564952,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.008563273073263558,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999883862070021,
+              1.1613793001530299e-05
+            ],
+            [
+              0.9999104533099143,
+              8.954669008312496e-05
+            ],
+            [
+              0.08454122700708196,
+              0.915458772992909
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9154471591999138,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9685573970470757,
+            0.03144260295292155
+          ],
+          "dominant_state_mass": 0.9685573970470757,
+          "posterior_expected_switches": 1.0473060416271482,
+          "posterior_expected_switch_rate": 0.0015820332955092874,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0015105740181268882,
+          "mean_marginal_state_entropy_nats": 0.004367559921396818,
+          "mean_max_gamma": 0.9981649811609753,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0030165912518853697,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999996763690909,
+              3.2363090931727343e-06
+            ],
+            [
+              0.9999843695194228,
+              1.5630480574914e-05
+            ],
+            [
+              0.9056910579308949,
+              0.09430894206909654
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.09430570576000871,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9988334529687419,
+            0.001166547031261354
+          ],
+          "dominant_state_mass": 0.9988334529687419,
+          "posterior_expected_switches": 0.16243008300402967,
+          "posterior_expected_switch_rate": 0.0005469026363772042,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 0.003839297861788268,
+          "mean_max_gamma": 0.9988334529687416,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999959955812403,
+              4.004418765180464e-06
+            ],
+            [
+              0.9999960645355684,
+              3.9354644361321e-06
+            ],
+            [
+              0.9964965559347443,
+              0.0035034440652544274
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.0034994396464926316,
+          "max_xi_marginal_inconsistency": 1.6653345369377348e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976000908422132,
+            0.9836147628567874,
+            0.9996433463111243,
+            0.9970308491176826,
+            0.9896675809124257,
+            0.9746114357039449
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933492150150541
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.997131929517565,
+            0.9985649143107204,
+            0.9999959674992105,
+            0.999990709689961,
+            0.9979287741140459,
+            0.9735100942971285
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982468442123831
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9958047310399227,
+            0.9957431202045355,
+            0.9990419568240156,
+            0.9999550208278025,
+            0.9999950043349433,
+            0.9245644819467945
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9974233439319692
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9980369338255117,
+            0.9955003745084261,
+            0.9992694882747172,
+            0.9998338169867584,
+            0.999460558131653,
+            0.9705476810177837
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9986532110501145
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.997927234768955,
+            0.9963710918562031,
+            0.9993548589826763,
+            0.9996953303545476,
+            0.9997365587015064,
+            0.9605121362569746
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.9986410468758156
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9985925009280447,
+            0.9982912014438956,
+            0.9992713853342228,
+            0.9897883046225439,
+            0.9999149892232455,
+            0.9738475014734641
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.9984418511859702
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9963446173494545,
+            0.9958265842681462,
+            0.9941330787586286,
+            0.9990238517459885,
+            0.9933321600230061,
+            0.9918910292359312
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.9949798315133873
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.997259662861906,
+            0.9992677345905433,
+            0.9997952799462966,
+            0.9998576525278269,
+            0.9999045670700475,
+            0.9912606646019722
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9995315072684199
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9961533554177127,
+            0.9958726229693109,
+            0.9998229557632103,
+            0.9983893087686072,
+            0.9999493294627798,
+            0.9549557723353203
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972713320931599
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9988982694765269,
+            0.9981462723317179,
+            0.9998329316203758,
+            0.9998374090790029,
+            0.9998137248816964,
+            0.9866914097425376
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9993559971791117
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9969571531702561,
+            0.9932802922143643,
+            0.9979524728428871,
+            0.9993951579131183,
+            0.9979499726778925,
+            0.9886938954478542
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.9974535629240744
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9946842349102205,
+            0.9811442939675585,
+            0.9978414851545366,
+            0.9999049225068842,
+            0.9978573390749597,
+            0.9848576059620764
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9962628600323786
+        }
+      ]
+    },
+    {
+      "epoch": 9,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            1.9276922924830393e-13,
+            0.9999999999963467
+          ],
+          "dominant_state_mass": 0.9999999999963467,
+          "posterior_expected_switches": 5.705964365234365e-11,
+          "posterior_expected_switch_rate": 3.8816084117240577e-13,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 8.846707248803903e-12,
+          "mean_max_gamma": 0.9999999999963467,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              6.61239135542976e-20,
+              0.9999999999965076
+            ],
+            [
+              5.822379854623757e-13,
+              0.9999999999945477
+            ],
+            [
+              3.700712181330516e-18,
+              0.9999999999979815
+            ]
+          ],
+          "early_late_state_distribution_TV": 7.369678610403128e-13,
+          "max_xi_marginal_inconsistency": 2.540190280342358e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            3.2696141448563046e-11,
+            0.9999999999484649
+          ],
+          "dominant_state_mass": 0.9999999999484649,
+          "posterior_expected_switches": 2.739753429728104e-08,
+          "posterior_expected_switch_rate": 6.554434042411733e-11,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 7.909674845550743e-10,
+          "mean_max_gamma": 0.9999999999484649,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              4.847431012463076e-12,
+              0.9999999999662642
+            ],
+            [
+              9.300744943079209e-11,
+              0.9999999998858389
+            ],
+            [
+              3.519567389920595e-20,
+              0.9999999999936139
+            ]
+          ],
+          "early_late_state_distribution_TV": 1.609855452754668e-11,
+          "max_xi_marginal_inconsistency": 1.128208637624084e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9477704605838467,
+            0.052229539416645376
+          ],
+          "dominant_state_mass": 0.9477704605838467,
+          "posterior_expected_switches": 3.0000418185428854,
+          "posterior_expected_switch_rate": 0.0036232389112836783,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0036231884057971015,
+          "mean_marginal_state_entropy_nats": 0.006188853271258423,
+          "mean_max_gamma": 0.9971579661514582,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0048250904704463205,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999991841,
+              1.044833348724543e-12
+            ],
+            [
+              0.9999999503155849,
+              4.9685013223827945e-08
+            ],
+            [
+              0.8431221939751198,
+              0.1568778060255288
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.15687780602427415,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.772308396621267,
+            0.22769160337898606
+          ],
+          "dominant_state_mass": 0.772308396621267,
+          "posterior_expected_switches": 1.0024168276803822,
+          "posterior_expected_switch_rate": 0.0014464889288317204,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.001443001443001443,
+          "mean_marginal_state_entropy_nats": 0.011461710574429717,
+          "mean_max_gamma": 0.9949370807637683,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.011527377521613832,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999791625799632,
+              2.083742021606384e-05
+            ],
+            [
+              0.999999982456899,
+              1.7543381844866283e-08
+            ],
+            [
+              0.3159604570955002,
+              0.6840395429047835
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.6840187054845153,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9046682706272042,
+            0.09533172937324672
+          ],
+          "dominant_state_mass": 0.9046682706272042,
+          "posterior_expected_switches": 1.001631594361343,
+          "posterior_expected_switch_rate": 0.0009240143859421984,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0009225092250922509,
+          "mean_marginal_state_entropy_nats": 0.003963308929256472,
+          "mean_max_gamma": 0.9982608034629666,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003686635944700461,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999925079140249,
+              7.492086269235193e-06
+            ],
+            [
+              0.9999999990302626,
+              9.702622187547095e-10
+            ],
+            [
+              0.7134841720683797,
+              0.28651582793215596
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.286508335845766,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            1.0000000066788037e-12,
+            0.9999999999990029
+          ],
+          "dominant_state_mass": 0.9999999999990029,
+          "posterior_expected_switches": 3.0799999999846126e-10,
+          "posterior_expected_switch_rate": 1.9999999999900084e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.863099917207131e-11,
+          "mean_max_gamma": 0.9999999999990002,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000001097099e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000092123767e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000107934543e-12,
+              0.9999999999989998
+            ]
+          ],
+          "early_late_state_distribution_TV": 5.341872215246715e-21,
+          "max_xi_marginal_inconsistency": 2.0194839173657902e-28
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.5709413839642635,
+            0.4290586160280035
+          ],
+          "dominant_state_mass": 0.5709413839642635,
+          "posterior_expected_switches": 3.0000315800716537,
+          "posterior_expected_switch_rate": 0.007894819947556983,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.007894736842105263,
+          "mean_marginal_state_entropy_nats": 0.009126722792182894,
+          "mean_max_gamma": 0.9962222310957735,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.007874015748031496,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999890788,
+              1.0051943559083022e-15
+            ],
+            [
+              0.7128241340877876,
+              0.28717586590297495
+            ],
+            [
+              1.7815924002626577e-08,
+              0.9999999821810344
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999999821770942,
+          "max_xi_marginal_inconsistency": 6.70019595361282e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6226976793796032,
+            0.3773023206206952
+          ],
+          "dominant_state_mass": 0.6226976793796032,
+          "posterior_expected_switches": 1.1606817676136338,
+          "posterior_expected_switch_rate": 0.0008983605012489426,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0007739938080495357,
+          "mean_marginal_state_entropy_nats": 0.007606325647875086,
+          "mean_max_gamma": 0.99710343677896,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004640371229698376,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9988098037237124,
+              0.0011901962765251532
+            ],
+            [
+              0.8692832342497934,
+              0.13071676575052524
+            ],
+            [
+              1.6528356618674634e-10,
+              0.9999999998350354
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9988098035584696,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            6.848102933863707e-10,
+            0.9999999992996548
+          ],
+          "dominant_state_mass": 0.9999999992996548,
+          "posterior_expected_switches": 5.798293112480911e-07,
+          "posterior_expected_switch_rate": 1.3707548729269294e-09,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 1.4088630912272544e-08,
+          "mean_max_gamma": 0.9999999992996548,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              3.818262932691657e-13,
+              0.9999999999734581
+            ],
+            [
+              8.710149332331698e-11,
+              0.9999999998962111
+            ],
+            [
+              1.9718016631460236e-09,
+              0.9999999980245162
+            ]
+          ],
+          "early_late_state_distribution_TV": 1.9601808668047023e-09,
+          "max_xi_marginal_inconsistency": 7.843725668976731e-13
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.5525846757389701,
+            0.44741532426140945
+          ],
+          "dominant_state_mass": 0.5525846757389701,
+          "posterior_expected_switches": 1.0001110379349754,
+          "posterior_expected_switch_rate": 0.0009524867027952146,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0009523809523809524,
+          "mean_marginal_state_entropy_nats": 0.003920058211516172,
+          "mean_max_gamma": 0.9982786355834331,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003805899143672693,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999323824318,
+              6.76178296159025e-08
+            ],
+            [
+              0.6564757655287619,
+              0.34352423447166314
+            ],
+            [
+              9.999999999312127e-13,
+              0.9999999999994327
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999999323815174,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8761202411546786,
+            0.12387975884561934
+          ],
+          "dominant_state_mass": 0.8761202411546786,
+          "posterior_expected_switches": 1.0024105691746787,
+          "posterior_expected_switch_rate": 0.0015142153612910554,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0015105740181268882,
+          "mean_marginal_state_entropy_nats": 0.004446881119641909,
+          "mean_max_gamma": 0.998080594902462,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0030165912518853697,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999990898,
+              1.0940082994742673e-12
+            ],
+            [
+              0.9999790470344989,
+              2.095296585786541e-05
+            ],
+            [
+              0.62838167643044,
+              0.37161832356990615
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.37161832356873103,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8210362887592171,
+            0.17896371124097368
+          ],
+          "dominant_state_mass": 0.8210362887592171,
+          "posterior_expected_switches": 3.0000547206503723,
+          "posterior_expected_switch_rate": 0.010101194345624148,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.018257088758480595,
+          "mean_max_gamma": 0.9922655220484615,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.016778523489932886,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999999999084,
+              9.999999989838183e-13
+            ],
+            [
+              0.9441482337329129,
+              0.0558517662673215
+            ],
+            [
+              0.5171529182907074,
+              0.4828470817095488
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.4828470817084627,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976003767265995,
+            0.9836123760751964,
+            0.9996414351393648,
+            0.9970235878688337,
+            0.9896548397913206,
+            0.9746118867354213
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933392138300772
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971209009647602,
+            0.9985654043454522,
+            0.9999960611019683,
+            0.9999908223929348,
+            0.9979470301313468,
+            0.9735083603317566
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982562172383995
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9958788554323225,
+            0.9958411527802393,
+            0.9901632124817947,
+            0.9924274901187875,
+            0.9976020974240128,
+            0.9129076280755107
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9941343214495134
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.99789131713564,
+            0.9964305421922683,
+            0.9987750062642612,
+            0.999721493512594,
+            0.9994043818391274,
+            0.9580609275558796
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9983331616999507
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977733369048198,
+            0.9967995499035618,
+            0.9992151898758026,
+            0.9995846294975899,
+            0.9997219001731112,
+            0.9479645916291263
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.9984942633903112
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9985928657640561,
+            0.9982914696070804,
+            0.9992746669714767,
+            0.9897811545388483,
+            0.9999144979770657,
+            0.9738477105210602
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.9984421676855683
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9974305515443928,
+            0.995522219821107,
+            0.9736924201044957,
+            0.9749682684184524,
+            0.9793147834882024,
+            0.9882118720092358
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.9837633277487191
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981374991657216,
+            0.9990664516191152,
+            0.9995765417316735,
+            0.9996371992486495,
+            0.9997889248039796,
+            0.990238252830132
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9993214966753944
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9961188521586893,
+            0.9958947826879948,
+            0.9998098626128582,
+            0.9984564192494777,
+            0.9999845566749196,
+            0.9547151549327071
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972876357040835
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9982103076513209,
+            0.998458625871341,
+            0.9997410874199203,
+            0.9994492336589554,
+            0.9995493121405689,
+            0.9750647516740603
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9989539297651482
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971265240656504,
+            0.9933890316992293,
+            0.9977950667409218,
+            0.999217848738574,
+            0.9988754744367139,
+            0.9831412486919029
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.9974607954032861
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9948179021733348,
+            0.9800537643763635,
+            0.9748779824747719,
+            0.977450218717782,
+            0.9801734391409783,
+            0.9786627188777552
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9793582416270594
+        }
+      ]
+    },
+    {
+      "epoch": 10,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.092102096648247e-13,
+            1.0000000000006422
+          ],
+          "dominant_state_mass": 1.0000000000006422,
+          "posterior_expected_switches": 6.192616757973652e-11,
+          "posterior_expected_switch_rate": 4.2126644612065657e-13,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 4.9771001607374885e-12,
+          "mean_max_gamma": 1.0000000000006422,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              7.232626134450853e-20,
+              1.0000000000012188
+            ],
+            [
+              6.31896351231911e-13,
+              1.0000000000001346
+            ],
+            [
+              3.800075863965041e-18,
+              1.0000000000005616
+            ]
+          ],
+          "early_late_state_distribution_TV": 3.2862787916384764e-13,
+          "max_xi_marginal_inconsistency": 2.7144952952085077e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.9083342411238278e-11,
+            0.9999999999753698
+          ],
+          "dominant_state_mass": 0.9999999999753698,
+          "posterior_expected_switches": 2.4370453474976347e-08,
+          "posterior_expected_switch_rate": 5.830252027506303e-11,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 6.858274393751769e-10,
+          "mean_max_gamma": 0.9999999999753698,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              4.440757936022081e-12,
+              1.000000000003391
+            ],
+            [
+              8.260153110887393e-11,
+              0.9999999999211793
+            ],
+            [
+              2.894534975683189e-20,
+              1.0000000000017273
+            ]
+          ],
+          "early_late_state_distribution_TV": 3.0522690658899955e-12,
+          "max_xi_marginal_inconsistency": 1.0437206654501097e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9476188071465733,
+            0.05238119285390119
+          ],
+          "dominant_state_mass": 0.9476188071465733,
+          "posterior_expected_switches": 3.0001178073231767,
+          "posterior_expected_switch_rate": 0.0036233306851729185,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0036231884057971015,
+          "mean_marginal_state_entropy_nats": 0.006219934873934988,
+          "mean_max_gamma": 0.9971677215967643,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0048250904704463205,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999999999102,
+              1.1262713462347053e-12
+            ],
+            [
+              0.9999996757380977,
+              3.2426248417051613e-07
+            ],
+            [
+              0.8426669587718969,
+              0.15733304122871913
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.157333041227399,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7692210487394512,
+            0.23077895126078662
+          ],
+          "dominant_state_mass": 0.7692210487394512,
+          "posterior_expected_switches": 1.3788641192532798,
+          "posterior_expected_switch_rate": 0.0019897029137853966,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.001443001443001443,
+          "mean_marginal_state_entropy_nats": 0.017307489023557415,
+          "mean_max_gamma": 0.9928868929426815,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.010086455331412104,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9938785982935868,
+              0.0061214017065909605
+            ],
+            [
+              0.999999980267377,
+              1.9732892891977886e-08
+            ],
+            [
+              0.31281202415281656,
+              0.6871879758474396
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.6810665741408095,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.904216234878537,
+            0.09578376512188799
+          ],
+          "dominant_state_mass": 0.904216234878537,
+          "posterior_expected_switches": 1.148994537044915,
+          "posterior_expected_switch_rate": 0.0010599580600045343,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0009225092250922509,
+          "mean_marginal_state_entropy_nats": 0.0060217836716712865,
+          "mean_max_gamma": 0.9977451992547656,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003686635944700461,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.998406822278325,
+              0.0015931777219657663
+            ],
+            [
+              0.9999999989194028,
+              1.0810892094735473e-09
+            ],
+            [
+              0.7137156386970509,
+              0.28628436130344204
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.2846911835813752,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            1.0000000066788037e-12,
+            0.9999999999990029
+          ],
+          "dominant_state_mass": 0.9999999999990029,
+          "posterior_expected_switches": 3.0799999999846126e-10,
+          "posterior_expected_switch_rate": 1.9999999999900084e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.863099917207131e-11,
+          "mean_max_gamma": 0.9999999999990002,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000001097099e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000092123767e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000107934543e-12,
+              0.9999999999989998
+            ]
+          ],
+          "early_late_state_distribution_TV": 5.341872215246715e-21,
+          "max_xi_marginal_inconsistency": 2.0194839173657902e-28
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.5683413056497671,
+            0.4316586943537251
+          ],
+          "dominant_state_mass": 0.5683413056497671,
+          "posterior_expected_switches": 3.0000336648693366,
+          "posterior_expected_switch_rate": 0.007894825433866675,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.007894736842105263,
+          "mean_marginal_state_entropy_nats": 0.00964385280382122,
+          "mean_max_gamma": 0.9959406411061542,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.007874015748031496,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000000047624,
+              2.6482927414467754e-15
+            ],
+            [
+              0.7050239039514438,
+              0.29497609605287056
+            ],
+            [
+              1.2993095591147798e-08,
+              0.9999999870083022
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999999870099832,
+          "max_xi_marginal_inconsistency": 7.351896869067787e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6162219347027252,
+            0.3837780652975613
+          ],
+          "dominant_state_mass": 0.6162219347027252,
+          "posterior_expected_switches": 2.977125235276346,
+          "posterior_expected_switch_rate": 0.0023042764978919088,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0023219814241486067,
+          "mean_marginal_state_entropy_nats": 0.008752847660885134,
+          "mean_max_gamma": 0.9965405188980785,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.006187161639597835,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9801239292498262,
+              0.019876070750408426
+            ],
+            [
+              0.8685418746880289,
+              0.13145812531227094
+            ],
+            [
+              1.7030136459120644e-10,
+              0.9999999998300004
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9801239290795585,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            6.900758953852197e-10,
+            0.9999999993164761
+          ],
+          "dominant_state_mass": 0.9999999993164761,
+          "posterior_expected_switches": 5.8431771991939e-07,
+          "posterior_expected_switch_rate": 1.3813657681309456e-09,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 1.4171890413477154e-08,
+          "mean_max_gamma": 0.9999999993164761,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              4.124251595482676e-13,
+              1.000000000010123
+            ],
+            [
+              9.135978325525269e-11,
+              0.9999999999148043
+            ],
+            [
+              1.983346708026147e-09,
+              0.9999999980195817
+            ]
+          ],
+          "early_late_state_distribution_TV": 1.9867377851110697e-09,
+          "max_xi_marginal_inconsistency": 7.559508574672691e-13
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.5524073787529911,
+            0.4475926212473569
+          ],
+          "dominant_state_mass": 0.5524073787529911,
+          "posterior_expected_switches": 1.0002856059827905,
+          "posterior_expected_switch_rate": 0.000952652958078848,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0009523809523809524,
+          "mean_marginal_state_entropy_nats": 0.0038891772966114617,
+          "mean_max_gamma": 0.9982822033543478,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0028544243577545195,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999991773364335,
+              8.226638212745304e-07
+            ],
+            [
+              0.6559441252112768,
+              0.3440558747891129
+            ],
+            [
+              9.999999998893246e-13,
+              0.9999999999993797
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999991773354959,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8749160769882753,
+            0.1250839230120108
+          ],
+          "dominant_state_mass": 0.8749160769882753,
+          "posterior_expected_switches": 1.225167307477537,
+          "posterior_expected_switch_rate": 0.001850705902534044,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.0015105740181268882,
+          "mean_marginal_state_entropy_nats": 0.008070802705421366,
+          "mean_max_gamma": 0.9970038458225399,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004524886877828055,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999989915,
+              1.191294545182827e-12
+            ],
+            [
+              0.9968174134573545,
+              0.003182586542981564
+            ],
+            [
+              0.6279308175084738,
+              0.3720691824918596
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.372069182490593,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8081633763907001,
+            0.1918366236094871
+          ],
+          "dominant_state_mass": 0.8081633763907001,
+          "posterior_expected_switches": 3.000046641760597,
+          "posterior_expected_switch_rate": 0.010101167143975074,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.01631667624263574,
+          "mean_max_gamma": 0.9926223906668662,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.020134228187919462,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999999999084,
+              9.999999996011923e-13
+            ],
+            [
+              0.9083592640616895,
+              0.09164073593854224
+            ],
+            [
+              0.5141931214385146,
+              0.48580687856173194
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.48580687856065063,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751951,
+            0.9996414351393732,
+            0.9970235878688617,
+            0.9896548397913442,
+            0.9746118867354205
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933392138301029
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971209009647576,
+            0.998565404345452,
+            0.9999960611019684,
+            0.9999908223929346,
+            0.9979470301313603,
+            0.9735083603316246
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982562172384062
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9958803417351897,
+            0.9958413939323352,
+            0.9902910091686016,
+            0.9925455151558976,
+            0.9976605457420029,
+            0.9129930723481082
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9941934545441165
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9978918679183687,
+            0.9964322109210303,
+            0.9985541007009204,
+            0.9996375853604966,
+            0.9993000951100924,
+            0.9578548499413205
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9982229843096446
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977739861666981,
+            0.9968002922994523,
+            0.9992105142340401,
+            0.9995809239088131,
+            0.9997210027281863,
+            0.9477307421613546
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.998492250200369
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9985928657640561,
+            0.9982914696070803,
+            0.9992746669714769,
+            0.9897811545388483,
+            0.9999144979770657,
+            0.9738477105210605
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.9984421676855681
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.99743361713484,
+            0.9955207826869352,
+            0.9714941672211408,
+            0.9735019776867728,
+            0.9774598194826162,
+            0.9876621262151124
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.9825609728488642
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981357794935338,
+            0.9990338417841944,
+            0.9966717668701167,
+            0.9967134693295936,
+            0.9980449352649008,
+            0.9895486389280854
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9973792022972472
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9961188521586872,
+            0.9958947826879813,
+            0.9998098626128594,
+            0.9984564192494654,
+            0.9999845566749217,
+            0.9547151549324163
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972876357040763
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9982118743959373,
+            0.9984586223783817,
+            0.9997456822392825,
+            0.9994573915545365,
+            0.9995584840427101,
+            0.9747978580208929
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9989580069664591
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971272421969628,
+            0.9933880546006674,
+            0.9977395526884429,
+            0.9992020073229101,
+            0.9988556281741965,
+            0.9832164861344064
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.9974333974427029
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9947981551425977,
+            0.9800912115359753,
+            0.9742272953487336,
+            0.9763059917957585,
+            0.9789229205676158,
+            0.97929424763533
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9791085841014728
+        }
+      ]
+    },
+    {
+      "epoch": 11,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            4.0503285476601347e-13,
+            0.9999999999955539
+          ],
+          "dominant_state_mass": 0.9999999999955539,
+          "posterior_expected_switches": 1.1988960816143235e-10,
+          "posterior_expected_switch_rate": 8.155755657240296e-13,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 1.505702918239184e-11,
+          "mean_max_gamma": 0.9999999999955539,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.4463119266627421e-19,
+              0.9999999999956617
+            ],
+            [
+              1.2233570853961367e-12,
+              0.9999999999934015
+            ],
+            [
+              7.30794693245497e-18,
+              0.9999999999975964
+            ]
+          ],
+          "early_late_state_distribution_TV": 9.673409030137689e-13,
+          "max_xi_marginal_inconsistency": 2.9343194540842887e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            3.35435069493863e-11,
+            0.9999999999754241
+          ],
+          "dominant_state_mass": 0.9999999999754241,
+          "posterior_expected_switches": 2.8108417095711044e-08,
+          "posterior_expected_switch_rate": 6.724501697538528e-11,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 7.826975999930907e-10,
+          "mean_max_gamma": 0.9999999999754241,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              5.517259046682085e-12,
+              1.0000000000053595
+            ],
+            [
+              9.487366529176207e-11,
+              0.9999999999198605
+            ],
+            [
+              3.173153741231412e-20,
+              1.0000000000012366
+            ]
+          ],
+          "early_late_state_distribution_TV": 4.820091619599265e-12,
+          "max_xi_marginal_inconsistency": 1.432409746371377e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9348971015057077,
+            0.06510289849467671
+          ],
+          "dominant_state_mass": 0.9348971015057077,
+          "posterior_expected_switches": 5.007782853737861,
+          "posterior_expected_switch_rate": 0.006048046924804179,
+          "hard_argmax_gamma_switches": 5,
+          "hard_argmax_gamma_switch_rate": 0.006038647342995169,
+          "mean_marginal_state_entropy_nats": 0.008397977154306182,
+          "mean_max_gamma": 0.9962426646764038,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.007237635705669481,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999961283,
+              4.0935311547646945e-12
+            ],
+            [
+              0.962753597184721,
+              0.03724640281575108
+            ],
+            [
+              0.8417018272692763,
+              0.15829817273118035
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.1582981727269694,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7504173812398569,
+            0.24958261876037338
+          ],
+          "dominant_state_mass": 0.7504173812398569,
+          "posterior_expected_switches": 3.003687000521851,
+          "posterior_expected_switch_rate": 0.0043343246760777065,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004329004329004329,
+          "mean_marginal_state_entropy_nats": 0.012321694101114314,
+          "mean_max_gamma": 0.9946591127893226,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.010086455331412104,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9317263467751132,
+              0.06827365322505267
+            ],
+            [
+              0.9999999622310931,
+              3.776915825343074e-08
+            ],
+            [
+              0.3187409474166606,
+              0.6812590525835991
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.6129853993584995,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8904735525850432,
+            0.10952644741532086
+          ],
+          "dominant_state_mass": 0.8904735525850432,
+          "posterior_expected_switches": 3.0037821070055797,
+          "posterior_expected_switch_rate": 0.002771016703879686,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0027675276752767526,
+          "mean_marginal_state_entropy_nats": 0.004077817141776299,
+          "mean_max_gamma": 0.9982657642106666,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003686635944700461,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9560292607340356,
+              0.04397073926624294
+            ],
+            [
+              0.9999999977274945,
+              2.272916351265101e-09
+            ],
+            [
+              0.7149064071792213,
+              0.2850935928211842
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.24112285355487778,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            1.0000000066788037e-12,
+            0.9999999999990029
+          ],
+          "dominant_state_mass": 0.9999999999990029,
+          "posterior_expected_switches": 3.0799999999846126e-10,
+          "posterior_expected_switch_rate": 1.9999999999900084e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.863099917207131e-11,
+          "mean_max_gamma": 0.9999999999990002,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000001097099e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000092123767e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000107934543e-12,
+              0.9999999999989998
+            ]
+          ],
+          "early_late_state_distribution_TV": 5.341872215246715e-21,
+          "max_xi_marginal_inconsistency": 2.0194839173657902e-28
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.5621986934303702,
+            0.4378013065708222
+          ],
+          "dominant_state_mass": 0.5621986934303702,
+          "posterior_expected_switches": 3.0000248930874687,
+          "posterior_expected_switch_rate": 0.007894802350230181,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.007894736842105263,
+          "mean_marginal_state_entropy_nats": 0.009492866589088407,
+          "mean_max_gamma": 0.995803632910067,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.010498687664041995,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999984818,
+              9.459517234744222e-14
+            ],
+            [
+              0.6865960681342043,
+              0.3134039318664362
+            ],
+            [
+              1.2158423509283926e-08,
+              0.999999987845936
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999999878429499,
+          "max_xi_marginal_inconsistency": 8.005818230572004e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6090633014736557,
+            0.3909366985265866
+          ],
+          "dominant_state_mass": 0.6090633014736557,
+          "posterior_expected_switches": 3.001197793669353,
+          "posterior_expected_switch_rate": 0.002322908509032007,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0023219814241486067,
+          "mean_marginal_state_entropy_nats": 0.007735619779517895,
+          "mean_max_gamma": 0.9965579942027878,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.008507347254447023,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9544801221132327,
+              0.04551987788697483
+            ],
+            [
+              0.8727097819710785,
+              0.12729021802916737
+            ],
+            [
+              3.366331932642385e-10,
+              0.9999999996636147
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9544801217766197,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            1.0811917922015689e-09,
+            0.999999998931954
+          ],
+          "dominant_state_mass": 0.999999998931954,
+          "posterior_expected_switches": 9.156355839608721e-07,
+          "posterior_expected_switch_rate": 2.1646231299311397e-09,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.172507890443254e-08,
+          "mean_max_gamma": 0.999999998931954,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              7.572983978629726e-13,
+              1.0000000000100973
+            ],
+            [
+              1.603895038508989e-10,
+              0.9999999998603184
+            ],
+            [
+              3.090091230340368e-09,
+              0.9999999969177998
+            ]
+          ],
+          "early_late_state_distribution_TV": 3.0908156750352517e-09,
+          "max_xi_marginal_inconsistency": 7.757128273055969e-13
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.5366194960153573,
+            0.46338050398492975
+          ],
+          "dominant_state_mass": 0.5366194960153573,
+          "posterior_expected_switches": 3.0002655331856696,
+          "posterior_expected_switch_rate": 0.002857395745891114,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.002857142857142857,
+          "mean_marginal_state_entropy_nats": 0.005142930019984897,
+          "mean_max_gamma": 0.9976720007487049,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004757373929590866,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9535814741819073,
+              0.04641852581832154
+            ],
+            [
+              0.6550856939255205,
+              0.34491430607477847
+            ],
+            [
+              1.0000000000594714e-12,
+              0.9999999999992981
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.953581474180942,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.846539600208279,
+            0.15346039979197973
+          ],
+          "dominant_state_mass": 0.846539600208279,
+          "posterior_expected_switches": 3.0001577204824272,
+          "posterior_expected_switch_rate": 0.004531960302843546,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004531722054380665,
+          "mean_marginal_state_entropy_nats": 0.006046276636731089,
+          "mean_max_gamma": 0.9975965327393914,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0030165912518853697,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999976856,
+              2.4943124617484894e-12
+            ],
+            [
+              0.9109790523819483,
+              0.08902094761835443
+            ],
+            [
+              0.6286397482452004,
+              0.37136025175509013
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.3713602517525405,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8002386568699138,
+            0.1997613431302654
+          ],
+          "dominant_state_mass": 0.8002386568699138,
+          "posterior_expected_switches": 3.000022653543353,
+          "posterior_expected_switch_rate": 0.010101086375566845,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.00633066672034731,
+          "mean_max_gamma": 0.9972306909346182,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003355704697986577,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999999999084,
+              9.999999999778495e-13
+            ],
+            [
+              0.8894003537419363,
+              0.11059964625828804
+            ],
+            [
+              0.5092978255239843,
+              0.49070217447624814
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.49070217447517395,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976003767265997,
+            0.9836123760751944,
+            0.9996414351393627,
+            0.9970235878688342,
+            0.9896548397913183,
+            0.9746118867354207
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933392138300763
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971209009647464,
+            0.9985654043454512,
+            0.9999960611019684,
+            0.9999908223929354,
+            0.9979470301313589,
+            0.9735083603316029
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982562172384051
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9958843458311772,
+            0.9957778164277281,
+            0.9839591283477254,
+            0.9869919286284734,
+            0.9955958855478839,
+            0.8959164680974256
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9912939070881787
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9978821337785363,
+            0.9964069848031035,
+            0.9866736983957453,
+            0.9944630261563103,
+            0.9926973476426341,
+            0.957322102911868
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9935801868994723
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977812367727155,
+            0.996770481911821,
+            0.9932565084307747,
+            0.9947156702622432,
+            0.9974491473893915,
+            0.9428225013792676
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.995743076087032
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9985928657640559,
+            0.9982914696070803,
+            0.9992746669714765,
+            0.9897811545388483,
+            0.9999144979770657,
+            0.9738477105210602
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.9984421676855681
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9974473694335201,
+            0.9955220740596372,
+            0.9672885481619706,
+            0.9751345314737931,
+            0.9738864323393028,
+            0.9854295069288025
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.9802820192012978
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981260038895818,
+            0.9990051261474338,
+            0.996015675812338,
+            0.9956275644650238,
+            0.9975578520115582,
+            0.9952156475614464
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9967867639119481
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.996118852158301,
+            0.9958947826883376,
+            0.9998098626131275,
+            0.9984564192532666,
+            0.9999845566748501,
+            0.9547151549298579
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972876357057838
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9982377909282112,
+            0.9984285438821291,
+            0.998452795873956,
+            0.9960038843025737,
+            0.9975341045002891,
+            0.9736859027890739
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9978859477142501
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.997098846864437,
+            0.993339182753961,
+            0.9872343635428689,
+            0.994228809887138,
+            0.9933349724993572,
+            0.9882568066458077
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.9933370776266591
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9947898610672413,
+            0.9800174803920593,
+            0.9614537720464884,
+            0.9664123219348294,
+            0.9687772577662879,
+            0.983265586894002
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9743973690791736
+        }
+      ]
+    },
+    {
+      "epoch": 12,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            1.4007665872356562e-12,
+            1.000000000003117
+          ],
+          "dominant_state_mass": 1.000000000003117,
+          "posterior_expected_switches": 4.1462643196974034e-10,
+          "posterior_expected_switch_rate": 2.8205879725832677e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 3.176794898325052e-11,
+          "mean_max_gamma": 1.000000000003117,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.4484090456883505e-18,
+              1.000000000005075
+            ],
+            [
+              4.2308326339180704e-12,
+              1.0000000000016194
+            ],
+            [
+              5.272302937520551e-17,
+              1.000000000002617
+            ]
+          ],
+          "early_late_state_distribution_TV": 1.229042525570213e-12,
+          "max_xi_marginal_inconsistency": 3.6048941609578833e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            3.145017702336199e-12,
+            0.9999999999825026
+          ],
+          "dominant_state_mass": 0.9999999999825026,
+          "posterior_expected_switches": 2.6355219675451963e-09,
+          "posterior_expected_switch_rate": 6.305076477380852e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 9.60565936817142e-11,
+          "mean_max_gamma": 0.9999999999825026,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              4.595917305325006e-13,
+              0.9999999999849284
+            ],
+            [
+              8.952996960007711e-12,
+              0.9999999999698957
+            ],
+            [
+              4.33984497723621e-21,
+              0.9999999999927568
+            ]
+          ],
+          "early_late_state_distribution_TV": 4.14399815871478e-12,
+          "max_xi_marginal_inconsistency": 1.1284306822290091e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9184405846312779,
+            0.08155941536887956
+          ],
+          "dominant_state_mass": 0.9184405846312779,
+          "posterior_expected_switches": 10.890738737888448,
+          "posterior_expected_switch_rate": 0.013153066108560927,
+          "hard_argmax_gamma_switches": 11,
+          "hard_argmax_gamma_switch_rate": 0.013285024154589372,
+          "mean_marginal_state_entropy_nats": 0.00967997790807064,
+          "mean_max_gamma": 0.9952118760956861,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.008443908323281062,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999859278169,
+              1.4072324172861808e-08
+            ],
+            [
+              0.9216241749303962,
+              0.07837582506976935
+            ],
+            [
+              0.8334020879584549,
+              0.16659791204170654
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.1665978979693722,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7643813552745834,
+            0.23561864472547753
+          ],
+          "dominant_state_mass": 0.7643813552745834,
+          "posterior_expected_switches": 6.804249680010319,
+          "posterior_expected_switch_rate": 0.009818542106796996,
+          "hard_argmax_gamma_switches": 7,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.013908406975758222,
+          "mean_max_gamma": 0.9939666571463746,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.012968299711815562,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9137511821629165,
+              0.08624881783714498
+            ],
+            [
+              0.9999998936695511,
+              1.0633050803136562e-07
+            ],
+            [
+              0.37874636736404943,
+              0.6212536326360011
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.5350048147988615,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8853116144864991,
+            0.11468838551358747
+          ],
+          "dominant_state_mass": 0.8853116144864991,
+          "posterior_expected_switches": 5.426777688050316,
+          "posterior_expected_switch_rate": 0.005006252479751214,
+          "hard_argmax_gamma_switches": 5,
+          "hard_argmax_gamma_switch_rate": 0.004612546125461255,
+          "mean_marginal_state_entropy_nats": 0.004818417186377428,
+          "mean_max_gamma": 0.9980326754673284,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004608294930875576,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9379566598176693,
+              0.062043340182404094
+            ],
+            [
+              0.9999999902716551,
+              9.72844304326304e-09
+            ],
+            [
+              0.7175146658878576,
+              0.282485334112232
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.22044199392981978,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            1.0000000066788037e-12,
+            0.9999999999990029
+          ],
+          "dominant_state_mass": 0.9999999999990029,
+          "posterior_expected_switches": 3.0799999999846126e-10,
+          "posterior_expected_switch_rate": 1.9999999999900084e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.863099917207131e-11,
+          "mean_max_gamma": 0.9999999999990002,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000001097099e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000092123767e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000107934543e-12,
+              0.9999999999989998
+            ]
+          ],
+          "early_late_state_distribution_TV": 5.341872215246715e-21,
+          "max_xi_marginal_inconsistency": 2.0194839173657902e-28
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.5326212506051812,
+            0.4673787493985127
+          ],
+          "dominant_state_mass": 0.5326212506051812,
+          "posterior_expected_switches": 1.0956310676020835,
+          "posterior_expected_switch_rate": 0.00288323965158443,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.002631578947368421,
+          "mean_marginal_state_entropy_nats": 0.008793498280942096,
+          "mean_max_gamma": 0.9965364656951061,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.005249343832020997,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999993182452,
+              6.824241064784716e-09
+            ],
+            [
+              0.5978637578758782,
+              0.40213624212986926
+            ],
+            [
+              7.572129752768421e-10,
+              0.9999999992414277
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999999924212128,
+          "max_xi_marginal_inconsistency": 6.650235917504688e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6178336421887085,
+            0.3821663578113551
+          ],
+          "dominant_state_mass": 0.6178336421887085,
+          "posterior_expected_switches": 3.0028132172947934,
+          "posterior_expected_switch_rate": 0.0023241588369154746,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0023219814241486067,
+          "mean_marginal_state_entropy_nats": 0.005077762888466627,
+          "mean_max_gamma": 0.9979437791285677,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0038669760247486465,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9526824330086074,
+              0.04731756699147112
+            ],
+            [
+              0.9008184908785969,
+              0.09918150912145966
+            ],
+            [
+              2.67890106489891e-09,
+              0.9999999973211365
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9526824303296859,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.980900833024491e-09,
+            0.9999999969993443
+          ],
+          "dominant_state_mass": 0.9999999969993443,
+          "posterior_expected_switches": 2.5245975155581336e-06,
+          "posterior_expected_switch_rate": 5.968315639617337e-09,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 5.68039377345812e-08,
+          "mean_max_gamma": 0.9999999969993443,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              2.282673441457321e-12,
+              0.9999999999747872
+            ],
+            [
+              7.463610729067157e-10,
+              0.9999999992272036
+            ],
+            [
+              8.215183704211704e-09,
+              0.9999999917749395
+            ]
+          ],
+          "early_late_state_distribution_TV": 8.206374360254247e-09,
+          "max_xi_marginal_inconsistency": 8.387734951043058e-13
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.5287995528459557,
+            0.4712004471540918
+          ],
+          "dominant_state_mass": 0.5287995528459557,
+          "posterior_expected_switches": 3.0088285097047542,
+          "posterior_expected_switch_rate": 0.0028655509616235756,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.002857142857142857,
+          "mean_marginal_state_entropy_nats": 0.004419906582866973,
+          "mean_max_gamma": 0.9981067053293582,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003805899143672693,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9425008326580605,
+              0.05749916734199043
+            ],
+            [
+              0.6427158222221728,
+              0.3572841777778566
+            ],
+            [
+              9.999999994107582e-13,
+              0.9999999999990287
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9425008326570494,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8484298785595231,
+            0.15157012144053209
+          ],
+          "dominant_state_mass": 0.8484298785595231,
+          "posterior_expected_switches": 3.0002109334586353,
+          "posterior_expected_switch_rate": 0.004532040684982833,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004531722054380665,
+          "mean_marginal_state_entropy_nats": 0.004476364686032955,
+          "mean_max_gamma": 0.9981008913888691,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004524886877828055,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999997209372,
+              2.791116561744489e-10
+            ],
+            [
+              0.9089590764279476,
+              0.09104092357210536
+            ],
+            [
+              0.6363305595296782,
+              0.36366944047037936
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.36366944019126335,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7920169058468632,
+            0.20798309415324273
+          ],
+          "dominant_state_mass": 0.7920169058468632,
+          "posterior_expected_switches": 3.0000753288477524,
+          "posterior_expected_switch_rate": 0.010101263733494115,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.009526103110255353,
+          "mean_max_gamma": 0.9958648479913162,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.006711409395973154,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999999921227,
+              7.951347038244895e-12
+            ],
+            [
+              0.8869413840103881,
+              0.11305861598972772
+            ],
+            [
+              0.4870084942032797,
+              0.5129915057968502
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.512991505788871,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976003767266012,
+            0.9836123760751844,
+            0.9996414351393696,
+            0.9970235878688518,
+            0.9896548397914293,
+            0.9746118867354141
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933392138301406
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971209009647785,
+            0.9985654043454548,
+            0.9999960611019686,
+            0.9999908223929282,
+            0.9979470301310229,
+            0.9735083603316738
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982562172382389
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.995821840154087,
+            0.9954423377981771,
+            0.9516484470091071,
+            0.959798901415326,
+            0.9851050308990749,
+            0.938204714937994
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9724519661572004
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977940477743829,
+            0.9963330133544683,
+            0.9692174353310609,
+            0.9878475332576981,
+            0.9832370638440128,
+            0.9826086206494179
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9855422985508555
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977481704881557,
+            0.9967271701069588,
+            0.9881587991331173,
+            0.9907187355149333,
+            0.9954015926353371,
+            0.962990363825771
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.9930601640751352
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9985928657640563,
+            0.99829146960708,
+            0.9992746669714767,
+            0.9897811545388481,
+            0.9999144979770657,
+            0.9738477105210605
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.9984421676855681
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9975230743187722,
+            0.9956331495459361,
+            0.9969478582277785,
+            0.9971733924925581,
+            0.9958696751512758,
+            0.9777569877719325
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.9964087666895272
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981176633159703,
+            0.9989977403221638,
+            0.9962948394869635,
+            0.9956304075975819,
+            0.99755490605592,
+            0.9969144005730587
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9972346533144893
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.996118852157046,
+            0.995894782689165,
+            0.9998098626143197,
+            0.9984564192687169,
+            0.9999845566745311,
+            0.95471515491038
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972876357128815
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9982179539445839,
+            0.9984350650772501,
+            0.9980679597953545,
+            0.9950379628263852,
+            0.9968412019328073,
+            0.9760761433948106
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9974545808640809
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9970897170728977,
+            0.9933499841478013,
+            0.9862120724807296,
+            0.9938371318418417,
+            0.9926490019705766,
+            0.9899040593813345
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.992999493059189
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9948445066740558,
+            0.9801353370751907,
+            0.9668670801262943,
+            0.9708874731109389,
+            0.9728987940507029,
+            0.9858834543868755
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9765170655629468
+        }
+      ]
+    },
+    {
+      "epoch": 20,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            8.329159723051569e-13,
+            0.9999999999983515
+          ],
+          "dominant_state_mass": 0.9999999999983515,
+          "posterior_expected_switches": 2.465429976603402e-10,
+          "posterior_expected_switch_rate": 1.6771632493900694e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.2737115010613405e-11,
+          "mean_max_gamma": 0.9999999999983515,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0501892314570722e-18,
+              0.999999999998895
+            ],
+            [
+              2.5156613675895e-12,
+              0.999999999996761
+            ],
+            [
+              8.376285339068283e-17,
+              0.9999999999993875
+            ]
+          ],
+          "early_late_state_distribution_TV": 2.462888231939393e-13,
+          "max_xi_marginal_inconsistency": 3.240741008880832e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.290890863504319e-13,
+            1.0000000000269744
+          ],
+          "dominant_state_mass": 1.0000000000269744,
+          "posterior_expected_switches": 1.9197664220459532e-10,
+          "posterior_expected_switch_rate": 4.592742636473572e-13,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": -2.067568548902283e-11,
+          "mean_max_gamma": 1.0000000000269744,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              3.418387952917704e-14,
+              1.000000000032274
+            ],
+            [
+              6.514470128353639e-13,
+              1.0000000000354767
+            ],
+            [
+              1.6185577554314555e-20,
+              1.000000000013073
+            ]
+          ],
+          "early_late_state_distribution_TV": 9.617523492512915e-12,
+          "max_xi_marginal_inconsistency": 1.0897949209720537e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9065560902428558,
+            0.09344390975713636
+          ],
+          "dominant_state_mass": 0.9065560902428558,
+          "posterior_expected_switches": 8.385125162103435,
+          "posterior_expected_switch_rate": 0.010126962756163569,
+          "hard_argmax_gamma_switches": 9,
+          "hard_argmax_gamma_switch_rate": 0.010869565217391304,
+          "mean_marginal_state_entropy_nats": 0.00873210652370101,
+          "mean_max_gamma": 0.9960304472001266,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.008443908323281062,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999990667668126,
+              9.332331915197522e-07
+            ],
+            [
+              0.902992036757552,
+              0.09700796324243878
+            ],
+            [
+              0.8163386056950613,
+              0.1836613943049236
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.18366046107174167,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7837847770961461,
+            0.2162152229038619
+          ],
+          "dominant_state_mass": 0.7837847770961461,
+          "posterior_expected_switches": 3.4759873557923866,
+          "posterior_expected_switch_rate": 0.005015854770263184,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004329004329004329,
+          "mean_marginal_state_entropy_nats": 0.009198844476001385,
+          "mean_max_gamma": 0.9961130178074492,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.007204610951008645,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.8892269714710409,
+              0.11077302852894998
+            ],
+            [
+              0.9999998702292064,
+              1.297708038976999e-07
+            ],
+            [
+              0.46167102987227093,
+              0.538328970127741
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.42755594159878046,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8819308895749445,
+            0.11806911042500305
+          ],
+          "dominant_state_mass": 0.8819308895749445,
+          "posterior_expected_switches": 3.591832327828483,
+          "posterior_expected_switch_rate": 0.0033134984574063496,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0027675276752767526,
+          "mean_marginal_state_entropy_nats": 0.00440454608827552,
+          "mean_max_gamma": 0.9980654683552838,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004608294930875576,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9296834630797539,
+              0.0703165369202171
+            ],
+            [
+              0.9999999829988865,
+              1.700106002536553e-08
+            ],
+            [
+              0.7156498828486083,
+              0.28435011715131864
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.21403358023112357,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            1.0000000066788037e-12,
+            0.9999999999990029
+          ],
+          "dominant_state_mass": 0.9999999999990029,
+          "posterior_expected_switches": 3.0799999999846126e-10,
+          "posterior_expected_switch_rate": 1.9999999999900084e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.863099917207131e-11,
+          "mean_max_gamma": 0.9999999999990002,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000001097099e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000092123767e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000107934543e-12,
+              0.9999999999989998
+            ]
+          ],
+          "early_late_state_distribution_TV": 5.341872215246715e-21,
+          "max_xi_marginal_inconsistency": 2.0194839173657902e-28
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.5146098924286961,
+            0.4853901075791735
+          ],
+          "dominant_state_mass": 0.5146098924286961,
+          "posterior_expected_switches": 1.0006319752604127,
+          "posterior_expected_switch_rate": 0.002633242040158981,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.002631578947368421,
+          "mean_marginal_state_entropy_nats": 0.006427236928214922,
+          "mean_max_gamma": 0.9973476370274885,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.005249343832020997,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999995479483332,
+              4.52059872447541e-07
+            ],
+            [
+              0.543830128396584,
+              0.456169871611402
+            ],
+            [
+              9.411726778189641e-10,
+              0.9999999990662461
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999995470067671,
+          "max_xi_marginal_inconsistency": 6.661338147750939e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6280182906485454,
+            0.3719817093514765
+          ],
+          "dominant_state_mass": 0.6280182906485454,
+          "posterior_expected_switches": 3.0028633019959816,
+          "posterior_expected_switch_rate": 0.0023241976021640726,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0023219814241486067,
+          "mean_marginal_state_entropy_nats": 0.0032378441413682736,
+          "mean_max_gamma": 0.9987170376563643,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0030935808197989174,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9512543825458802,
+              0.04874561745412938
+            ],
+            [
+              0.9328004792553555,
+              0.06719952074465871
+            ],
+            [
+              1.0144381006947772e-08,
+              0.9999999898556398
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9512543724015048,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.502150376138612e-09,
+            0.9999999975354613
+          ],
+          "dominant_state_mass": 0.9999999975354613,
+          "posterior_expected_switches": 2.1201871418676505e-06,
+          "posterior_expected_switch_rate": 5.012262746732034e-09,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 4.803238587191382e-08,
+          "mean_max_gamma": 0.9999999975354613,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              2.012097504179003e-12,
+              1.0000000000478797
+            ],
+            [
+              8.338914983242805e-10,
+              0.9999999992122809
+            ],
+            [
+              6.688279009740802e-09,
+              0.9999999933284048
+            ]
+          ],
+          "early_late_state_distribution_TV": 6.702870888824878e-09,
+          "max_xi_marginal_inconsistency": 9.404699241599701e-13
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.5165136918858343,
+            0.4834863081141552
+          ],
+          "dominant_state_mass": 0.5165136918858343,
+          "posterior_expected_switches": 3.088457230169868,
+          "posterior_expected_switch_rate": 0.0029413878382570174,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.002857142857142857,
+          "mean_marginal_state_entropy_nats": 0.004090460868856413,
+          "mean_max_gamma": 0.9982445650126536,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003805899143672693,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9313924271399714,
+              0.06860757286002239
+            ],
+            [
+              0.6169632807014891,
+              0.3830367192984774
+            ],
+            [
+              9.999999992569093e-13,
+              0.9999999999989719
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9313924271389604,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8487568184947066,
+            0.15124318150530766
+          ],
+          "dominant_state_mass": 0.8487568184947066,
+          "posterior_expected_switches": 3.000199859004722,
+          "posterior_expected_switch_rate": 0.0045320239562004865,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004531722054380665,
+          "mean_marginal_state_entropy_nats": 0.004559782989671918,
+          "mean_max_gamma": 0.997865530613867,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004524886877828055,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999858696674,
+              1.4130336105868404e-08
+            ],
+            [
+              0.9031092985008918,
+              0.09689070149912127
+            ],
+            [
+              0.6431611711135522,
+              0.3568388288864654
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.3568388147561222,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7746394555827392,
+            0.22536054441726716
+          ],
+          "dominant_state_mass": 0.7746394555827392,
+          "posterior_expected_switches": 3.000207586726898,
+          "posterior_expected_switch_rate": 0.01010170904621851,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.011038318519600738,
+          "mean_max_gamma": 0.9953960474134136,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.006711409395973154,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999999492816,
+              5.071863696431242e-10
+            ],
+            [
+              0.878802645356402,
+              0.1211973546436053
+            ],
+            [
+              0.4428393527685951,
+              0.5571606472314149
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.5571606467242247,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976003767266005,
+            0.9836123760751911,
+            0.999641435139379,
+            0.9970235878688294,
+            0.9896548397913323,
+            0.9746118867354212
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933392138300808
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971209009647761,
+            0.9985654043454535,
+            0.9999960611019687,
+            0.9999908223929279,
+            0.9979470301309433,
+            0.9735083603314925
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982562172381984
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9958848143347923,
+            0.9956590845361595,
+            0.969482109299691,
+            0.974309021685992,
+            0.9901588664217548,
+            0.8827062465766811
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9822339440538734
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9978536833851384,
+            0.996390927012711,
+            0.9887464960601908,
+            0.9953344372071498,
+            0.9929462079624826,
+            0.9527364288680864
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9941403225848162
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977799491865098,
+            0.9967658534460969,
+            0.993476446447471,
+            0.9949554940786947,
+            0.9973750680372496,
+            0.9376502719002301
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.9958606737623958
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714767,
+            0.9897811545388481,
+            0.9999144979770654,
+            0.9738477105210601
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.9984421676855681
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9975179896981144,
+            0.9956464546754275,
+            0.9966591471362707,
+            0.997813980158133,
+            0.9961449416836381,
+            0.9721574152026217
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.9964020444099544
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981058499045214,
+            0.9989750869030204,
+            0.9958324370133393,
+            0.9947132832135818,
+            0.9970106041912625,
+            0.9957810912292403
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9964215206023009
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9961188521573962,
+            0.995894782688372,
+            0.9998098626138342,
+            0.9984564192621885,
+            0.9999845566746737,
+            0.9547151549121274
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972876357097924
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981921036208034,
+            0.9984471562735062,
+            0.9978308361879991,
+            0.9953408834717707,
+            0.9968671542625052,
+            0.975680583621445
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9973489952252521
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971019093552751,
+            0.9933957974951498,
+            0.9901774747444743,
+            0.9950231658169646,
+            0.9937602254275029,
+            0.9874175810117699
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.9935780114613264
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9949066854684374,
+            0.980211273612747,
+            0.9665185545126592,
+            0.9687288632896423,
+            0.9718792677578083,
+            0.981875354265958
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9760452706852776
+        }
+      ]
+    },
+    {
+      "epoch": 30,
+      "rings": [
+        {
+          "ring_id": "DM01",
+          "labeled": false,
+          "T": 148,
+          "data_weight": 0.2,
+          "state_mass": [
+            8.328282245502866e-13,
+            1.0000000000043832
+          ],
+          "dominant_state_mass": 1.0000000000043832,
+          "posterior_expected_switches": 2.4651702434246025e-10,
+          "posterior_expected_switch_rate": 1.6769865601527907e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 1.6703431437825736e-11,
+          "mean_max_gamma": 1.0000000000043832,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0499923563143828e-18,
+              1.0000000000067166
+            ],
+            [
+              2.51539633869566e-12,
+              1.0000000000040603
+            ],
+            [
+              8.375791300549293e-17,
+              1.0000000000023248
+            ]
+          ],
+          "early_late_state_distribution_TV": 2.195951474366422e-12,
+          "max_xi_marginal_inconsistency": 2.993161274389422e-13
+        },
+        {
+          "ring_id": "DM02",
+          "labeled": false,
+          "T": 419,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.291358666392822e-13,
+            0.9999999999840089
+          ],
+          "dominant_state_mass": 0.9999999999840089,
+          "posterior_expected_switches": 1.9201584408039258e-10,
+          "posterior_expected_switch_rate": 4.593680480392167e-13,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.2291031798251834e-11,
+          "mean_max_gamma": 0.9999999999840089,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              3.4182725473269755e-14,
+              0.9999999999833822
+            ],
+            [
+              6.51588173603546e-13,
+              0.9999999999772107
+            ],
+            [
+              1.6195000436159763e-20,
+              0.9999999999914874
+            ]
+          ],
+          "early_late_state_distribution_TV": 4.0696829502771125e-12,
+          "max_xi_marginal_inconsistency": 1.0712541964608135e-12
+        },
+        {
+          "ring_id": "DM04",
+          "labeled": true,
+          "T": 829,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.9065560052604188,
+            0.09344399473957417
+          ],
+          "dominant_state_mass": 0.9065560052604188,
+          "posterior_expected_switches": 8.38510793491849,
+          "posterior_expected_switch_rate": 0.01012694195038465,
+          "hard_argmax_gamma_switches": 9,
+          "hard_argmax_gamma_switch_rate": 0.010869565217391304,
+          "mean_marginal_state_entropy_nats": 0.008731775722280824,
+          "mean_max_gamma": 0.9960305358615468,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.008443908323281062,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999066779004,
+              9.33221001367734e-07
+            ],
+            [
+              0.9029919928096156,
+              0.09700800719037546
+            ],
+            [
+              0.8163383943755415,
+              0.1836616056244417
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.1836606724034514,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM05",
+          "labeled": true,
+          "T": 694,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.7837889709578345,
+            0.21621102904217782
+          ],
+          "dominant_state_mass": 0.7837889709578345,
+          "posterior_expected_switches": 3.4759799841585273,
+          "posterior_expected_switch_rate": 0.005015844132984888,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004329004329004329,
+          "mean_marginal_state_entropy_nats": 0.009197445369862781,
+          "mean_max_gamma": 0.9961138014023861,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.007204610951008645,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.8892269228431119,
+              0.11077307715688028
+            ],
+            [
+              0.9999998702292047,
+              1.2977080702655622e-07
+            ],
+            [
+              0.46168367845102337,
+              0.5383163215489984
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.42754324439210334,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM06",
+          "labeled": true,
+          "T": 1085,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8819309147196587,
+            0.11806908528028473
+          ],
+          "dominant_state_mass": 0.8819309147196587,
+          "posterior_expected_switches": 3.5917031272400766,
+          "posterior_expected_switch_rate": 0.0033133792686716574,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0027675276752767526,
+          "mean_marginal_state_entropy_nats": 0.004404344646017354,
+          "mean_max_gamma": 0.9980655717583241,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004608294930875576,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9296831758904,
+              0.07031682410957166
+            ],
+            [
+              0.9999999829988875,
+              1.7001060028438295e-08
+            ],
+            [
+              0.71565024640695,
+              0.28434975359296455
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.21403292948342145,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM09",
+          "labeled": true,
+          "T": 155,
+          "data_weight": 1.0,
+          "state_mass": [
+            1.0000000066788037e-12,
+            0.9999999999990029
+          ],
+          "dominant_state_mass": 0.9999999999990029,
+          "posterior_expected_switches": 3.0799999999846126e-10,
+          "posterior_expected_switch_rate": 1.9999999999900084e-12,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 2.863099917207131e-11,
+          "mean_max_gamma": 0.9999999999990002,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              1.0000000001097099e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000092123767e-12,
+              0.9999999999989998
+            ],
+            [
+              1.0000000107934543e-12,
+              0.9999999999989998
+            ]
+          ],
+          "early_late_state_distribution_TV": 5.341872215246715e-21,
+          "max_xi_marginal_inconsistency": 2.0194839173657902e-28
+        },
+        {
+          "ring_id": "DM10",
+          "labeled": false,
+          "T": 381,
+          "data_weight": 0.2,
+          "state_mass": [
+            0.5146097723075822,
+            0.48539022769531404
+          ],
+          "dominant_state_mass": 0.5146097723075822,
+          "posterior_expected_switches": 1.0006320244928935,
+          "posterior_expected_switch_rate": 0.0026332421697181406,
+          "hard_argmax_gamma_switches": 1,
+          "hard_argmax_gamma_switch_rate": 0.002631578947368421,
+          "mean_marginal_state_entropy_nats": 0.006427252446386301,
+          "mean_max_gamma": 0.9973476401048371,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.005249343832020997,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999995478606036,
+              4.521440259732825e-07
+            ],
+            [
+              0.5438297681205421,
+              0.45617023188549183
+            ],
+            [
+              9.416006293243662e-10,
+              0.9999999990564243
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9999995469157007,
+          "max_xi_marginal_inconsistency": 7.100986465502501e-13
+        },
+        {
+          "ring_id": "DM12",
+          "labeled": true,
+          "T": 1293,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.6280186820731721,
+            0.37198131792682976
+          ],
+          "dominant_state_mass": 0.6280186820731721,
+          "posterior_expected_switches": 3.002862405317737,
+          "posterior_expected_switch_rate": 0.0023241969081406635,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.0023219814241486067,
+          "mean_marginal_state_entropy_nats": 0.0032373641202125543,
+          "mean_max_gamma": 0.9987172359282228,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0030935808197989174,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9512543817951636,
+              0.04874561820484541
+            ],
+            [
+              0.9328016542799522,
+              0.06719834572004599
+            ],
+            [
+              1.014438134982715e-08,
+              0.9999999898555993
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9512543716507682,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        },
+        {
+          "ring_id": "DM14",
+          "labeled": false,
+          "T": 424,
+          "data_weight": 0.2,
+          "state_mass": [
+            2.501827643573068e-09,
+            0.9999999974817132
+          ],
+          "dominant_state_mass": 0.9999999974817132,
+          "posterior_expected_switches": 2.119913762215977e-06,
+          "posterior_expected_switch_rate": 5.011616459139425e-09,
+          "hard_argmax_gamma_switches": 0,
+          "hard_argmax_gamma_switch_rate": 0.0,
+          "mean_marginal_state_entropy_nats": 4.8080585280011314e-08,
+          "mean_max_gamma": 0.9999999974817132,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.0,
+          "occupancy_by_normalized_time_third": [
+            [
+              2.0118685016241194e-12,
+              0.9999999999837316
+            ],
+            [
+              8.337816577862927e-10,
+              0.9999999991416982
+            ],
+            [
+              6.687418594325412e-09,
+              0.999999993301965
+            ]
+          ],
+          "early_late_state_distribution_TV": 6.683586655147368e-09,
+          "max_xi_marginal_inconsistency": 9.050538096744276e-13
+        },
+        {
+          "ring_id": "DM16",
+          "labeled": true,
+          "T": 1051,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.5165136117616594,
+            0.4834863882383266
+          ],
+          "dominant_state_mass": 0.5165136117616594,
+          "posterior_expected_switches": 3.0884492709870583,
+          "posterior_expected_switch_rate": 0.0029413802580829126,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.002857142857142857,
+          "mean_marginal_state_entropy_nats": 0.004090411703618828,
+          "mean_max_gamma": 0.9982445867345058,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.003805899143672693,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9313924002627496,
+              0.06860759973724476
+            ],
+            [
+              0.6169630670540506,
+              0.38303693294591257
+            ],
+            [
+              9.999999984903707e-13,
+              0.9999999999989599
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.9313924002617324,
+          "max_xi_marginal_inconsistency": 1.7763568394002505e-15
+        },
+        {
+          "ring_id": "DM17",
+          "labeled": true,
+          "T": 663,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.8487576210914006,
+            0.1512423789086112
+          ],
+          "dominant_state_mass": 0.8487576210914006,
+          "posterior_expected_switches": 3.000199770328054,
+          "posterior_expected_switch_rate": 0.0045320238222478154,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.004531722054380665,
+          "mean_marginal_state_entropy_nats": 0.004559323862032205,
+          "mean_max_gamma": 0.9978657017187675,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.004524886877828055,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.999999985869669,
+              1.4130335601325664e-08
+            ],
+            [
+              0.9031094893696568,
+              0.09689051063035643
+            ],
+            [
+              0.6431633880348705,
+              0.35683661196514216
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.3568365978348025,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        },
+        {
+          "ring_id": "DM18",
+          "labeled": true,
+          "T": 298,
+          "data_weight": 1.0,
+          "state_mass": [
+            0.774640605441908,
+            0.22535939455809698
+          ],
+          "dominant_state_mass": 0.774640605441908,
+          "posterior_expected_switches": 3.0002075237614854,
+          "posterior_expected_switch_rate": 0.010101708834213756,
+          "hard_argmax_gamma_switches": 3,
+          "hard_argmax_gamma_switch_rate": 0.010101010101010102,
+          "mean_marginal_state_entropy_nats": 0.011037502302210355,
+          "mean_max_gamma": 0.9953964869212522,
+          "fraction_ambiguous_max_gamma_below_0_8": 0.006711409395973154,
+          "occupancy_by_normalized_time_third": [
+            [
+              0.9999999994928163,
+              5.071863754931782e-10
+            ],
+            [
+              0.8788026432785208,
+              0.12119735672148725
+            ],
+            [
+              0.44284281603872205,
+              0.5571571839612832
+            ]
+          ],
+          "early_late_state_distribution_TV": 0.5571571834540956,
+          "max_xi_marginal_inconsistency": 1.887379141862766e-15
+        }
+      ],
+      "posterior_mean_emission_residual_lag1": [
+        {
+          "ring_id": "DM01",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976003767265996,
+            0.9836123760751972,
+            0.999641435139375,
+            0.9970235878688593,
+            0.9896548397913018,
+            0.9746118867354248
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9976003767266006,
+            0.9836123760751894,
+            0.9996414351393934,
+            0.9970235878688722,
+            0.9896548397914434,
+            0.9746118867354144
+          ],
+          "median_abs_raw_lag1": 0.9933392138300805,
+          "median_abs_residual_lag1": 0.9933392138301578
+        },
+        {
+          "ring_id": "DM02",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9971209009647791,
+            0.9985654043454549,
+            0.9999960611019688,
+            0.9999908223929278,
+            0.9979470301309569,
+            0.9735083603316086
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971209009647805,
+            0.9985654043454553,
+            0.9999960611019687,
+            0.9999908223929279,
+            0.9979470301309845,
+            0.9735083603316652
+          ],
+          "median_abs_raw_lag1": 0.9982562172382059,
+          "median_abs_residual_lag1": 0.9982562172382199
+        },
+        {
+          "ring_id": "DM04",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9958046157558254,
+            0.9957423111228424,
+            0.9990422434020149,
+            0.9999550655366285,
+            0.9999950379409278,
+            0.9245647831308309
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9958848126577208,
+            0.9956590786878208,
+            0.9694815875249319,
+            0.9743086281246485,
+            0.9901586800839,
+            0.8827057899948512
+          ],
+          "median_abs_raw_lag1": 0.9974234295789202,
+          "median_abs_residual_lag1": 0.9822336541042742
+        },
+        {
+          "ring_id": "DM05",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9977781357601985,
+            0.9967365388791387,
+            0.999823801371688,
+            0.9999940100739274,
+            0.9997154779719567,
+            0.9720288992186707
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9978536751605814,
+            0.9963909310664755,
+            0.988746549770727,
+            0.9953344683400113,
+            0.9929461928832723,
+            0.9527364816200496
+          ],
+          "median_abs_raw_lag1": 0.9987468068660776,
+          "median_abs_residual_lag1": 0.9941403306116419
+        },
+        {
+          "ring_id": "DM06",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9976857716302883,
+            0.9969007176491617,
+            0.9998352090690134,
+            0.9999872162238901,
+            0.9999196247475916,
+            0.9590359872560016
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9977799509555286,
+            0.9967658532548122,
+            0.9934764120598868,
+            0.9949554931334941,
+            0.9973750558072197,
+            0.9376486240325094
+          ],
+          "median_abs_raw_lag1": 0.9987604903496508,
+          "median_abs_residual_lag1": 0.9958606731941531
+        },
+        {
+          "ring_id": "DM09",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9985928657640563,
+            0.9982914696070802,
+            0.9992746669714772,
+            0.9897811545388483,
+            0.9999144979770654,
+            0.9738477105210605
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.998592865764056,
+            0.99829146960708,
+            0.9992746669714767,
+            0.9897811545388481,
+            0.9999144979770657,
+            0.9738477105210605
+          ],
+          "median_abs_raw_lag1": 0.9984421676855681,
+          "median_abs_residual_lag1": 0.998442167685568
+        },
+        {
+          "ring_id": "DM10",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9973606854829224,
+            0.9956697557233437,
+            0.999708194668448,
+            0.999984019660102,
+            0.9984571997691002,
+            0.9919141141914798
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9975179937514009,
+            0.995646454700319,
+            0.9966591471828056,
+            0.9978139880681535,
+            0.9961449431770425,
+            0.9721574328580566
+          ],
+          "median_abs_raw_lag1": 0.9979089426260113,
+          "median_abs_residual_lag1": 0.996402045179924
+        },
+        {
+          "ring_id": "DM12",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981553671886004,
+            0.9988160201835218,
+            0.9999839833596711,
+            0.9999937474032349,
+            0.9999988725479783,
+            0.98644510872499
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981058480415332,
+            0.9989750851304979,
+            0.995832394659239,
+            0.9947132518105041,
+            0.9970105729874053,
+            0.995781049512014
+          ],
+          "median_abs_raw_lag1": 0.9994000017715965,
+          "median_abs_residual_lag1": 0.9964214838233221
+        },
+        {
+          "ring_id": "DM14",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9961188521590849,
+            0.9958947826871701,
+            0.9998098626122411,
+            0.9984564192405265,
+            0.9999845566750871,
+            0.9547151549351238
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9961188521573946,
+            0.9958947826883752,
+            0.9998098626138225,
+            0.99845641926206,
+            0.9999845566746729,
+            0.9547151549121125
+          ],
+          "median_abs_raw_lag1": 0.9972876356998057,
+          "median_abs_residual_lag1": 0.9972876357097273
+        },
+        {
+          "ring_id": "DM16",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9981016871288857,
+            0.9984629223883,
+            0.9999739729355219,
+            0.9999964757966521,
+            0.9999559457834625,
+            0.9904733653122201
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9981921054282072,
+            0.998447156382918,
+            0.9978308413117923,
+            0.9953409199360569,
+            0.996867158069263,
+            0.9756805141902896
+          ],
+          "median_abs_raw_lag1": 0.9992094340858813,
+          "median_abs_residual_lag1": 0.9973489996905276
+        },
+        {
+          "ring_id": "DM17",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.996991101420132,
+            0.993813716487606,
+            0.9998779671763045,
+            0.9999893975790236,
+            0.9997164336156528,
+            0.9893497248621168
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9971019076178068,
+            0.9933957958453419,
+            0.9901772755658742,
+            0.9950230979432517,
+            0.9937601144659142,
+            0.9874178084572933
+          ],
+          "median_abs_raw_lag1": 0.9983537675178924,
+          "median_abs_residual_lag1": 0.9935779551556281
+        },
+        {
+          "ring_id": "DM18",
+          "n_channels": 6,
+          "raw_lag1_per_channel": [
+            0.9945859047889454,
+            0.9812313160835314,
+            0.9986090864079009,
+            0.9999742702156887,
+            0.9979226194693961,
+            0.9849264201644691
+          ],
+          "posterior_mean_residual_lag1_per_channel": [
+            0.9949066835744954,
+            0.9802112650548004,
+            0.9665182462961586,
+            0.9687288570340662,
+            0.9718790712578812,
+            0.9818752899720705
+          ],
+          "median_abs_raw_lag1": 0.9962542621291708,
+          "median_abs_residual_lag1": 0.9760451681563408
+        }
+      ]
+    }
+  ],
+  "history_summary": [
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 8,
+      "rings_single_state_dominant_gt_0_99": 6,
+      "rings_zero_hard_argmax_switches": 6,
+      "total_unweighted_expected_switches": 8.155166660998471,
+      "total_weighted_expected_switches": 7.109116603442561,
+      "overall_weighted_expected_switch_rate": 0.0011224448344452698,
+      "total_unweighted_hard_argmax_switches": 6,
+      "posterior_transition_mean": [
+        [
+          0.9987188936476623,
+          0.0012811063523376358
+        ],
+        [
+          0.0012648200668735898,
+          0.9987351799331263
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        780.5753192740448,
+        790.6262923798768
+      ],
+      "median_ring_expected_switches": 0.5965536957602541,
+      "max_ring_xi_gamma_inconsistency": 1.4591661212648432e-12,
+      "epoch": 1
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 8,
+      "rings_single_state_dominant_gt_0_99": 5,
+      "rings_zero_hard_argmax_switches": 5,
+      "total_unweighted_expected_switches": 9.001073771542652,
+      "total_weighted_expected_switches": 8.201065053133211,
+      "overall_weighted_expected_switch_rate": 0.0012948504883688915,
+      "total_unweighted_hard_argmax_switches": 9,
+      "posterior_transition_mean": [
+        [
+          0.9984952693371525,
+          0.0015047306628476074
+        ],
+        [
+          0.001223872430394857,
+          0.9987761275696051
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        664.5707598645122,
+        817.0786228735741
+      ],
+      "median_ring_expected_switches": 1.0000029164929503,
+      "max_ring_xi_gamma_inconsistency": 1.5114576257246881e-12,
+      "epoch": 2
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 6,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 9.892968913225111,
+      "total_weighted_expected_switches": 9.091843658082137,
+      "overall_weighted_expected_switch_rate": 0.0014354938199573918,
+      "total_unweighted_hard_argmax_switches": 9,
+      "posterior_transition_mean": [
+        [
+          0.9983307189643345,
+          0.0016692810356655806
+        ],
+        [
+          0.0013294261381445332,
+          0.9986705738618554
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        599.0603011920616,
+        752.2042566393794
+      ],
+      "median_ring_expected_switches": 1.0000680542783702,
+      "max_ring_xi_gamma_inconsistency": 1.3490319972220277e-12,
+      "epoch": 3
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 5,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 11.370540162228352,
+      "total_weighted_expected_switches": 10.570073752057166,
+      "overall_weighted_expected_switch_rate": 0.0016688887444829426,
+      "total_unweighted_hard_argmax_switches": 11,
+      "posterior_transition_mean": [
+        [
+          0.9980840686365846,
+          0.0019159313634154035
+        ],
+        [
+          0.0015532209793668154,
+          0.9984467790206332
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        521.9393654151437,
+        643.8233923466888
+      ],
+      "median_ring_expected_switches": 1.0000503592205483,
+      "max_ring_xi_gamma_inconsistency": 1.5661916208387083e-12,
+      "epoch": 4
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 5,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 13.998930435470902,
+      "total_weighted_expected_switches": 11.598882914260734,
+      "overall_weighted_expected_switch_rate": 0.0018313254569692961,
+      "total_unweighted_hard_argmax_switches": 14,
+      "posterior_transition_mean": [
+        [
+          0.9978741207961013,
+          0.002125879203898686
+        ],
+        [
+          0.0016001855779871788,
+          0.9983998144220128
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        470.3936132241489,
+        624.9275170057624
+      ],
+      "median_ring_expected_switches": 1.0000957414659375,
+      "max_ring_xi_gamma_inconsistency": 1.3962164757685969e-12,
+      "epoch": 5
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 12.09464908511549,
+      "total_weighted_expected_switches": 9.694300188784544,
+      "overall_weighted_expected_switch_rate": 0.0015306145302489173,
+      "total_unweighted_hard_argmax_switches": 12,
+      "posterior_transition_mean": [
+        [
+          0.9980615348355923,
+          0.0019384651644076788
+        ],
+        [
+          0.0010110740821134907,
+          0.9989889259178865
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        515.8720509200249,
+        989.0472099824874
+      ],
+      "median_ring_expected_switches": 1.0001341198150646,
+      "max_ring_xi_gamma_inconsistency": 1.1222134332911082e-12,
+      "epoch": 6
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 13.833927471493809,
+      "total_weighted_expected_switches": 11.433886137475593,
+      "overall_weighted_expected_switch_rate": 0.001805274431204306,
+      "total_unweighted_hard_argmax_switches": 14,
+      "posterior_transition_mean": [
+        [
+          0.9978600814718894,
+          0.0021399185281106444
+        ],
+        [
+          0.0014902284154001022,
+          0.9985097715846
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        467.307510479356,
+        671.0380701817209
+      ],
+      "median_ring_expected_switches": 1.0000724148750746,
+      "max_ring_xi_gamma_inconsistency": 1.106004177131581e-12,
+      "epoch": 7
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 14.002258334853238,
+      "total_weighted_expected_switches": 11.602229775552576,
+      "overall_weighted_expected_switch_rate": 0.001831853886502554,
+      "total_unweighted_hard_argmax_switches": 14,
+      "posterior_transition_mean": [
+        [
+          0.9978344892495248,
+          0.0021655107504752486
+        ],
+        [
+          0.001524834649910993,
+          0.9984751653500891
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        461.78482364058965,
+        655.8088118330802
+      ],
+      "median_ring_expected_switches": 1.0001935353985072,
+      "max_ring_xi_gamma_inconsistency": 1.2455592113269631e-12,
+      "epoch": 8
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 14.16738052362183,
+      "total_weighted_expected_switches": 11.767354773737383,
+      "overall_weighted_expected_switch_rate": 0.0018579251568992961,
+      "total_unweighted_hard_argmax_switches": 14,
+      "posterior_transition_mean": [
+        [
+          0.9978121356834465,
+          0.0021878643165536217
+        ],
+        [
+          0.0015635187515128952,
+          0.9984364812484872
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        457.0667350959338,
+        639.582991270437
+      ],
+      "median_ring_expected_switches": 1.0020210817680109,
+      "max_ring_xi_gamma_inconsistency": 1.128208637624084e-12,
+      "epoch": 9
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 16.73063552804608,
+      "total_weighted_expected_switches": 14.330608109150532,
+      "overall_weighted_expected_switch_rate": 0.002262632327452086,
+      "total_unweighted_hard_argmax_switches": 16,
+      "posterior_transition_mean": [
+        [
+          0.9975225058991977,
+          0.0024774941008024087
+        ],
+        [
+          0.0022628468634524296,
+          0.9977371531365475
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        403.63365534398264,
+        441.92119941969213
+      ],
+      "median_ring_expected_switches": 1.187080922261226,
+      "max_ring_xi_gamma_inconsistency": 1.0437206654501097e-12,
+      "epoch": 10
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 26.016921499405456,
+      "total_weighted_expected_switches": 23.616900829844365,
+      "overall_weighted_expected_switch_rate": 0.003728827338298024,
+      "total_unweighted_hard_argmax_switches": 26,
+      "posterior_transition_mean": [
+        [
+          0.9964339276092995,
+          0.0035660723907004954
+        ],
+        [
+          0.0046258954251361785,
+          0.9953741045748637
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        280.42055528871765,
+        216.1743636845284
+      ],
+      "median_ring_expected_switches": 3.000091306784948,
+      "max_ring_xi_gamma_inconsistency": 1.432409746371377e-12,
+      "epoch": 11
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 36.22932769081276,
+      "total_weighted_expected_switches": 35.35282081461296,
+      "overall_weighted_expected_switch_rate": 0.005581789316441354,
+      "total_unweighted_hard_argmax_switches": 36,
+      "posterior_transition_mean": [
+        [
+          0.9951077162958875,
+          0.004892283704112581
+        ],
+        [
+          0.00770250188861773,
+          0.9922974981113823
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        204.40351796429584,
+        129.82794609602718
+      ],
+      "median_ring_expected_switches": 3.0001431311531936,
+      "max_ring_xi_gamma_inconsistency": 1.1284306822290091e-12,
+      "epoch": 12
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 32.59321094274947,
+      "total_weighted_expected_switches": 31.79066780008811,
+      "overall_weighted_expected_switch_rate": 0.005019367784528247,
+      "total_unweighted_hard_argmax_switches": 30,
+      "posterior_transition_mean": [
+        [
+          0.9954990534191145,
+          0.004500946580885438
+        ],
+        [
+          0.006730385237385278,
+          0.9932696147626148
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        222.17548731788347,
+        148.5799051212264
+      ],
+      "median_ring_expected_switches": 3.0003326393287773,
+      "max_ring_xi_gamma_inconsistency": 1.0769163338864018e-12,
+      "epoch": 13
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 29.61083666433894,
+      "total_weighted_expected_switches": 28.81010753879265,
+      "overall_weighted_expected_switch_rate": 0.004548772820953746,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9958351674840739,
+          0.004164832515926229
+        ],
+        [
+          0.005948648031225266,
+          0.9940513519687747
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        240.1056936085767,
+        168.10542408138076
+      ],
+      "median_ring_expected_switches": 3.000274734862729,
+      "max_ring_xi_gamma_inconsistency": 1.1666223542761145e-12,
+      "epoch": 14
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.792064863470213,
+      "total_weighted_expected_switches": 27.99152196636425,
+      "overall_weighted_expected_switch_rate": 0.004419527909303437,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959282725068559,
+          0.00407172749314409
+        ],
+        [
+          0.00573652272289198,
+          0.9942634772771081
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        245.59600358417407,
+        174.32163146664453
+      ],
+      "median_ring_expected_switches": 3.0002224894163154,
+      "max_ring_xi_gamma_inconsistency": 1.1333156635373598e-12,
+      "epoch": 15
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.601470372922225,
+      "total_weighted_expected_switches": 27.800958406311874,
+      "overall_weighted_expected_switch_rate": 0.004389440192988486,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959501985268056,
+          0.004049801473194398
+        ],
+        [
+          0.005687953274315894,
+          0.9943120467256841
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        246.92568428822483,
+        175.81016435481655
+      ],
+      "median_ring_expected_switches": 3.000208243224986,
+      "max_ring_xi_gamma_inconsistency": 1.3589129821411916e-12,
+      "epoch": 16
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.55818114796879,
+      "total_weighted_expected_switches": 27.757673736763905,
+      "overall_weighted_expected_switch_rate": 0.004382606059233912,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.995955257337442,
+          0.004044742662558007
+        ],
+        [
+          0.005677177550512279,
+          0.9943228224494877
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.23451735432798,
+        176.14386569779825
+      ],
+      "median_ring_expected_switches": 3.000204762236446,
+      "max_ring_xi_gamma_inconsistency": 1.0931255900459291e-12,
+      "epoch": 17
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.548331006952054,
+      "total_weighted_expected_switches": 27.747823936929024,
+      "overall_weighted_expected_switch_rate": 0.004381050893161712,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959564322558858,
+          0.004043567744114167
+        ],
+        [
+          0.005674803581088119,
+          0.9943251964189118
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.30635500186673,
+        176.21755285638326
+      ],
+      "median_ring_expected_switches": 3.000203906170955,
+      "max_ring_xi_gamma_inconsistency": 1.1193268534270828e-12,
+      "epoch": 18
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.546160384087678,
+      "total_weighted_expected_switches": 27.745653190956926,
+      "overall_weighted_expected_switch_rate": 0.004380708158228642,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959566988202142,
+          0.004043301179785765
+        ],
+        [
+          0.005674305457027553,
+          0.9943256945429725
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.3226592665,
+        176.23302227438592
+      ],
+      "median_ring_expected_switches": 3.000203758268035,
+      "max_ring_xi_gamma_inconsistency": 1.1262102361797588e-12,
+      "epoch": 19
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545306919815847,
+      "total_weighted_expected_switches": 27.74479964310699,
+      "overall_weighted_expected_switch_rate": 0.004380573393189811,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568011170044,
+          0.004043198882995582
+        ],
+        [
+          0.005674101318651727,
+          0.9943258986813482
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.32891676579857,
+        176.23936264811238
+      ],
+      "median_ring_expected_switches": 3.00020372286581,
+      "max_ring_xi_gamma_inconsistency": 1.0897949209720537e-12,
+      "epoch": 20
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545344204763573,
+      "total_weighted_expected_switches": 27.744836911347548,
+      "overall_weighted_expected_switch_rate": 0.004380579277401091,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959567990015568,
+          0.004043200998443315
+        ],
+        [
+          0.005674117948641607,
+          0.9943258820513583
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.32878736056682,
+        176.2388461169344
+      ],
+      "median_ring_expected_switches": 3.0002036854974152,
+      "max_ring_xi_gamma_inconsistency": 1.0869083411080283e-12,
+      "epoch": 21
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545155313976363,
+      "total_weighted_expected_switches": 27.74464800312653,
+      "overall_weighted_expected_switch_rate": 0.004380549451043093,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568209670029,
+          0.004043179032997057
+        ],
+        [
+          0.005674070549320499,
+          0.9943259294506795
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.33013102779267,
+        176.24031835835447
+      ],
+      "median_ring_expected_switches": 3.0002036807876378,
+      "max_ring_xi_gamma_inconsistency": 1.5311085732605534e-12,
+      "epoch": 22
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545260299033394,
+      "total_weighted_expected_switches": 27.74475298941969,
+      "overall_weighted_expected_switch_rate": 0.004380566027128282,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568095911411,
+          0.004043190408858864
+        ],
+        [
+          0.0056740996173850365,
+          0.9943259003826149
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.32943514332842,
+        176.2394154900038
+      ],
+      "median_ring_expected_switches": 3.0002036673118617,
+      "max_ring_xi_gamma_inconsistency": 1.0444978215673473e-12,
+      "epoch": 23
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545180549971445,
+      "total_weighted_expected_switches": 27.744673234346873,
+      "overall_weighted_expected_switch_rate": 0.004380553434752253,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568184819203,
+          0.0040431815180796225
+        ],
+        [
+          0.0056740783470969015,
+          0.9943259216529031
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.32997900993288,
+        176.2400761546845
+      ],
+      "median_ring_expected_switches": 3.0002036629104483,
+      "max_ring_xi_gamma_inconsistency": 1.13464793116691e-12,
+      "epoch": 24
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545211438410895,
+      "total_weighted_expected_switches": 27.744704124550676,
+      "overall_weighted_expected_switch_rate": 0.004380558311947498,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568154270437,
+          0.004043184572956317
+        ],
+        [
+          0.00567408785747775,
+          0.9943259121425222
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.32979213680224,
+        176.23978075737992
+      ],
+      "median_ring_expected_switches": 3.000203658311408,
+      "max_ring_xi_gamma_inconsistency": 1.1721734693992403e-12,
+      "epoch": 25
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.54519362825698,
+      "total_weighted_expected_switches": 27.744686312078105,
+      "overall_weighted_expected_switch_rate": 0.004380555499570245,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568173984391,
+          0.0040431826015608985
+        ],
+        [
+          0.005674083058593956,
+          0.994325916941406
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.32991273111065,
+        176.23992981304727
+      ],
+      "median_ring_expected_switches": 3.0002036562659598,
+      "max_ring_xi_gamma_inconsistency": 1.2108092306561957e-12,
+      "epoch": 26
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.54516312617635,
+      "total_weighted_expected_switches": 27.74465580985144,
+      "overall_weighted_expected_switch_rate": 0.004380550683631969,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568210662105,
+          0.004043178933789507
+        ],
+        [
+          0.005674075800128353,
+          0.9943259241998716
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.33013709654193,
+        176.240155265
+      ],
+      "median_ring_expected_switches": 3.0002036538980765,
+      "max_ring_xi_gamma_inconsistency": 1.0507150705052481e-12,
+      "epoch": 27
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545162499781064,
+      "total_weighted_expected_switches": 27.744655185017166,
+      "overall_weighted_expected_switch_rate": 0.004380550584978079,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568211221974,
+          0.0040431788778026246
+        ],
+        [
+          0.005674075586546373,
+          0.9943259244134536
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.3301405213825,
+        176.24016189898148
+      ],
+      "median_ring_expected_switches": 3.0002036514586745,
+      "max_ring_xi_gamma_inconsistency": 1.1345369088644475e-12,
+      "epoch": 28
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.54517578784751,
+      "total_weighted_expected_switches": 27.7446684719948,
+      "overall_weighted_expected_switch_rate": 0.004380552682833586,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568196421191,
+          0.004043180357880912
+        ],
+        [
+          0.005674079130773767,
+          0.9943259208692263
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.33004998177333,
+        176.2400518132444
+      ],
+      "median_ring_expected_switches": 3.0002036497167612,
+      "max_ring_xi_gamma_inconsistency": 1.113109604489182e-12,
+      "epoch": 29
+    },
+    {
+      "rings": 12,
+      "rings_single_state_dominant_gt_0_95": 4,
+      "rings_single_state_dominant_gt_0_99": 4,
+      "rings_zero_hard_argmax_switches": 4,
+      "total_unweighted_expected_switches": 28.545144161864616,
+      "total_weighted_expected_switches": 27.74463684598847,
+      "overall_weighted_expected_switch_rate": 0.004380547689463886,
+      "total_unweighted_hard_argmax_switches": 28,
+      "posterior_transition_mean": [
+        [
+          0.9959568232439845,
+          0.004043176756015564
+        ],
+        [
+          0.005674070945330379,
+          0.9943259290546697
+        ]
+      ],
+      "posterior_mean_sojourn_steps": [
+        247.33027031583083,
+        176.24030605803077
+      ],
+      "median_ring_expected_switches": 3.0002036470447697,
+      "max_ring_xi_gamma_inconsistency": 1.0712541964608135e-12,
+      "epoch": 30
+    }
+  ],
+  "note": "No test scoring, no model weights, no labels stored."
+}

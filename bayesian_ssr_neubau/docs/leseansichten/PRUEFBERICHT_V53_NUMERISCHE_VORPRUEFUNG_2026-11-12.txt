@@ -1,0 +1,34 @@
+BAYESIAN BACHELOR · TECHNISCHE FREIGABEVORPRÜFUNG
+V5.3 – Synthetische numerische Prüfung
+Stand: 12. November 2026 | Eigenständiges QA-Overlay zur unveränderten V5.2-Installation
+STATUS: 14/14 synthetische Prüfungen im Entwickler-System bestanden. Kein offizieller Trainingslauf, keine Ringdaten-Deserialisierung, keine erneute alte Testauswertung. Windows-Python-3.11-Bestätigung steht aus.
+1. Ausgangslage
+Die V5.2-Konfiguration wurde auf dem Nutzerrechner mit Python 3.11.9 unter Windows erfolgreich geprüft. 19/19 V5.2-Vertragstests waren PASS. Der native Test der Symlink-Erzeugung wurde wegen WinError 1314 nicht ausgeführt; der Ablehnungspfad wurde erfolgreich simuliert. Dieser Unterschied bleibt als Prüfvorbehalt bestehen.
+Die hier neu erstellte V5.3-Vorprüfung ergänzt V5.2 ausschließlich durch einen separaten Ordner qa_v53. Alle zehn eingefrorenen mathematischen Kernel, die Konfigurationsdatei, der V5.2-Einstiegspunkt und die V5.1-Eingabesicherheit bleiben unverändert. Es findet keine Modellanpassung statt.
+2. Abgedeckte Prüfgruppen
+Prüfgruppe
+Befund
+Integrität
+Konfiguration und zehn Kernhashes verifiziert; keine Veränderung am Freeze-Kandidaten
+Markov-M2-Momente
+32 explizite Zustandspfade: max. Abweichung 1,11 × 10⁻¹⁶; PSD und Normierungsprüfungen
+Lokale Zielfunktion
+Exakter K2/T5-Pfadvergleich (32 Pfade): Abweichung 0 innerhalb der Rechengenauigkeit
+Gradienten
+7 Koordinaten mit zentralen finiten Differenzen: max. Abweichung 8,66 × 10⁻¹¹
+Lange/extreme Sequenzen
+2.048 Schritte; fast deterministische Übergänge ab 10⁻¹² – endlich und normalisiert
+Normal-Wishart
+KL(q‖q) für d=2,6; Konditionierung bis 10⁸; invalides W wird abgelehnt
+Prozess-/Qualitätsmodell
+Korrelierte Gauß-Kanäle: endliche Prozessupdates; zwei NIG-Köpfe: positive Varianzen
+Lokales Feedback
+Fixiertes künstliches globales Modell: 0 gegen 8 VI-Schritte und Qualitätsvorzeichen-Wechsel
+
+3. Interpretation des Rückkopplungsnachweises
+Für einen rein synthetischen Prozess und absichtlich stark eingestellte Bayesian-Qualitätsköpfe führt die lokale Optimierung mit acht VI-Schritten zu einer Verbesserung ihrer lokalen Zielfunktion um 229,894 gegenüber dem Ausgangspunkt mit null Schritten. Der größte M2-Momentenunterschied beträgt 0,4185. Bei künstlicher Umkehr des Qualitätslabels wechselt die Zustandsbelegung von rund 0,7902 auf 0,2098 für Zustand 1.
+Dieser Befund ist ein Funktionsnachweis für die implementierte Zustandsrückkopplung in einer konstruierten Situation. Er misst weder die auf echten DM-Daten vorhandene Rückkopplungsstärke noch einen positiven Effekt auf RMSE/MAE oder die Güte der Endqualitätsprognose. Eine realdatenbezogene, ausschließlich entwicklungsbasierte 0-vs.-8-Ablation bleibt offen.
+4. Freigabestatus und nächste Schritte
+V5.3 ist noch keine neue Hauptmodellfreigabe und keine Änderung des Trainingsmodells. Das Overlay kann auf dem Windows-Projektstand mit dem beigefügten Befehl ausgeführt werden. Die 14 PASS-Befunde stammen aus der lokalen Entwicklerumgebung; ihre Reproduktion unter Windows 3.11.9 ist noch abzuwarten.
+.\.venv\Scripts\python.exe .\qa_v53\test_numerical_v53.py
+Danach: getrennte Untersuchung der lokalen Qualitätskopplung auf erlaubten Entwicklungsdaten, einschließlich Momentendifferenzen, lokalen Optimierungsgewinnen, Unsicherheit und Interpretationsgrenzen. Die historisch geöffneten Ringe DM07/DM08/DM11/DM15 dürfen nicht erneut zur Modellwahl benutzt werden. Kein endgültiger Trainingslauf ohne ausdrückliche Freigabe.

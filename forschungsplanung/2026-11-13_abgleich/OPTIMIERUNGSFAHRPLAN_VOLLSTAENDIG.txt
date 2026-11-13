@@ -1,0 +1,192 @@
+Vollständige Leseansicht des Nutzer-DOCX vom 13.11.2026
+Quelle: C:\Users\umutj\Downloads\BAYESIAN_BACHELOR_OPTIMIERUNGSFAHRPLAN_2026-11-13.docx
+SHA256: b5f21a4aec64171d6bee6f859f40907c804148c9b958c3abfb4c7cbc5584665b
+Absatznummern umfassen Word-Haupttext und Tabellenzellen; keine Word-Seitenangaben.
+
+P001: Forschungs- und Optimierungsfahrplan
+P002: Bayesian Bachelor · Zweiköpfiges Bayesian-SSR-HMM im Ringwalzprozess
+P003: Version 13.11.2026 · getrennt von der Implementierung des neuen Basismodells · Status: Forschungsplanung, keine Modellfreigabe
+P004: Dieses Dokument sammelt und priorisiert sämtliche bisher identifizierten mathematischen, numerischen, physikalischen und empirischen Verbesserungsansätze. Es ist ausdrücklich ein Folgeauftrag für den VS-Code-Agenten, NACHDEM das neue Basismodell eigenständig implementiert, synthetisch validiert und auf den zwölf Entwicklungsexperimenten reproduziert worden ist. Es ist keine Aufforderung, alle Änderungen gleichzeitig einzubauen.
+P005: 0. Klare Trennung: Basismodell versus spätere Forschung
+P006: Bereits mathematisch geprüfte strukturelle Korrekturen GEHÖREN in das Basismodell: abgesicherter lokaler Warmstart und ELBO-Blockkontrolle (V5.8), K−1-Logit-Gauge (V5.9), induzierter NIG-Prior bei der M2-Reduktion (V6.0).
+P007: Die Prozess-ELBO-Zerlegung (V6.1), zeitlichen HMM- und Residualdiagnosen (V6.2/V6.3) sollen als Diagnostik/Tests ins neue System; sie rechtfertigen noch keine geänderte generative Modellklasse.
+P008: Alle folgenden Optimierungen sind getrennte Hypothesen; jedes Experiment braucht einen dokumentierten mathematischen Vertrag, einen unabhängigen synthetischen Test, ringweise saubere Evaluation und ein reproduzierbares Artefakt.
+P009: Keine neuen unabhängigen Außenringdaten werden erwartet. Die zuvor geöffneten DM07/DM08/DM11/DM15 dürfen explorativ betrachtet werden, sind aber kein frisch blinder Test des nachträglich optimierten Modells.
+P010: 1. Kurzüberblick und Prioritäten
+P011: Rang
+P012: Forschungspaket
+P013: Warum jetzt?
+P014: P0
+P015: Konformität des Neubaus
+P016: Auftrag für den Neubau, kein Optimierungsexperiment
+P017: P1
+P018: Dynamische Emissionsstruktur / AR-HMM
+P019: Hohes Residual-Lag1 und plausible Modellannahmenverletzung
+P020: P2
+P021: Marginalnutzen von HMM-Zuständen
+P022: Zentrale Forschungsfrage: braucht Endqualität HMM?
+P023: P3
+P024: Bayes-Mehrwert und Unsicherheit
+P025: Posterior-Prädiktion vs MAP/Ridge und reale Kalibrierung
+P026: P4
+P027: Reiner SSL-Effekt ungelabelter Prozesse
+P028: U-ELBO vs U-Preprocessing sauber trennen
+P029: P5
+P030: Generalisierung & Ring-Folds
+P031: N=16 und nur 8 Labels Entwicklungsbasis
+P032: P6
+P033: Echte Initialisierungsrobustheit
+P034: Drei Seeds ergaben gleiche K-Means-Zentren
+P035: P7
+P036: Physikalische Zustandsinterpretation
+P037: HMM-Wechsel sind nicht automatisch Phase 1/2
+P038: P8
+P039: Feature-/Prior- und Kovarianzannahmen
+P040: Wenige Labels, starke Regularisierung
+P041: P9
+P042: Komplexere Posterior-Predictive & Multi-Target
+P043: Quantile/Korrelation bislang approximiert
+P044: P10
+P045: Trainings-, Reproduzierbarkeits-, Performancetests
+P046: Codequalität und Ressourcen
+P047: P11
+P048: Wissenschaftliche Quellen-/Reportingmatrix
+P049: Nachweisbare Seiten und Evidenztrennung
+P050: 2. Priorisierte Forschungsaufträge (erst nach erfolgreichem Neubau)
+P051: P1 – Zeitkorrelierte Emissionen und autoregressives HMM  |  sehr hoch
+P052: Ziel: Prüfen, ob HMM-Emissionen mit expliziter zeitlicher Dynamik die Prozessbeschreibung verbessern, ohne bei Ringendqualitätslabels überzuoptimieren.
+P053: Fachliche Motivation: V6.2/V6.3: Posterior-gemittelte Residuen weisen sehr hohe lag-1-Autokorrelation auf; nach phasenweiser linearer Detrend bleibt sie hoch. Erste Differenzen sind deutlich weniger korreliert. Dies zeigt ein mögliches Missverhältnis zu bedingt unabhängigen Gaussian-Emissionen, aber ist noch kein formaler Test.
+P054: Mathematische Aufgabe: Kandidat: x_t|z_t=k,x_(t−1) ~ N(A_k x_(t−1)+b_k, Σ_k). Vollständige gemeinsame HMM-Likelihood einschließlich Anfangsbeobachtung, korrekter Normierung und stationärem/initialem Anteil herleiten. Erwäge Matrix-Normal-Wishart- bzw. Matrix-Normal-Inverse-Wishart-Priors; untersuche Konjugiertheit, erwartete Logdichte, gewichtete Updates, Posteriorprädiktion, Residualinnovationen und Ringlängen.
+P055: Code-/Experimentarbeit: Zuerst bedingte Predictive-Checks und Posterior-Predictive-Simulation, korrekte Innovations-ACF auf L/U-Train und ringweisen Val-Folds. Dann eigenständiger AR-HMM-Branch, kontrollierter identischer F2-Fenster-/Scaler-/K-/Head-Vergleich mit altem HMM, Trainings-ELBO nur innerhalb vergleichbarer Zielfunktionen interpretieren.
+P056: Verfügbare Vorbefunde: V6.2: ca. 0,996 medianes |lag1| bei Emissionsresiduen. V6.3: ~0,987 nach linearer phasenweiser Bereinigung; erste Differenzen ~0,254. Expliziter Unterschied zwischen Residualdiagnostik mit aus X geschätztem gamma und echter generativer Innovation beachten.
+P057: Akzeptanzkriterien: Synthetische AR-HMM-Gleichheits-/Gradiententests, stabile SPD-Kovarianzen; bei gleichem Ringfold Verbesserung der held-out Prozessvorhersage und nachgelagerter Ringqualität, nicht nur bessere TRAIN-ELBO; Komplexitätsvorteil/Overfitting dokumentieren.
+P058: Nicht vorschnell tun: Nicht allein aufgrund hoher Lag1-Werte A_k einführen; keine F2-Startbeobachtung doppelt zählen; keine Val-Sequenz für Feature-/Prior-Fit nutzen.
+P059: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P060: P2 – Was bringt das HMM für die Qualitätsprognose wirklich?  |  sehr hoch
+P061: Ziel: Quantifizieren, ob zeitabhängige latente Zustände echte Zusatzinformation gegenüber transparenten Prozessstatistiken liefern.
+P062: Fachliche Motivation: Bisherige physikalische NIG-only vs HMM-Vergleiche änderten mehrere Komponenten gleichzeitig und sind deshalb keine sauberen Ablationen. Hohe Selbstübergangswahrscheinlichkeiten können ringweite Regime statt relevante dynamische Qualitätsmerkmale bedeuten.
+P063: Mathematische Aufgabe: Formuliere zwei bis vier verschachtelte Modelle mit gleichen Qualitätsfeatures und Priors: (a) train-mean, (b) head-only physikalische Deskriptoren, (c) i.i.d. Bayesian Gaussian mixture / HMM ohne Transitionsabhängigkeit, (d) vollständiges HMM mit M2-Momenten. Gleiche Daten-/Scaler-Verträge und vergleichbare Parameterräume.
+P064: Code-/Experimentarbeit: Gepaarte Ringfolds, identisches Labelbudget, getrennte Ablationen HMM-Momente / M2-Delta / physikalische Deskriptoren. Zusätzlich qualitative Zustandsdynamik visualisieren.
+P065: Verfügbare Vorbefunde: V6.2: 8 von 12 Ringen hatten harte Zustandswechsel, 4 nicht; erwartete Wechselrate nur ~0,00438 je 0,1-s Kante.
+P066: Akzeptanzkriterien: Berichte beide Target-RMSE/MAE/R² mit foldweise gepaarten Differenzen, absolute und relative Effekte, Unsicherheit und Negativergebnisse. Belege einen eigenständigen Effekt, keine bloße höhere Modellkomplexität.
+P067: Nicht vorschnell tun: Kein Architekturvergleich mit anderen Folds oder anders gefitteten Scalern als gleichwertig deklarieren.
+P068: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P069: P3 – Eigenständiger Bayes-Nutzen und Kalibrierung  |  sehr hoch
+P070: Ziel: Beweisen oder widerlegen, ob der Bayesian-Posterior gegenüber regelmäßigen Punktschätzungen bessere Vorhersagen oder aussagekräftigere Unsicherheit liefert.
+P071: Fachliche Motivation: Nur acht Labelringe und starke NIG-Priors; historische prädiktive SD ist Momentenapproximation und nicht automatisch kalibriertes 95%-Intervall.
+P072: Mathematische Aufgabe: Bayesian NIG posterior mean/predictive moments mit Ridge/MAP/Empirical Bayes auf identischen Designmomenten vergleichen; zusätzlich Priorstärken (v, a, b) untersuchen. Die genaue Student-t-Verteilung für fixiertes g und Zustandsmischung zur prädiktiven Gesamtmischung sauber abgrenzen.
+P073: Code-/Experimentarbeit: Gleiche ringweise Folds und Features, pro Fold negative log-likelihood, CRPS (wenn korrekt berechnet), predictive RMSE/MAE, empirische Coverage, Breite und PIT-/Kalibrierdiagramme (nur deskriptiv bei kleinen n). Posteriorpredictive simulation vs Momentenapproximation synthetisch überprüfen.
+P074: Verfügbare Vorbefunde: V5.1/4 äußere Testwerte waren zu wenige für belastbare Coverage; bislang keine volle t-Mischungsquantile.
+P075: Akzeptanzkriterien: Korrekter Vergleich bei gleichen Priors/Regularisierungsinformationen; numerische Posteriorintervalle decken theoretische Simulationsfälle, Coverage nicht aus 4 Datenpunkten behaupten.
+P076: Nicht vorschnell tun: Keine universellen Kalibrierungsversprechen oder exakte Bayes-Posteriorbehauptungen.
+P077: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P078: P4 – Eigentlicher Nutzen der ungelabelten Ringe  |  sehr hoch
+P079: Ziel: Trennen, ob zusätzliche U-Prozesssequenzen den Prozessposterior selbst verbessern oder nur die gemeinsamen Scaler/KMeans-Startwerte beeinflussen.
+P080: Fachliche Motivation: Alte Entwicklung-CV: strict L-only ungefähr Außen .654 / Höhe 3.176; shared C0 .550 / 3.263; SSL C>0 .545 / 3.210. Reiner U-ELBO-Effekt gegenüber shared C0 war klein und foldsensitiv.
+P081: Mathematische Aufgabe: Formal getrennte Arme: A strict L-only Daten + L-only Scaler und Init; B shared X-only-Preprocessing, aber C=0; C gleiche Preprocessing/Init wie B und C>0 (nur U-Prozess-ELBO zusätzlich); D Supervised + eventuell U-Prior. Gewichte C einschließlich U-Entropie.
+P082: Code-/Experimentarbeit: Identische Ringsplits/Folds/Features/Seeds; in train-fold jeweils verschiedene zugelassene U-Ringe oder Teilmengen hinzufügen, beobachten ob posterior q(theta) und Qualitätsfehler sich nachvollziehbar ändern.
+P083: Verfügbare Vorbefunde: Bei C=0 darf kein U-lokaler Faktor ungewollt Prozessposterior-Statistiken beeinflussen; historische V4-CV zeigte schwachen U-spezifischen Mehrwert.
+P084: Akzeptanzkriterien: Gepaarte foldweise Effekte, Sensitivität je Ring, keine versehentliche U-Labelnutzung. Ergebnis kann „U bringt nichts“ sein und soll trotzdem wissenschaftlich dokumentiert werden.
+P085: Nicht vorschnell tun: Nicht strict gegen SSL unter unterschiedlichem Scaling als isolierten semi-supervised Effekt verkaufen.
+P086: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P087: P5 – Generalisierung mit sehr wenigen Labels  |  sehr hoch
+P088: Ziel: Faire Unsicherheitsschätzung der Ringgeneralisation mit maximal verfügbarer Datenbasis und ohne erneute unabhängige Test-Fiktion.
+P089: Fachliche Motivation: Nur 16 aktive Ringe, zunächst acht gelabelte Entwicklung, vier U und vier bereits historisch geöffnete Außenringe. Trial-22/phys_var und C/K wurden teils explorativ gewählt.
+P090: Mathematische Aufgabe: Ringweise CV; bei geeignetem Vorhersagevergleich pre-specify Folds, Leave-One-Ring-Out auf erlaubten Entwicklungsringen, repeated folds und ggf. nested CV wenn Modellwahl tatsächlich erfolgt. Metriken/Fehlerbars auf RING-Ebene und nicht Zeitpunkten.
+P091: Code-/Experimentarbeit: Softwaretests zur Split-Isolation, val-only model selection, QA aller scaler, dokumentierte Seeds, foldweiser Bericht und train-mean-Referenz.
+P092: Verfügbare Vorbefunde: Historisch geöffnete Testlabels sind methodisch nicht wieder unabhängig zu machen, auch nicht in neuem Verzeichnis.
+P093: Akzeptanzkriterien: Keine Data leakage, val RMSE pro Ring, paired differences, breite Unsicherheit offenlegen; keine unhaltbaren Signifikanztests bei n≈8.
+P094: Nicht vorschnell tun: Nie sämtliche 16 Ringe für Feature-/Prior-Tuning verwenden und später externe Unabhängigkeit behaupten.
+P095: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P096: P6 – Echte multistart Initialisierungsrobustheit  |  hoch
+P097: Ziel: Mehrere physikalisch und numerisch unterschiedliche Startzustände testen, um lokale Variationsoptima zu untersuchen.
+P098: Fachliche Motivation: V5.6: Seeds 20261111/12/13 ergaben KMeans-Zentren praktisch identisch; KMeans-Seedwechsel allein ist kein Multistart.
+P099: Mathematische Aufgabe: Unabhängige, kontrollierte Startzentren, KMeans-N init=1/verschiedene Subsamples, informative und bewusst perturbierte Start-Dirichlets, Permutationsalignierung der Zustände; ELBO-Endwerte und prädiktive Ergebnisse vergleichbar messen.
+P100: Code-/Experimentarbeit: Keine alten trainierten Gewichte; jede Initialisierung aus frischem Prior und Train-X; identische Folddefinition, Diagnose von state collapse und Zustandsbesetzung.
+P101: Verfügbare Vorbefunde: V5.5 ELBO Plateau nach ~20, V5.6 Seed-Variationen nicht material; V5.7 lokale maxiter 8/16 spielt kaum Rolle.
+P102: Akzeptanzkriterien: Dokumentation wirklich unterschiedlicher Startpunkte (normierte Zentren, matched-distances), mehrere ELBO-Basins und Vorhersagesensitivität, robusteste Auswertung statt Best-Seed-Testshopping.
+P103: Nicht vorschnell tun: Nicht bloß ein anderer random_state ohne Veränderung der KMeans-Lösung als Robustheit melden.
+P104: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P105: P7 – Validität physikalischer Zustände und Prozessphasen  |  hoch
+P106: Ziel: Prüfen, was latente Zustände tatsächlich repräsentieren und ob ihre Wechsel zur dokumentierten Walzphase passen.
+P107: Fachliche Motivation: V6.3: Alle zwölf Entwicklungsringe besitzen genau eine phase804-2→1-Grenze. Nur 11,7% der erwarteten HMM-Wechselmasse in ±2s-Fenster, gegenüber uniformer Referenz 1,681 Wechsel; nur 3/12 harte Wechsel nahe Grenze.
+P108: Mathematische Aufgabe: Posterior-Expected switch mass aus xi (nicht nur argmax), Phasenanfang/ende, konkrete Logger-Merkmalverläufe, Ring-Überlappungen; state-label-permutation beachten.
+P109: Code-/Experimentarbeit: Ringweise Plots gamma(t), phase804(t), relevanten F_rad/F_ax/Ist_D/Ist_h/RWG-Kanälen; Annotation mit tatsächlichen Zeitpunkten, nicht beliebigen Normalpositionen.
+P110: Verfügbare Vorbefunde: V6.2 4/12 Ringe ein dominanter Zustand; 8/12 zeigen wechselnde Zustände, sehr starke Persistenz.
+P111: Akzeptanzkriterien: Interpretation vorsichtig: korrelierte Signale/Regime vs echte Walzphasen; physikalische Hypothesen durch dokumentierte Kanäle und Betreuerwissen stützen.
+P112: Nicht vorschnell tun: Nicht jeden Zustand unmittelbar „Phase 1“ oder „Phase 2“ nennen.
+P113: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P114: P8 – Sensitivität von Merkmalen, Priors und Kovarianzen  |  hoch
+P115: Ziel: Quantifizieren, wie stark die Vorhersagen von wenigen Qualitätslabels und strukturellen Vorannahmen abhängen.
+P116: Fachliche Motivation: Die beiden Qualitätsköpfe benutzen 9/8 Features bei nur 8 gelabelten Entwicklungsringen; `physical_var` stammt aus explorativen Versuchen. K=2, Vollkovarianz bei 6 Kanälen, starke Persistenz-Priors.
+P117: Mathematische Aufgabe: Strukturierte Prior-Sensitivität inkl NIG V, a,b und Normal-Wishart kappa,nu,W; Cholesky-Konditionierung, effektive Zustandsbesetzung, Regularisierung, NIG priorerhaltende M2-Pushforward-Identität. Featuregruppen/zeitliche M2-Differenzen isoliert ablatieren.
+P118: Code-/Experimentarbeit: Eine Variable pro branch ändern, Kontrollfalten fix, eval targetwise; physikalische Plausibilität vor feature selection. Bei identifizierbaren Designs dokumentierte Rangdiagnostik (Design N≈8!).
+P119: Verfügbare Vorbefunde: V6.0 beseitigt 1 lineare M2-Redundanz/head, nicht die affine Summe h=1 ohne Intercept; Restmodell bleibt klein-datensensitiv.
+P120: Akzeptanzkriterien: Prüfe Posterior-Condition Number, predictive stability und Baselinevergleich; keine Priorwünsche aus bekannten Outer-Ring-Labels ableiten.
+P121: Nicht vorschnell tun: Nicht alle Priors gleichzeitig so anpassen, dass RMSE bei acht Ringen minimal wird.
+P122: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P123: P9 – Erweiterte prädiktive Unsicherheit und gemeinsame Zielstruktur  |  mittel
+P124: Ziel: Von Momentenapproximation zu einer nachvollziehbaren prädiktiven Verteilung und ggf. korrelierter Zwei-Ziel-Unsicherheit fortschreiten.
+P125: Fachliche Motivation: Bisher zwei getrennte NIG-Köpfe; gemeinsame Zustandsbasis erzeugt Abhängigkeit, aber keine explizit modellierte Residualkovarianz von Außenunrundheit und Höhenschlag.
+P126: Mathematische Aufgabe: Monte-Carlo-Integration über q(z|X) und NIG-Posterior (bei zulässiger Approximation); fixierte Feature-Student-t vs Mischungsquantile; alternative Matrix-Normal-Inverse-Wishart zwei Zielköpfe nur mit korrekter Zwei-Ziel-Generativdichte und angemessenem Prior.
+P127: Code-/Experimentarbeit: Synthetische Samples, analytische Momentenkontrolle, ringweise Interval-/Score-Auswertung; Reproduzierbarkeit des Zufallsgenerators.
+P128: Verfügbare Vorbefunde: V5.2 exportierte SD aus approximierter Mixture; kein empirisch kalibriertes Intervall, keine unabhängige 4-Ring-Coverage.
+P129: Akzeptanzkriterien: Matche first/second moments, stabile Quantile und erklärte zusätzliche Modellkomplexität, dokumentiere Zielkorrelation lediglich falls gemessen.
+P130: Nicht vorschnell tun: Bei nur 8 Labels nicht automatisch flexible Zwei-Output-Kovarianzlernen behaupten.
+P131: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P132: P10 – Zeit-/Ringgewichtung, Takt und Datenrepräsentation  |  mittel
+P133: Ziel: Untersuchen, ob sehr viele nahe benachbarte Loggerpunkte zu unangemessener Likelihood-/Priorbalance führen.
+P134: Fachliche Motivation: 6,342.4 gewichtete Prozesszeitpunkte aus 6068 L + .2*1372 U; physikalische Abtastung 0.1 s; stark korrelierte Zeitwerte.
+P135: Mathematische Aufgabe: Mögliche Ansätze: physikalisch begründete Resampling/Downsampling-Studie, Zeitintervallnormierung, gewichtete Batch-Loglikelihood (vorher neue probabilistische Interpretation prüfen), U C nach Gesamteffekt, F2-Fenstersensitivität.
+P136: Code-/Experimentarbeit: Gleiche Ringgruppen und Targets, alle Prozesse fit-neu, keine Testfehleroptimierung; Zeitauflösung als kontrollierte variable behandeln.
+P137: Verfügbare Vorbefunde: Selbstübergang .996/.994 pro Zeitschritt, entspricht langen Verweildauern in Samples, nicht unmittelbar physikalischen Sekunden ohne Raster.
+P138: Akzeptanzkriterien: Gleiche phy. Merkmals-/Zeitkonvention und unabhängige Vorhersageprüfung; nicht Likelihood pro Zeitschritt beliebig neu gewichten ohne generatives Modell.
+P139: Nicht vorschnell tun: Kein zufälliges Zeitpunktsubsampling vor Split und keine Nachhersage auf anderer Zeitbasis ohne Validierung.
+P140: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P141: P11 – Trainingslogik, lokale VI, Gradienten und Laufzeit  |  mittel
+P142: Ziel: Die neue Codebasis effizient machen, ohne die nachgewiesene mathematische Äquivalenz zu verlieren.
+P143: Fachliche Motivation: V5.7: 8→16 maxiter ergab nur 700→707 tatsächliche Iterationen; ftol-Abbruch häufig vor Endgradient <gtol. V5.8 Warmstart, V5.9 reduzierte Logits sind bereits Basis.
+P144: Mathematische Aufgabe: Vergleiche lokale Gradienten-Skalierung, geeignete Abbruchbedingungen relativ zum Ringumfang, Cholesky-/Logsumexp-Stabilität und State-Permutationen. Unterscheide inkrementellen lokalen Gain und globale Plateau-ELBO. Profiling O(T*K² + exakte M2-Crossmomente).
+P145: Code-/Experimentarbeit: Benchmarks erst nach numerischer Gleichheitsprüfung, CPU/RAM/Walltime pro Ring; Caching mit expliziter Invalidierung und dokumentierter Geschwindigkeit.
+P146: Verfügbare Vorbefunde: V5.8–V6.0 mathematische Kernänderungen bereits bestanden; keine Benchmarks aus Verdoppelung der Logit-Dim allein folgern.
+P147: Akzeptanzkriterien: Numerisch äquivalentes Ergebnis bei schnellerem Lauf, klar definierte tolerances, kein stiller Gradient-/ELBO-Regressionsfehler.
+P148: Nicht vorschnell tun: Nicht nur maxiter/epochs hochsetzen und als neue Modellarchitektur bezeichnen.
+P149: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P150: P12 – Wissenschaftliche Nachweise, Code-zu-Herleitung-Traceability  |  hoch, querliegend
+P151: Ziel: Jede konkrete Modellgleichung, Prior-Entscheidung und empirische Aussage der Arbeit korrekt belegen.
+P152: Fachliche Motivation: Originale A–D von Okt 2026 gehören zur alten SFA/3-Target/diagonalen Version; A–D neu vom Nov 11 bilden das zweiköpfige Vollkovarianzmodell, enthalten aber V5.8–V6.0 strukturelle Nachträge noch nicht als vollständigen eigenen finalen Text.
+P153: Mathematische Aufgabe: Aus dem neuen Code mathematische Entscheidungsmatrix: Gleichung, Datentyp, Implementation, unabhängiger synthetischer Test, Originalquelle oder eigene Herleitung, Limitierung. Statistische Generalisierungsclaims separat.
+P154: Code-/Experimentarbeit: Quellenstatus-CSV mit 133 Karten und 82 konkrete PDF-Dateien verwenden; Originale nach Relevanz lesen, gedruckte Seiten nachprüfen, keine bibliografischen Platzhalter als Originaltext behandeln.
+P155: Verfügbare Vorbefunde: Rabiner 1989, Beal 2003, Bishop 2006, Shao 2022, Mowbray 2022, Gelman/Gabry, Cawley/Talbot, Varma/Simon etc. vorhanden, aber Seiten in Übergabe nicht pauschal erneut verifiziert.
+P156: Akzeptanzkriterien: Jede wissenschaftliche Belegstelle hat exakten Originalabschnitt und geprüften Seitenverweis; Modelleigenleistung korrekt deklarieren; beobachtete historische Außenring-Kennzahlen nicht als unabhängige Neubauprüfung.
+P157: Nicht vorschnell tun: Nicht pauschal „fully Bayesian“ oder „signifikant überlegen“ ohne korrekte Bedeutung schreiben.
+P158: Voraussetzung: Funktionierendes, mathematisch getestetes Basismodell
+P159: 3. Experimentelle Arbeitsordnung und Gates
+P160: Gate A (Mathematische Korrektheit): T1–T10 des Master-Prompts bestanden, neues Modell kann K2/C0.2/M2 von Null trainieren, ELBO-Bilanzen rechnerisch korrekt.
+P161: Gate B (Baseline-Referenz): Gleiche erlaubte 8L+4U-Ringe, identische Zeitfenster/Scalierung/Targets, ringweises Entwicklungs-CV-Design dokumentiert. Keine alten Gewichte.
+P162: Gate C (Ein Experiment = eine Hypothese): Vor Trainingslauf primary metric, negative-control und Abbruchregel schriftlich fixieren. Interpretierbare Gegenmodelle, gleiche Folds, keine Kaskade mehrerer Änderungen.
+P163: Gate D (Evidenzstatus): Nur Entwicklungsbeobachtung → explorativ. Bereits geöffnete Outer-Ringe → historische oder ergänzende explorative Betrachtung. Kein neuer externer Blindtest.
+P164: Gate E (Posterior): Kalibrierung und Unsicherheitsquantile gesondert belegen, nicht aus schönem ELBO-Plateau folgern.
+P165: Gate F (wissenschaftliche Darstellung): Original-PDFs gelesen, Seiten geprüft, Code-Formel-Matrix und negative Befunde dokumentiert.
+P166: 4. Offene Grundsatzfragen an den Betreuer
+P167: Ist die primäre Forschungsfrage primär die Erklärung/Nutzung unlabeled Ringloggerdaten oder die möglichst gute Endqualitätsvorhersage aus 16 Ringen? Beide Ziele können in Spannung stehen.
+P168: Welche Originalmessvorschriften definieren Außenunrundheit und Höhenschlag eindeutig? Welche Unsicherheiten haben Zielmessungen, und wurden mehrere Messungen pro Ring gemittelt?
+P169: Sollen latente HMM-Zustände physikalisch mit Walzphasen identisch sein oder dürfen sie aus Daten abgeleitete Regime sein?
+P170: Ist eine gewichtete generalisierte ELBO mit C != 1 methodisch akzeptiert, und wie ist C aus der Literatur/eigener Argumentation begründet?
+P171: Wie sollen Vorhersageintervalle bei sehr wenigen Ringlabels bewertet werden? Keine formale Signifikanz ohne geeignete N.
+P172: Was gilt als ausreichender Nachweis der originären Forschungsleistung gegenüber bekannten semisupervised Bayesian HMM Soft-Sensor-Verfahren?
+P173: 5. Kompakte Forschungsstands-Matrix vom 13.11.2026
+P174: BESTÄTIGT – V5.5 30 Epochen numerisch plateau; 10 Epochen zu früh in geprüftem Lauf.
+P175: BESTÄTIGT – V5.7 lokale VI 8 vs 16 Iterationsbudget kein relevanter End-ELBO-Unterschied; Optimiererstatus nicht gleich Stationarität.
+P176: BESTÄTIGT – V5.8 mathematische Block-ELBO/abgesicherter Warmstart in Entwicklungsreplay; nicht globale Optimumgarantie.
+P177: BESTÄTIGT – V5.9 Markov-Gauge-K−1 spart 50 % freie lokale Logits für K2, gleiche Wahrscheinlichkeitsfamilie.
+P178: BESTÄTIGT – V6.0 priorerhaltender M2-Feature-Pushforward: Head 10/9→9/8, keine prognostische Verbesserung behauptet.
+P179: BESTÄTIGT – V6.1 ELBO-Sprung E11 primär Emission/Normal-Wishart.
+P180: BESTÄTIGT – V6.2 HMM-Zustände zeitlich dynamisch und stark persistent, nicht immer ringweit konstant.
+P181: LOKALER FORSCHUNGSBEFUND – V6.3 Phasengrenzen teilweise angereichert, starke Residualzeitstruktur. Der Nutzer-Windows-Lauf V6.3 war zum Datum dieser Dokumentation noch nicht separat bestätigt.
+P182: OFFEN – AR-HMM-Korrektheit und prädiktiver Nutzen.
+P183: OFFEN – echter HMM-/Bayes-/SSL-Effekt in kontrollierten ringweisen Folds.
+P184: OFFEN – independent external unseen evaluation; neue Ringe nicht angekündigt.
+P185: OFFEN – vollständig mit aktuellem Neubau abgeglichene A–D-Dokumentation und exakt bestätigte PDF-Seiten für jeden Thesisabschnitt.
+
+Zusatzteil word/footer1.xml: Bayesian Bachelor | Forschungsfahrplan | 13.11.2026 | Nicht als Modellfreigabe verwenden

@@ -1,0 +1,65 @@
+Konvergenzdiagnostik V5.5
+30 Epochen: Befunde, Geltungsbereich und nächster kontrollierter Trainingsvergleich
+Forschungsstand 12.11.2026 · Entwicklungslauf K=2 / C=0,2 / M2 / P0 / 8 lokale L-BFGS-B-Maximaliterationen · Seed 20261111
+1. Ergebnis auf einen Blick
+Größe
+Ergebnis
+Einordnung
+ELBO bei Epoche 10
+−24.242,3013795
+Früher festes Trainingsende
+ELBO bei Epoche 30
+−22.028,9144453
+Erweitertes Trainingsbudget
+Verbesserung Ep. 11–30
++2.213,3869342
+47,0 % des gesamten 30-Epochen-Gewinns
+ELBO-Sprung Ep. 10 → 11
++1.322,4469098
+Deutliche Spätänderung
+Letzter ELBO-Schritt
++3,9225 × 10⁻⁸
+Numerisch sehr klein
+Max. Zustandsänderung, letzte 5
+1,1417 × 10⁻⁹
+Anteile stabil, nicht gesamte Parameter
+Abweichung erste 10 zum Original
+8,8014 × 10⁻⁸
+Reproduktion der Baseline
+Kernaussage: Die bis dahin verwendeten zehn Epochen waren für diese Optimierungskonfiguration offensichtlich kein hinreichender Stopp. Nach starker Verbesserung vor allem in Epoche 11/12 verflacht die Trainings-ELBO ab ungefähr Epoche 20 nahezu vollständig.
+
+Abbildung 1: ELBO-Historie aus dem vom Nutzer bereitgestellten unveränderten V5.5-Trainingsbericht. Schattierung markiert die beobachtete Plateauphase, nicht einen mathematischen Optimalitätsbeweis.
+2. Exakte Interpretation und Grenzen
+Die vollständige Verbesserung von Epoche 1 bis 30 beträgt +4.710,406124 ELBO-Einheiten; 2.213,386934 davon entstehen erst nach Epoche 10. Damit war der alte Stopp deutlich vor einer stationären Phase.
+Epoche 11 und 12 liefern +1.322,446910 beziehungsweise +799,964960. Solche späten Sprünge sind bei nichtkonvexer VI relevant und verlangen eine Untersuchung von Initialisierung und lokalen Optima; die Ursachen sind durch die vorliegende Historie allein nicht identifiziert.
+Ab etwa Epoche 20 beträgt der verbleibende Gesamthub bis Epoche 30 nur noch etwa 3,30 × 10⁻⁷. Drei negative ELBO-Schritte mit Beträgen im Bereich 10⁻⁸ liegen in der Größenordnung numerischer Rundungsabweichungen; das ist kein Beweis einer streng monotonen koordinatenweisen Optimierung.
+Die Zustandsmasse verschiebt sich von [0,7447; 0,2553] auf [0,6179; 0,3821]. Nur die letzten fünf Änderungen sind sehr klein. Ähnliche globale Anteile garantieren weder identische zeitliche Zustandsfolgen noch stationäre Gradienten.
+Der als „local_gain“ gespeicherte Wert ist die Summe lokaler Verbesserungen innerhalb der jeweils laufenden Epoche; die eingefrorene Kernfunktion protokolliert für die lokalen Optimierer nicht systematisch Erfolgskriterium, Gradienten-Norm, Abbruchgrund oder tatsächlich erreichte Stationarität.
+Die ELBO wird nach den globalen Updates anhand zuvor berechneter lokaler Faktoren ausgewertet. Sie zeigt die Entwicklung dieser konkret implementierten Zielfunktionsauswertung, nicht automatisch einen exakten Posterior oder eine Garantie auf ein globales Optimum.
+3. Was ist durch den Lauf belegt?
+Aussage
+Status
+Identische erste zehn ELBO-Werte wie Referenzmodell
+Belegt bis ca. 8,8 × 10⁻⁸ Abweichung
+10 Epochen waren für diesen Lauf zu kurz
+Deutlich gestützt
+Annäherung an eine numerische Plateauphase bei 30 Epochen
+Deutlich gestützt
+Robuste Konvergenz über Initialisierungen
+Noch offen
+Lokale VI korrekt stationär in jeder Epoche
+Noch offen
+Globales Optimum / exakter Bayesian-Posterior
+Nicht belegt
+Bessere Qualität / Generalisierung bei 30 Epochen
+Nicht untersucht
+
+4. Nächste vorab festgelegte Forschungsstufe
+V5.6: Konstante Datenaufteilung, Features, Priors, K=2, C=0,2 und 30 Epochen. Nur zwei Faktoren variieren: (i) zufallsabhängige K-Means-Initialisierung über Seeds 20261111/12/13; (ii) maximale L-BFGS-B-Iterationen der gelabelten lokalen VI (8 gegenüber 16). Keine Auswahl anhand von Qualitäts- oder äußeren Testfehlern.
+Zunächst Seed 20261112, lokale VI = 8. Danach den dritten Seed unter derselben Bedingung; vergleichen: erreichter ELBO-Endwert, Beginn der Plateauphase, Zustandsanteile (unter Beachtung des Label-Switching) und gegebenenfalls unterschiedliche Optimierungswege.
+Erst darauf local_steps = 16 bei denselben Seeds. Mehr lokale Iterationen allein belegen keine bessere lokale Stationarität; dafür sind Optimierer-Abbruchgründe und Gradienten separat zu instrumentieren.
+Die 30-Epochen-Kandidaten erhalten keine automatische Freigabe. Für die Vorhersageleistung ist eine separat festgelegte ringweise interne Evaluationsstudie mit fold-lokalem Training nötig. Die historisch geöffneten DM07/08/11/15 sind nicht mehr unberührt.
+5. Weiterer Forschungsfahrplan bleibt offen
+Nach der Trainingsstabilität folgen kontrollierte Komponentenvergleiche (HMM-Zustandsinformation versus physikalische Deskriptoren), Bayesian-Posterior/MAP-Regularisierung, Prior- und Unsicherheitssensitivität sowie getrennte L-only/C0/SSL-Analysen. Erst danach ist eine neue vollständige Train-from-scratch-Pipeline mit vorab dokumentierten Modellentscheidungen vorgesehen. Keine bestehende Modellkopie oder Skalierung wird dazu übernommen.
+6. Nachweise / Prüfgrenzen
+Originalquelle dieses Berichts: CONVERGENCE_30E_TRAINONLY_01.json (vom Nutzer zur Verfügung gestellt). Daten-SHA256 bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5; Referenzmodell-SHA256 56c3605ba3e0157125ecb7b2adaaddcb160a15c16edf22f2e28e5b232f2ae3c4. Trainingscode: dynamic_quality_v2.py und research_convergence_v55/convergence_probe_v55.py. Bericht prüft die zahlenmäßige Ausgabe; die realen Train-Arrays und die ursprünglichen Windows-Pickle-Bytes wurden hier nicht neu trainiert oder unabhängig geladen.

@@ -1,0 +1,639 @@
+Herleitung B – Strukturierte Variationsverteilung für unser Bayesian-SSR-HMM
+Mathematische Modellentwicklung · Arbeitsstand B.1 · Fortsetzung von Herleitung A · 28. Oktober 2026
+Wir setzen jetzt unmittelbar bei unserer letzten Modellgleichung aus Herleitung A an.
+Dort haben wir festgelegt, welche Zufallsgrößen unser Ringwalzmodell besitzt, durch welche Wahrscheinlichkeitsverteilungen sie beschrieben werden und wie gelabelte und ungelabelte Ringe gemeinsam in das Training eingehen.
+In Herleitung B beantworten wir die nächste Frage:
+Wie können wir die unbekannten Zustandsfolgen und Modellparameter tatsächlich probabilistisch lernen, obwohl ihre exakte gemeinsame Posteriorverteilung zu kompliziert ist, um sie direkt zu berechnen?
+Dabei verfolgen wir ausdrücklich unsere festgelegte Variante B1:
+Standard-HMM erster Ordnung mit diagonalen Gauß-Emissionen.
+Die vollständige verborgene Zustandsfolge trägt zur Endqualitätsregression bei.
+Alle globalen Modellparameter erhalten Bayesian-Priors.
+Gelabelte und ungelabelte Ringsequenzen werden gemeinsam genutzt.
+Die Unsicherheit über die Zustandsfolgen soll erhalten bleiben.
+Strukturierte Variational Inference ist unser Hauptverfahren; B2 bleibt lediglich Rückfallpfad.
+Wie bei Herleitung A gehen wir chronologisch vor. Wir beginnen beim exakten Posterior, führen anschließend die Variationsverteilung ein und entwickeln daraus die Berechnungen, die wir für den Algorithmus benötigen.
+B.1 Ausgangspunkt: Was haben wir aus Herleitung A?
+Unsere globalen Parameter lauten:
+Θ=π,A,Φ,Ψ.
+Dabei bezeichnen π die Anfangszustandswahrscheinlichkeiten, A die Übergangsmatrix, Φ die Parameter der Gauß-Emissionen und Ψ=B,Σy die Parameter unserer Qualitätsregression.
+Jeder Ring besitzt eine unbekannte Zustandsfolge:
+Zi=Zi1,…,ZiTi.
+Für einen gelabelten Ring hatten wir die gemeinsame Verteilung formuliert als
+pXi,yi,Zi∣Θ=pZi∣π,A pXi∣Zi,Φ pyi∣Zi,Ψ.
+Gleichung (B.1): Gemeinsame Faktorisierung eines gelabelten Rings.
+Der letzte Faktor ist unsere B1-Erweiterung:
+yi∣Zi,B,Σy∼N3​BhiZi,Σy.
+Gleichung (B.2): Endqualitätsmodell auf Basis der gesamten latenten Zustandsfolge.
+Der Vektor hiZi enthält die relativen Aufenthaltsanteile in den K verborgenen Zuständen. Bei ungelabelten Ringen fehlt der Qualitätsfaktor, weil keine Qualitätsmessung beobachtet wurde.
+Aus allen Ringsequenzen und den Priors hatten wir schließlich die vollständige gemeinsame Modellverteilung erhalten:
+pDL,DU,Z,Θ=pΘi∈IL​FiLj∈IU​FjU.
+Dabei sind die ringweisen Faktoren
+FiL=pZi∣π,A pXi∣Zi,Φ pyi∣Zi,Ψ
+und
+FjU=pZj∣π,A pXj∣Zj,Φ
+Gleichung (B.3): Gesamte gemeinsame Verteilung im Training.
+Das ist unsere mathematische Ausgangsbasis. Die Frage ist nun, wie wir aus dieser gemeinsamen Verteilung die bedingten Verteilungen aller unbekannten Größen bestimmen.
+B.2 Der exakte Bayesian-Posterior – und warum wir ihn nicht direkt berechnen
+Nach dem Bayes-Theorem lautet die gesuchte gemeinsame Posteriorverteilung:
+pΘ,Z∣DL,DU=pDL,DU,Z,ΘpDL,DU.
+Gleichung (B.4): Exakter gemeinsamer Posterior.
+Sie beschreibt gleichzeitig unsere Unsicherheit über die globalen Parameter und über sämtliche verborgenen Zustandsfolgen.
+Das wäre die ideale Lösung: Wir könnten daraus beispielsweise bestimmen, wie wahrscheinlich jeder Prozesszustand zu einem bestimmten Zeitpunkt ist und welche Regressionsparameter mit den beobachteten Qualitätswerten vereinbar sind.
+Das Problem liegt im Nenner, der Modellevidenz:
+pDL,DU=∫Z​pDL,DU,Z,Θ dΘ.
+Gleichung (B.5): Modellevidenz durch Summation und Integration.
+Hier müssen zwei unterschiedliche Arten von unbekannten Größen berücksichtigt werden.
+Erstens summieren wir über sämtliche möglichen diskreten Zustandsfolgen. Besitzt ein Ring Ti Zeitpunkte und unser HMM K mögliche Zustände, existieren theoretisch KTi verschiedene Zustandsfolgen.
+Zweitens integrieren wir über die kontinuierlichen Modellparameter, beispielsweise die Zustandsmittelwerte, Varianzen und Regressionskoeffizienten.
+Hinzu kommt, dass die globalen Parameter über alle Ringe gemeinsam gelernt werden. Dadurch können die Zustandsfolgen verschiedener Ringe in der gemeinsamen Posteriorverteilung statistisch voneinander abhängig sein, obwohl die Ringe bei gegebenen Modellparametern als unabhängig modelliert werden.
+Beal (2003) behandelt genau diese Schwierigkeit für Bayesian Hidden Markov Models: Wenn sowohl die Zustände als auch die Modellparameter unsicher sind, lässt sich die gewöhnliche HMM-Inferenz nicht einfach durch eine einmalige Forward-Backward-Berechnung über den exakten marginalisierten Posterior lösen.
+Unsere B1-Qualitätskopplung bringt noch eine zusätzliche Schwierigkeit mit sich, weil die Endqualitätsmessung von der gesamten Zustandsfolge abhängt.
+Warum reicht Forward-Backward allein nicht aus?
+Bei einem gewöhnlichen HMM lässt sich die Wahrscheinlichkeit einer Beobachtungssequenz trotz der sehr großen Zahl möglicher Zustandsfolgen effizient berechnen.
+Das liegt daran, dass die Verteilung in lokale Übergangs- und Emissionsfaktoren zerfällt. Forward-Backward nutzt genau diese Struktur.
+Unsere Qualitätslikelihood besitzt dagegen den Faktor
+pyi∣hiZi,Ψ.
+Da hiZi von allen Zuständen des Rings abhängt, verbindet dieser Faktor Informationen aus sämtlichen Zeitpositionen.
+Wir müssen deshalb zwei Schwierigkeiten lösen: die Unsicherheit der globalen Parameter und die zusätzliche zeitübergreifende Kopplung durch die Qualitätsregression.
+Erstes Ergebnis: Wir benötigen eine Approximation des gemeinsamen Posteriors. Dabei möchten wir die zeitliche Struktur der verborgenen Zustände so weit wie möglich erhalten.
+B.3 Unsere Lösung: Variational Inference
+Die Grundidee der Variational Inference (VI) besteht darin, nicht die exakte Posteriorverteilung selbst zu berechnen, sondern innerhalb einer geeigneten Familie von Wahrscheinlichkeitsverteilungen eine möglichst gute Näherung zu suchen.
+Diese Näherung bezeichnen wir mit
+qΘ,Z.
+Sie soll die unbekannten globalen Parameter und sämtliche verborgenen Zustandsfolgen gemeinsam beschreiben.
+B.3.1 Was bedeutet eine Variationsverteilung?
+Nehmen wir als einfaches Beispiel an, dass ein unbekannter Parameter θ einen komplizierten Posterior besitzt.
+Anstatt dessen Verteilung exakt zu bestimmen, wählen wir beispielsweise eine Familie von Normalverteilungen:
+qθ=Nm,s2.
+Nun suchen wir diejenigen Werte von m und s2, für die diese Normalverteilung eine möglichst gute Annäherung an den tatsächlichen Posterior darstellt.
+Die Parameter m und s2 heißen in diesem Zusammenhang Variationsparameter.
+Dieses einfache Beispiel verdeutlicht die Grundidee. In unserem HMM verwenden wir jedoch nicht ausschließlich Normalverteilungen, sondern unterschiedliche Verteilungsfamilien für verschiedene Parametergruppen.
+B.3.2 Woran erkennen wir eine gute Approximation?
+Wir wollen den Unterschied zwischen der approximierenden Verteilung und dem tatsächlichen Posterior möglichst klein halten.
+Ein dafür verwendetes Maß ist die Kullback-Leibler-Divergenz:
+DKLq∥p=Eq​logqΘ,ZpΘ,Z∣D.
+Gleichung (B.6): Kullback-Leibler-Divergenz.
+Hierbei bezeichnet D=DL,DU unseren beobachteten Trainingsdatensatz. Die KL-Divergenz ist nichtnegativ und beträgt null, wenn beide Verteilungen fast überall übereinstimmen.
+Dennoch können wir sie nicht unmittelbar berechnen, weil der tatsächliche Posterior die unbekannte Modellevidenz enthält.
+Wir nutzen deshalb die Identität
+logpD=Lq+DKLqΘ,Z∥pΘ,Z∣D.
+Gleichung (B.7): Beziehung zwischen Evidenz, ELBO und KL-Divergenz.
+Daraus folgt:
+Lq=EqlogpD,Z,Θ−EqlogqΘ,Z.
+Gleichung (B.8): Evidence Lower Bound (ELBO).
+Die Größe Lq heißt Evidence Lower Bound, kurz ELBO.
+Da die Modellevidenz pD nicht von den Variationsparametern abhängt, können wir die KL-Divergenz verringern, indem wir die ELBO maximieren.
+Diese Herleitung entspricht dem grundlegenden VI-Prinzip, das Beal (2003) anschließend auf Bayesian Hidden Markov Models überträgt.
+Zweites Ergebnis: Wir müssen den exakten Posterior nicht direkt berechnen. Stattdessen können wir ein Optimierungsproblem über eine geeignete Näherungsverteilung formulieren.
+B.4 Welche Variationsverteilung wählen wir für unser Ringwalzmodell?
+Jetzt treffen wir die erste wichtige Entscheidung von Herleitung B.
+Wir besitzen zwei grundlegend unterschiedliche Arten unbekannter Größen:
+Globale Modellparameter Θ, die für sämtliche Ringe gemeinsam gelten.
+Lokale Zustandsfolgen Zi, die für jeden einzelnen Ring unterschiedlich sind.
+Wir möchten diese beiden Gruppen in der Näherung trennen, die Abhängigkeiten innerhalb der einzelnen Zustandsfolgen aber erhalten.
+Daher wählen wir als erste Variationsfamilie:
+qΘ,Z=qΘi=1NqϕiZi.
+Gleichung (B.9): Global-lokale Variationsfaktorisierung.
+Dabei ist N=NL+NU. Die Größe ϕi bezeichnet die Variationsparameter der Zustandsverteilung des Rings i.
+B.4.1 Was bedeutet diese Faktorisierung?
+Wir nehmen in der approximierenden Verteilung an, dass globale Parameter und lokale Zustandsfolgen voneinander getrennt beschrieben werden können.
+Das bedeutet nicht, dass wir in unserem ursprünglichen generativen Modell eine entsprechende tatsächliche Unabhängigkeit behaupten.
+Vielmehr handelt es sich um eine Approximation, mit der die Inferenz berechenbar gemacht werden soll.
+Auch im tatsächlichen Posterior können die globalen Parameter und die Zustandsfolgen eng miteinander zusammenhängen. Diese Abhängigkeiten werden durch die gewählte Faktorisierung nur angenähert berücksichtigt.
+Der Vorteil liegt darin, dass wir abwechselnd globale Parameterverteilungen und ringspezifische Zustandsverteilungen aktualisieren können.
+B.4.2 Faktorisierung der globalen Parameterverteilung
+Für die in Herleitung A gewählten Priorfamilien bietet sich folgende Struktur an:
+qΘ=qπqAqΦqΨ.
+Hier stehen die letzten beiden Gruppen für
+qΦ=k=1Kj=1dqμkj,vkj
+und
+qΨ=r=13qβr,σy,r2
+Gleichung (B.10): Struktur der globalen Variationsfaktoren.
+Dabei gilt vkj=σx,kj2.
+Diese Schreibweise besitzt einen wichtigen Vorteil. Wir trennen nicht jeden unbekannten Parameter künstlich von allen anderen, sondern behalten bestimmte bedingte Abhängigkeiten innerhalb der Prior- beziehungsweise Posteriorfamilien bei.
+Insbesondere betrachten wir den Mittelwert und die Varianz einer Gauß-Emission gemeinsam: qμkj,vkj.
+Ebenso behalten wir den Zusammenhang zwischen den Regressionskoeffizienten und der jeweiligen Qualitätsfehlervarianz: qβr,σy,r2.
+Diese Faktoren können später durch Normal-Invers-Gamma-Verteilungen beschrieben werden.
+Auch P112 und Beal verwenden konjugierte Variationsfamilien. Unsere Variante passt diese Struktur an diagonale Gauß-Emissionen und unsere drei ringweisen Qualitätsgrößen an.
+B.4.3 Warum möchten wir qZi nicht in unabhängige Einzelzeitpunkte zerlegen?
+Eine sehr starke Vereinfachung wäre:
+qZi=t=1TiqZit.
+Dann würde jeder Zeitpunkt unabhängig von allen anderen approximiert. Das wäre bei unserem dynamischen Modell jedoch unbefriedigend.
+Schließlich haben wir gerade deshalb ein HMM gewählt, weil die zeitliche Abfolge und die Übergänge zwischen Prozesszuständen relevant sein sollen.
+Wenn wir diese Abhängigkeit während der Inferenz verwerfen, könnten wir einen Teil der gewünschten Dynamik verlieren.
+Daher verwenden wir eine strukturierte Variationsverteilung.
+B.5 Die strukturierte Zustandsverteilung
+Wir wählen für jeden Ring eine Markov-faktorisierte Variationsverteilung:
+qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1.
+Gleichung (B.11): Strukturierte Markov-Variationsfamilie.
+Hierbei gilt:
+ρik: approximierte Wahrscheinlichkeit, dass Ring i im Zustand k beginnt.
+Qitj,k: approximierte Übergangswahrscheinlichkeit von Zustand j zu Zustand k zwischen t−1 und t.
+ϕi: Gesamtheit der Parameter von ρi und Qit.
+Wir erlauben in der Variationsverteilung bewusst zeitabhängige Übergangsparameter Qit.
+Das bedeutet nicht, dass wir unser generatives Standard-HMM durch ein zeitinhomogenes Modell ersetzen.
+Im generativen Modell bleibt A die gemeinsame zeitlich homogene Übergangsmatrix. Die zeitabhängige Struktur von qϕi beschreibt lediglich unsere beobachtungsabhängige Näherung der unbekannten Zustandsfolge.
+B.5.1 Beispiel
+Nehmen wir einen Ring mit vier Zeitpunkten und drei möglichen Zuständen an.
+Dann lautet seine Variationsverteilung:
+qZi1,Zi2,Zi3,Zi4=ρiZi1t=24QitZit∣Zi,t−1
+Die Wahrscheinlichkeit einer bestimmten Zustandsfolge ergibt sich damit aus dem Produkt ihrer Anfangs- und Übergangswahrscheinlichkeiten.
+Wir müssen also nicht jeder der 34=81 möglichen Zustandsfolgen einen völlig unabhängigen Variationsparameter zuweisen.
+Stattdessen beschreiben wir die Verteilung durch Wahrscheinlichkeitsvektoren und Übergangsmatrizen. Für lange Ringsequenzen ist diese strukturierte Beschreibung wesentlich praktikabler.
+B.5.2 Der zentrale mathematische Vorbehalt
+Hier kommt eine entscheidende Besonderheit unserer B1-Architektur.
+Bei einem gewöhnlichen HMM ist die optimale lokale Variationsverteilung unter der global-lokalen Faktorisierung wieder proportional zu einem Produkt lokaler HMM-Faktoren. Deshalb kann Beal (2003) angepasste Forward-Backward-Berechnungen verwenden.
+Bei uns hängt jedoch die Qualitätslikelihood von sämtlichen Zuständen ab.
+Die formal optimale lokale Verteilung bei festem qΘ lautet für einen gelabelten Ring:
+qi⋆Zi∝exp​EqΘlogpXi,yi,Zi∣Θ.
+Gleichung (B.12): Formaler lokaler VI-Faktor vor Beschränkung auf Markov-Struktur.
+Dieser Ausdruck enthält den zusätzlichen globalen Qualitätsterm.
+Deshalb ist die optimale Verteilung im Allgemeinen keine Markov-Kette erster Ordnung mehr. Unsere gewählte Form (B.11) ist also eine bewusst eingeschränkte Variationsfamilie.
+Das ist zulässig: Auch innerhalb dieser Familie können wir die ELBO maximieren. Wir dürfen dann aber nicht behaupten, dass wir die unbeschränkte optimale Zustandsverteilung exakt durch Forward-Backward erhalten.
+Unser Ziel lautet vielmehr: Wir approximieren die B1-Zustandsverteilung durch eine strukturierte Markov-Verteilung und optimieren deren Parameter unter Berücksichtigung des vollständigen Qualitätsterms. Das ist der mathematisch saubere Ansatz, den wir weiterverfolgen.
+B.6 Welche Informationen benötigen wir aus der strukturierten Zustandsverteilung?
+Unsere Variationsverteilung qϕiZi beschreibt theoretisch eine Vielzahl möglicher Zustandsfolgen.
+Für die praktische Optimierung möchten wir jedoch nicht jede dieser Folgen einzeln behandeln. Stattdessen berechnen wir bestimmte Erwartungswerte, die für die HMM-Parameter und die Qualitätsregression benötigt werden.
+Zunächst benötigen wir zwei bekannte Größen aus der HMM-Inferenz.
+B.6.1 Einzelne Zustandswahrscheinlichkeiten
+Wir definieren:
+γitk=qϕiZit=k.
+Gleichung (B.13): Marginale Zustandswahrscheinlichkeit.
+Diese Größe beschreibt die Wahrscheinlichkeit, dass sich Ring i zum Zeitpunkt t im Zustand k befindet.
+Bei drei Zuständen könnte sich beispielsweise ergeben:
+γit=0,150,750,10.
+Das würde bedeuten, dass der zweite Zustand nach unserer approximierenden Verteilung mit 75 % die höchste Wahrscheinlichkeit besitzt. Trotzdem würden die anderen beiden Zustände nicht ausgeschlossen.
+Diese Interpretation ist wichtig: Wir weisen einem Zeitpunkt keinen zwangsläufig eindeutigen Zustand zu, sondern behalten eine Wahrscheinlichkeitsverteilung.
+B.6.2 Paarweise Übergangswahrscheinlichkeiten
+Für die Übergangsmatrix benötigen wir außerdem:
+ξitj,k=qϕiZi,t−1=j,Zit=k.
+Gleichung (B.14): Paarwahrscheinlichkeit benachbarter Zustände.
+Diese Größe beschreibt die gemeinsame Wahrscheinlichkeit zweier aufeinanderfolgender Zustände. Beispielsweise kann ξit1,2 angeben, wie wahrscheinlich ein Übergang von Zustand 1 nach Zustand 2 zwischen zwei Messzeitpunkten ist.
+B.6.3 Welche Funktion haben diese Größen beim Training?
+Die erwartete Anzahl der Aufenthalte in Zustand k lautet:
+Nk=i=1Nt=1Tiγitk.
+Analog ergibt sich die erwartete Anzahl der Übergänge von Zustand j nach Zustand k:
+Njk=i=1Nt=2Tiξitj,k.
+Diese Größen bilden später die hinreichenden Statistiken für die Updates der Übergangswahrscheinlichkeiten und weiterer HMM-Parameter.
+Beal (2003) verwendet genau dieses Prinzip: Die Posteriorparameter konjugierter HMM-Verteilungen ergeben sich aus den Prior-Hyperparametern und den erwarteten Zustands- beziehungsweise Übergangshäufigkeiten.
+B.6.4 Können wir γ und ξ effizient bestimmen?
+Ja. Aus unserer Markov-Variationsverteilung
+qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1
+lassen sich die marginalen Zustandswahrscheinlichkeiten rekursiv berechnen:
+γi1k=ρik
+und für t≥2:
+γitk=j=1Kγi,t−1j Qitj,k.
+Die benachbarten gemeinsamen Wahrscheinlichkeiten lauten dann:
+ξitj,k=γi,t−1j Qitj,k.
+Bei dieser direkt normalisierten Markov-Parametrisierung benötigen wir für die Marginalisierung also keine Aufzählung der vollständigen Zustandsfolgen.
+Alternativ kann eine solche strukturierte Verteilung über unnormalisierte lokale Potenziale dargestellt und mit Forward-Backward normiert werden. Diese Unterscheidung wird bei der späteren Implementierung relevant.
+Drittes Ergebnis: Die für das klassische HMM benötigten Zustands- und Übergangsstatistiken können wir innerhalb unserer strukturierten Variationsfamilie effizient bestimmen. Aber für B1 reicht das noch nicht aus.
+B.7 Unsere zusätzliche Herausforderung: Die Zustandsaufenthalte der gesamten Ringsequenz
+Jetzt kommen wir zur eigentlichen Besonderheit unseres Modells.
+Aus Herleitung A kennen wir den relativen Aufenthaltsanteil:
+hikZi=1Tit=1Ti1Zit=k.
+Er beschreibt den Anteil der Zeitpositionen, in denen sich Ring i im Zustand k befindet.
+Unser Qualitätsmodell lautet:
+yi∣Zi,B,Σy∼N3​BhiZi,Σy.
+Weil hi von den unbekannten Zuständen abhängt, müssen wir seine Unsicherheit in die Berechnung übernehmen.
+B.7.1 Das erste benötigte Moment
+Wir definieren:
+mi=EqϕihiZi.
+Gleichung (B.15): Erster Aufenthaltsmoment.
+Die k-te Komponente ergibt sich aus:
+mik=1Tit=1Tiγitk.
+Gleichung (B.16): Erwarteter Anteil des Zustands k.
+Wir mitteln also die marginalen Zustandswahrscheinlichkeiten über die gesamte Sequenz.
+Angenommen, ein Ring besitzt drei Zeitpunkte, und die approximierten Wahrscheinlichkeiten für Zustand 1 lauten:
+γi11=0,8, γi21=0,6, γi31=0,1.
+Dann folgt:
+mi1=0,8+0,6+0,13=0,5.
+Der erwartete relative Aufenthalt in Zustand 1 beträgt somit 50 %.
+Das bedeutet ausdrücklich nicht, dass der Ring tatsächlich exakt die Hälfte seiner drei Zeitpunkte in diesem Zustand gewesen sein muss. Es handelt sich um einen Erwartungswert über mögliche Zustandsfolgen.
+B.7.2 Warum reicht dieser Erwartungswert nicht aus?
+Bei unserem Qualitätsmodell wird die Abweichung zwischen gemessener Qualität und vorhergesagtem Qualitätswert quadratisch betrachtet.
+Für eine einzelne Qualitätsgröße r entsteht ein Ausdruck der Form:
+(yir−βr⊤hi)2.
+Die unbekannten Zustandsaufenthalte stehen hier innerhalb einer quadratischen Funktion.
+Wenn wir den Erwartungswert bilden, gilt im Allgemeinen:
+Eqhihi⊤≠Eqhi Eqhi⊤.
+Genau dieser Unterschied ist entscheidend. Würden wir ausschließlich den erwarteten Aufenthaltsvektor verwenden, könnten wir die verbleibende Unsicherheit der Aufenthaltsanteile nicht vollständig in den quadratischen Qualitätsterm einbringen.
+Deshalb benötigen wir ein zweites Moment.
+B.7.3 Das zweite benötigte Moment
+Wir definieren die Matrix:
+Hi=EqϕihiZihiZi⊤.
+Gleichung (B.17): Zweiter Aufenthaltsmoment.
+Diese Matrix besitzt die Dimension Hi∈RK×K. Ihr Element an Position k,l lautet:
+Hikl=Eqhikhil.
+Setzen wir die Definition der Aufenthaltsanteile ein:
+Hikl=1Ti2t=1Tis=1TiqϕiZit=k,Zis=l.
+Gleichung (B.18): Zweite Momente als Summe zeitübergreifender Paarwahrscheinlichkeiten.
+Diese Gleichung zeigt, weshalb der zweite Moment anspruchsvoller ist: Wir benötigen darin nicht nur Informationen über direkt benachbarte Zustände, sondern über Zustände an beliebigen Zeitpositionen t und s.
+Anschauliches Beispiel
+Nehmen wir an, es seien nur zwei mögliche Zustandsfolgen mit folgenden Wahrscheinlichkeiten relevant:
+1,1,2,2,2,3: 60 %
+1,2,2,2,2,3: 40 %
+Vereinfachtes Zahlenbeispiel, keine aus Ringwalzdaten ermittelte Zustandsverteilung.
+Die erste Zustandsfolge besitzt den Aufenthaltsvektor
+h1=1/31/21/6,
+und die zweite:
+h2=1/62/31/6.
+Damit ist der erwartete Aufenthaltsvektor:
+m=0,6h1+0,4h2.
+Für den ersten Zustand ergibt sich m1≈0,267.
+Der zweite Moment dieses Aufenthaltsanteils beträgt dagegen:
+Eh12=0,6132+0,4162≈0,0778.
+Das Quadrat des Erwartungswertes ist:
+Eh12≈0,0711.
+Die beiden Werte unterscheiden sich. Ihre Differenz ist die Varianz des Aufenthaltsanteils:
+Varh1≈0,0067.
+Dieses Beispiel verdeutlicht, weshalb wir nicht einfach den erwarteten Aufenthaltsvektor in die gesamte Bayesian-Qualitätslikelihood einsetzen möchten. Unsere B1-Variante soll diese verbleibende Unsicherheit berücksichtigen.
+B.7.4 Die Kovarianz der Aufenthaltsanteile
+Aus den ersten und zweiten Momenten können wir zusätzlich berechnen:
+Covqhi=Hi−mimi⊤.
+Gleichung (B.19): Kovarianz der latenten Zustandsanteile.
+Diese Matrix beschreibt, wie unsicher die geschätzten Zustandsanteile sind und wie ihre Unsicherheiten zusammenhängen.
+Dabei gibt es einen strukturellen Zusammenhang: Weil sich die Aufenthaltsanteile immer zu eins summieren, sind sie nicht unabhängig voneinander.
+Ein größerer Aufenthalt in einem Zustand geht bei festgelegter relativer Gesamtdauer zwangsläufig mit kleineren Gesamtanteilen anderer Zustände einher.
+Viertes Ergebnis: Für unsere B1-Endqualitätsregression benötigen wir neben den klassischen HMM-Statistiken die ersten und zweiten Momente der Zustandsaufenthalte. Wir haben nun exakt definiert, welche zusätzlichen Größen unsere Inferenz liefern muss.
+B.8 Können wir die Aufenthaltsmomente tatsächlich effizient berechnen?
+Das ist einer der wichtigsten Punkte unserer gesamten Modellkonstruktion.
+Bisher haben wir gesehen, dass die zweiten Momente eine doppelte Summe über alle Zeitpunkte enthalten:
+Hikl=1Ti2t=1Tis=1TiqZit=k,Zis=l.
+Eine naive Implementierung könnte versuchen, sämtliche zeitübergreifenden gemeinsamen Zustandswahrscheinlichkeiten einzeln zu berechnen. Für lange Ringsequenzen wäre das möglicherweise sehr aufwendig.
+Die entscheidende Frage lautet daher: Können wir die ersten und zweiten Momente direkt aus der Markov-Struktur von qϕiZi berechnen, ohne sämtliche Zustandsfolgen oder Zeitpunktpaare einzeln aufzuzählen?
+Ja. Für unsere gewählte Aufenthaltsfunktion lässt sich eine entsprechende Rekursion entwickeln.
+Die folgende Konstruktion ist eine mathematische Ableitung für unser Modell. Sie ist keine unverändert übernommene Update-Gleichung aus Beal oder P112.
+B.8.1 Von Aufenthaltsanteilen zu Zustandszählungen
+Für die Herleitung betrachten wir zunächst nicht relative Aufenthaltsanteile, sondern absolute Zustandszählungen.
+Wir definieren:
+Cit=s=1teZis.
+Gleichung (B.20): Absolute Zustandszählungen.
+Dabei ist ek∈RK der k-te Einheitsvektor.
+Beispielsweise gilt bei drei Zuständen:
+e1=100, e2=010, e3=001.
+Der Vektor Cit zählt, wie häufig die verschiedenen Zustände bis einschließlich Zeitpunkt t aufgetreten sind.
+Am Ende der Sequenz gilt:
+hi=CiTiTi.
+Gleichung (B.21): Umrechnung von absoluten in relative Zählungen.
+Das ist hilfreich, weil sich die Zustandszählung schrittweise aufbauen lässt:
+Cit=Ci,t−1+eZit.
+Gleichung (B.22): Additive Zählrekursion.
+Bei jedem neuen Zeitpunkt wird also genau ein Einheitsvektor addiert. Diese additive Struktur ermöglicht uns eine dynamische Berechnung der benötigten Momente.
+B.8.2 Drei Hilfsgrößen für die Rekursion
+Um die Zustandszählungen und ihre Unsicherheit zu verfolgen, definieren wir für jeden Zeitpunkt und Endzustand k drei Größen.
+Die erste ist:
+atk=qϕiZit=k.
+Die zweite ist ein Vektor:
+ctk=EqCit 1Zit=k.
+Die dritte ist eine Matrix:
+Rtk=EqCitCit⊤1Zit=k.
+Zur besseren Lesbarkeit unterdrücken wir hier den Ringindex i. Alle drei Größen werden für jeden Ring getrennt berechnet.
+atk: Wahrscheinlichkeit des aktuellen Zustands k
+ctk: Erwartete bisherige Zustandszählungen, gemeinsam gewichtet mit dem Ereignis Zt=k
+Rtk: Zweite Momente der bisherigen Zustandszählungen, gemeinsam gewichtet mit Zt=k
+Wichtig: ctk und Rtk sind keine auf Zt=k bedingten Erwartungswerte. Die Wahrscheinlichkeit dieses Ereignisses ist bereits enthalten. Dadurch lassen sich die Rekursionen einfacher schreiben.
+B.8.3 Initialisierung am ersten Zeitpunkt
+Am ersten Zeitpunkt besteht der Zählvektor lediglich aus dem Einheitsvektor des ersten Zustands: C1=eZ1.
+Damit gelten:
+a1k=ρik
+c1k=ρikek
+R1k=ρikekek⊤
+Gleichung (B.23): Initialisierung der drei Momentenstatistiken.
+Diese drei Größen bilden den Startpunkt unserer Momentenberechnung.
+B.8.4 Rekursion der Zustandswahrscheinlichkeiten
+Für den folgenden Zeitpunkt berechnen wir zunächst:
+atk=j=1KQitj,kat−1j.
+Gleichung (B.24): Rekursion der aktuellen Zustandsmarginalen.
+Das ist die gewöhnliche Vorwärtsrekursion einer normalisierten Markov-Verteilung. Sie berücksichtigt alle möglichen vorherigen Zustände j, aus denen der aktuelle Zustand k erreicht werden kann.
+B.8.5 Rekursion des ersten Zählmoments
+Wir verwenden Ct=Ct−1+eZt. Für den Fall Zt=k ergibt sich Ct=Ct−1+ek.
+Daraus folgt für den erwarteten Zählvektor:
+ctk=j=1KQitj,kct−1j+at−1jek.
+Gleichung (B.25): Rekursion des ersten Zählmoments.
+Die erste Größe in der Klammer berücksichtigt die bisherigen Zustandszählungen. Die zweite fügt den Beitrag des neuen Zustands k hinzu.
+Dadurch können die erwarteten Zählungen über die Sequenz schrittweise aktualisiert werden.
+B.8.6 Rekursion des zweiten Zählmoments
+Jetzt kommt der mathematisch anspruchsvollste Teil. Wir benötigen das äußere Produkt CtCt⊤.
+Setzen wir die Rekursion für Ct ein:
+CtCt⊤=Ct−1+ekCt−1+ek⊤.
+Mit Ut,k=Ct−1ek⊤ folgt äquivalent:
+CtCt⊤=Ct−1Ct−1⊤+Ut,k+Ut,k⊤+ekek⊤
+Gleichung (B.26): Ausmultiplizieren des zweiten Zählmoments.
+Wir sehen, dass vier Terme entstehen: der bisherige zweite Moment, zwei Kreuzterme und der Beitrag des neuen Zustands.
+Wenn wir über die möglichen vorherigen Zustände mitteln, erhalten wir:
+Rtk=j=1KQitj,kMtj,k.
+Mit den Hilfsgrößen
+Mtj,k=Rt−1j+Ut−1j,k+at−1jekek⊤
+und
+Ut−1j,k=ct−1jek⊤+ekct−1j⊤
+Gleichung (B.27): Rekursion des zweiten Zählmoments.
+Das ist ein entscheidendes Ergebnis unserer Herleitung. Wir können den vollständigen zweiten Moment der Zustandszählungen rekursiv fortschreiben, ohne alle möglichen Zustandsfolgen explizit zu enumerieren.
+B.8.7 Wie erhalten wir daraus unsere benötigten Aufenthaltsmomente?
+Am Ende der Ringsequenz summieren wir über sämtliche möglichen Endzustände.
+Der erwartete absolute Zählvektor ergibt sich aus:
+EqCiTi=k=1KcTik.
+Da hi=CiTi/Ti, folgt:
+mi=1Tik=1KcTik.
+Gleichung (B.28): Erster Aufenthaltsmoment aus der Rekursion.
+Analog ergibt sich der zweite Moment:
+Hi=1Ti2k=1KRTik.
+Gleichung (B.29): Zweiter Aufenthaltsmoment aus der Rekursion.
+Damit besitzen wir beide Größen, die unsere B1-Qualitätslikelihood benötigt.
+Warum ist dieses Ergebnis wichtig?
+Die direkte Berechnung der zweiten Momente schien zunächst eine Auswertung sehr vieler gemeinsamer Zustandswahrscheinlichkeiten zu erfordern.
+Unsere Rekursion nutzt dagegen den additiven Aufbau der Zustandszählungen und die Markov-Struktur der Variationsverteilung. Wir benötigen zu einem Zeitpunkt nur die Hilfsgrößen des vorherigen Zeitpunkts. Das macht den Ansatz für die spätere Implementierung wesentlich konkreter.
+Die Momentenrekursion wurde für kurze synthetische Fälle mit K=2 beziehungsweise K=3 und den Sequenzlängen Ti=2,3,5 gegen eine vollständige Zustandsenumeration numerisch überprüft. Die Ergebnisse stimmen bis auf Rundungsabweichungen überein. Diese Prüfung betrifft die Momentenformeln, noch nicht den gesamten VI-Algorithmus.
+Rechenaufwand
+Bei direkter Implementation müssen für sämtliche Zustandsübergänge j→k Matrizen der Größe K×K verarbeitet werden. Eine einfache Implementierung besitzt deshalb für die zweiten Momente eine Größenordnung von
+OTiK4.
+Für eine kleine Zustandsanzahl kann das praktikabel sein. Bei vielen Zuständen und sehr langen Sequenzen kann der Aufwand jedoch relevant werden. Hier müssen wir später auf optimierte Tensoroperationen, Speicherbedarf und Laufzeiten achten. Das ist noch kein Beweis, dass die Berechnung für unsere realen Loggersequenzen schnell genug sein wird.
+Fünftes Ergebnis: Die ersten und zweiten Aufenthaltsmomente sind unter unserer Markov-Variationsverteilung rekursiv und ohne exponentielle Aufzählung der Zustandsfolgen berechenbar. Das ist eine wesentliche Voraussetzung für die Umsetzung von B1.
+B.9 Wie geht die Unsicherheit der Zustandsfolge tatsächlich in unsere Qualitätsregression ein?
+Wir haben nun zwei wichtige Größen:
+mi=Eqhi,  Hi=Eqhihi⊤.
+Jetzt müssen wir zeigen, wie diese Größen innerhalb der Variational Inference verwendet werden. Das ist die mathematische Verbindung zwischen unserer HMM-Zustandsinferenz und der Qualitätsvorhersage.
+B.9.1 Die Qualitätslikelihood für eine einzelne Zielgröße
+Aus Herleitung A gilt:
+yir∣Zi,βr,σy,r2∼N​βr⊤hi,σy,r2.
+Dabei beschreibt r∈{1,2,3} die jeweilige Qualitätsgröße.
+Für die folgende Rechnung verwenden wir die Präzision
+λr=1σy,r2.
+Die Präzision ist der Kehrwert der Varianz. Eine hohe Präzision bedeutet somit eine geringe Fehlervarianz.
+Damit lautet die logarithmierte Gauß-Likelihood:
+logpyir∣Zi,βr,λr=12logλr2π−λr2eir2.
+Hier verwenden wir den Residualterm eir=yir−βr⊤hi.
+Gleichung (B.30): Logarithmierte Qualitätslikelihood.
+Der letzte Term enthält die Abweichung zwischen der tatsächlichen Qualitätsmessung und der aus den Zustandsaufenthalten vorhergesagten Qualität.
+B.9.2 Wir entwickeln den quadratischen Fehler
+Zunächst gilt:
+eir2=yir2−2yirβr⊤hi+βr⊤hi2
+Den letzten Term können wir schreiben als:
+βr⊤hi2=βr⊤hihi⊤βr.
+Damit erhalten wir:
+eir2=yir2−2yirβr⊤hi+βr⊤hihi⊤βr
+Gleichung (B.31): Quadratischer Regressionsfehler als Momentenform.
+Nun wird deutlich, weshalb wir die beiden Aufenthaltsmomente benötigt haben. Der lineare Term verwendet hi, der quadratische Term dagegen hihi⊤.
+B.9.3 Erwartungswert über die unbekannte Zustandsfolge
+Nehmen wir zunächst an, die Regressionskoeffizienten seien gegeben. Dann folgt:
+EqZieir2=yir2−2yirβr⊤mi+βr⊤Hiβr
+Gleichung (B.32): Zustandsgemittelter quadratischer Qualitätsfehler.
+Hier ist keine Ersetzung des zufälligen Aufenthaltsvektors durch einen festen Pseudo-Wert erforderlich. Die benötigte Information über die Aufenthaltsunsicherheit bleibt durch Hi erhalten. Das ist ein wesentlicher Unterschied zu unserer vereinfachten B2-Kopplung.
+Was passiert, wenn auch die Regressionsparameter unsicher sind?
+In unserem fully Bayesian Modell besitzen auch die Regressionskoeffizienten und die Fehlervarianzen Posteriorverteilungen.
+Deshalb benötigen wir zusätzlich Erwartungswerte über qβr,λr.
+Wir definieren dazu vier Hilfsgrößen:
+ur=Eqλr,  vr=Eqlogλr,
+gr=Eqλrβr,  Gr=Eqλrβrβr⊤.
+Alle vier Größen werden aus der globalen Variationsverteilung der Qualitätsparameter berechnet.
+Unter unserer Faktorisierung zwischen globalen Parametern und lokaler Zustandsfolge ergibt sich:
+Eqlogpyir∣Zi,βr,λr=−12log2π+12vr−12Jir.
+Dabei ist
+Jir=yir2ur−2yirgr⊤mi+trGrHi
+Gleichung (B.33): Erwartete B1-Qualitätslikelihood mit Zustands- und Parameterunsicherheit.
+Dabei bezeichnet tr die Spur einer Matrix, also die Summe ihrer Diagonalelemente.
+Diese Gleichung ist für unseren Algorithmus außerordentlich wichtig.
+Sie zeigt, dass wir den erwarteten logarithmischen Qualitätsterm aus einer begrenzten Anzahl von Momenten berechnen können: den ersten und zweiten Momenten der Zustandsaufenthalte, den mit der Präzision gewichteten Regressionskoeffizientenmomenten und den erwarteten Präzisionsgrößen.
+Wir müssen dafür nicht jede mögliche Zustandsfolge einzeln auswerten.
+B.9.4 Lassen sich auch die Parametererwartungswerte berechnen?
+Ja. Für unseren gewählten Normal-Invers-Gamma-Variationsfaktor bietet sich eine konjugierte Parametrisierung an.
+Schreiben wir für eine Qualitätsgröße:
+qσy,r2=InvGammaar,br
+und
+qβr∣σy,r2=NKbr,σy,r2Vr.
+Hier ist br der Mittelwert der Regressionskoeffizienten innerhalb des Variationsfaktors. Wichtig ist die Unterscheidung zu br ohne Fettdruck: Dieses bezeichnet den Skalenparameter der Invers-Gamma-Verteilung.
+Bei dieser Parametrisierung und Verwendung der Invers-Gamma-Skalenkonvention gelten:
+Eqλr=arbr,
+Eqlogλr=ψar−logbr,
+Eqλrβr=arbrbr,
+sowie
+Eqλrβrβr⊤=Vr+arbrbrbr⊤.
+Gleichung (B.34): Momente des Normal-Invers-Gamma-Regressionsfaktors.
+Dabei bezeichnet ψ die Digammafunktion. Damit sind auch die für den Qualitätsterm erforderlichen Parametererwartungswerte in geschlossener Form verfügbar.
+Warum ist das ein wichtiger Fortschritt?
+Wir haben jetzt erstmals eine vollständig auswertbare Form unseres erwarteten Qualitätsverlustes für B1.
+Sie berücksichtigt gleichzeitig:
+Unsicherheit über die verborgenen Zustandsaufenthalte.
+Unsicherheit über die Regressionskoeffizienten.
+Unsicherheit über die Qualitätsfehlervarianzen.
+Das ist genau die Art probabilistischer Kopplung, die wir für unsere fully Bayesian Semi-Supervised Regression anstreben.
+Sechstes Ergebnis: Der erwartete logarithmische B1-Qualitätsfaktor lässt sich unter unseren festgelegten Verteilungsannahmen analytisch durch erste und zweite Zustands- und Parametermomente ausdrücken. Das ist noch nicht der gesamte Optimierungsalgorithmus. Es ist aber der zentrale mathematische Baustein, dessen Fehlen uns zuvor Sorgen bereitet hat.
+B.10 Wie sieht unsere gesamte ELBO jetzt konkret aus?
+Bislang haben wir die allgemeine ELBO kennengelernt:
+Lq=EqlogpD,Z,Θ−EqlogqΘ,Z.
+Jetzt setzen wir die Struktur unserer Ringwalzdaten ein.
+Wir erhalten:
+Lq=−DKLqΘ∥pΘ+LZ+LX+LY+HZ.
+Die dabei verwendeten Terme sind
+LZ=i=1NEqlogpZi∣π,A
+LX=i=1NEqlogpXi∣Zi,Φ
+LY=i∈IL​Eqlogpyi∣Zi,Ψ
+HZ=i=1NHqϕiZi
+Gleichung (B.35): Vollständige ELBO des B1-SSR-HMM.
+Dabei bezeichnet H die Entropie einer Wahrscheinlichkeitsverteilung.
+Wir können diese Gleichung in fünf Bestandteile zerlegen.
+Globaler Prior-/KL-Term: Hält die approximierten globalen Parameterverteilungen im Verhältnis zu ihren Priors
+Zustandsdynamik: Bewertet Anfangszustände und Übergänge
+Prozessemissionen: Bewertet, wie gut die verborgenen Zustände die Loggerdaten erklären
+Qualitätslikelihood: Bewertet die drei Endqualitätsgrößen anhand der gesamten latenten Zustandsfolge
+Zustandsentropie: Berücksichtigt die Unsicherheit der approximierten Zustandsfolgen
+Wichtig ist der Unterschied zwischen gelabelten und ungelabelten Ringen.
+Alle Trainingsringe tragen zur Dynamik, zu den Prozessemissionen und zur Zustandsentropie bei. Nur gelabelte Ringe tragen unmittelbar zur Qualitätslikelihood bei.
+Bei ungelabelten Ringen entsteht dadurch kein künstlicher Zielwert. Ihre Informationen gelangen ausschließlich über die beobachteten Prozesssequenzen in die gemeinsame Inferenz.
+B.10.1 Können wir auch die gewöhnlichen HMM-Terme auswerten?
+Ja. Für die Zustandsdynamik gilt:
+EqlogpZi∣π,A=Siinit+Sitrans.
+Dabei sind
+Siinit=k=1Kγi1kEqlogπk
+und
+Sitrans=t=2Tij,k=1Kξitj,kEqlogAjk
+Gleichung (B.36): Erwarteter Zustandsdynamikterm.
+Die erwarteten logarithmierten Anfangs- und Übergangswahrscheinlichkeiten können wir aus den Dirichlet-Variationsfaktoren bestimmen.
+Für die Prozessemissionen erhalten wir:
+EqlogpXi∣Zi,Φ=t=1Tik=1Kγitkℓitk.
+Hier ist
+ℓitk=EqΦlogpxit∣Zit=k,Φ
+Gleichung (B.37): Erwarteter Gauß-Emissionsterm.
+Aufgrund der diagonalen Gaußstruktur können die enthaltenen Emissionserwartungswerte wiederum über die Parameter der Normal-Invers-Gamma-Faktoren berechnet werden.
+B.10.2 Die Entropie unserer strukturierten Zustandsverteilung
+Auch hier bietet uns die Markov-Struktur einen Vorteil.
+Für qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1 folgt aus der Entropie-Kettenregel:
+Hqϕi=Hρi+Hitrans.
+Mit dem bedingten Entropiebeitrag
+Hitrans=t=2Tij=1Kγi,t−1j HQitj,:
+Gleichung (B.38): Strukturierte Zustandsentropie.
+Dabei bezeichnet Qitj,: die gesamte Übergangswahrscheinlichkeitszeile vom Zustand j.
+Auch die Entropie lässt sich damit ohne Aufzählung sämtlicher Zustandsfolgen bestimmen.
+Siebtes Ergebnis: Alle Bestandteile unserer ELBO lassen sich unter der gewählten Markov-Variationsfamilie aus erwarteten lokalen HMM-Statistiken, den Aufenthaltsmomenten und den globalen Parametermomenten zusammensetzen. Die ELBO ist damit als auswertbare Zielfunktion mathematisch konkretisiert.
+B.11 Wie aktualisieren wir die Variationsverteilungen?
+Bis hierhin haben wir gezeigt, dass unsere ELBO berechenbar ist. Das ist jedoch nur ein Teil der Inferenz.
+Wir müssen zusätzlich festlegen, wie wir die Variationsparameter verändern, um die ELBO zu maximieren. Dabei unterscheiden wir zwischen den globalen Parameterupdates und den ringspezifischen Zustandsupdates.
+B.11.1 Die globalen Parameterverteilungen
+Für die Anfangsverteilung und die Übergangsmatrix besitzen wir Dirichlet-Priors. Hier können wir weitgehend die bekannten konjugierten HMM-Updates verwenden.
+Beispielsweise erhält die Anfangsverteilung die Form:
+qπ=Dirαπ
+mit
+αkπ=α0,kπ+i=1Nγi1k.
+Gleichung (B.39): Globales Dirichlet-Update der Anfangsverteilung.
+Die Posteriorparameter setzen sich also aus der Priorinformation und den erwarteten Anfangszuständen sämtlicher Trainingsringe zusammen.
+Für die Übergangsmatrix gilt entsprechend:
+αjkA=α0,jkA+i=1Nt=2Tiξitj,k.
+Gleichung (B.40): Globales Dirichlet-Update der Übergangsmatrix.
+Auch die Prozessemissionsparameter können mithilfe der erwarteten Zustandszuordnungen aktualisiert werden.
+Beal (2003) leitet die zugrunde liegenden Dirichlet-Updates für Bayesian HMMs her. P112 entwickelt analoge Varianten innerhalb der Semi-Supervised Bayesian-HMM-Struktur.
+Unsere Anpassung besteht insbesondere darin, dass wir mehrere eigenständige Ringsequenzen besitzen und sämtliche verfügbaren Trainingsringe in die erwarteten Zustandsstatistiken eingehen.
+B.11.2 Auch die Qualitätsregression besitzt ein konjugiertes Update
+Das ist ein weiterer wichtiger Vorteil unserer linearen Gaußregression.
+Wir betrachten eine einzelne Qualitätsgröße r und verwenden den in Herleitung A festgelegten Normal-Invers-Gamma-Prior:
+σy,r2∼InvGammaa0,r,b0,r,
+βr∣σy,r2∼NKm0,r,σy,r2V0,r.
+Die Zustandsaufenthalte sind nicht beobachtet. Ihre ersten und zweiten Momente stehen uns aber aus der strukturierten Zustandsinferenz zur Verfügung.
+Damit können wir die Parameter einer aktualisierten Normal-Invers-Gamma-Verteilung aus den gelabelten Ringen bestimmen.
+Zur Vereinfachung unterdrücken wir den Qualitätsindex r in den folgenden Gleichungen.
+Die neue inverse Koeffizientenkovarianz lautet:
+Vn−1=V0−1+i∈IL​Hi.
+Gleichung (B.41): Aktualisierte inverse Koeffizientenkovarianz.
+Der aktualisierte Koeffizientenmittelwert ergibt sich aus:
+mn=VnV0−1m0+i∈IL​yimi.
+Gleichung (B.42): Aktualisierter Koeffizientenmittelwert.
+Die beiden Parameter der Invers-Gamma-Verteilung lauten:
+an=a0+NL2
+Gleichung (B.43): Aktualisierter Formparameter.
+und
+bn=b0+12Δy.
+Mit der zusammengefassten Größe
+Δy=i∈IL​yi2+m0⊤V0−1m0−mn⊤Vn−1mn
+Gleichung (B.44): Aktualisierter Skalenparameter.
+Diese Gleichungen sind eine eigene Ableitung der konjugierten Bayesian-Regressionsaktualisierung unter unserer VI-Faktorisierung.
+Der entscheidende Unterschied zur gewöhnlichen Bayesian linearen Regression ist: Wir verwenden nicht die äußeren Produkte tatsächlich beobachteter Eingabevektoren, sondern deren Erwartungen unter der latenten Zustandsverteilung, also Hi=Eqhihi⊤.
+Entsprechend steht im linearen Term der erwartete Aufenthaltsvektor mi.
+Das Ergebnis ist bemerkenswert: Obwohl die Eingaben unserer Qualitätsregression selbst unsichere Funktionen verborgener Zustandsfolgen sind, bleibt der globale Variationsfaktor der linearen Qualitätsregression bei festgehaltenem qZ konjugiert aktualisierbar.
+Das macht unsere bisherige Modellwahl erheblich attraktiver. Allerdings gilt diese Aussage für den verwendeten linearen Gauß-Regressionskopf und die gewählte Variationsfaktorisierung. Sie lässt sich nicht ungeprüft auf beliebige nichtlineare Qualitätsmodelle übertragen.
+B.11.3 Die schwierige Aktualisierung: qϕiZi
+Für die ungelabelten Ringe ist die Situation relativ einfach.
+Da dort kein beobachteter Qualitätsfaktor vorliegt, besteht die optimale lokale Aktualisierung bei gegebenem qΘ aus den erwarteten Anfangs-, Übergangs- und Emissionslogwahrscheinlichkeiten.
+Diese bilden wieder eine HMM-artige Kettenverteilung. Ihre Marginalen können durch angepasste Forward-Backward-Berechnungen ermittelt werden.
+Bei gelabelten Ringen müssen wir dagegen den globalen Qualitätsterm berücksichtigen.
+Um zu verstehen, was das bedeutet, betrachten wir noch einmal die erwartete logarithmierte Qualitätslikelihood.
+Aus Gleichung (B.33) können wir für eine feste Zustandsfolge alle vom Aufenthaltsvektor unabhängigen Terme zusammenfassen.
+Für einen gelabelten Ring ergibt sich dann eine Abhängigkeit der Form:
+EqΨlogpyi∣Zi,Ψ=ci+gi⊤hiZi−12hiZi⊤RhiZi.
+Gleichung (B.45): Globaler quadratischer B1-Qualitätsterm.
+Dabei sind
+gi=r=13yir Eqλrβr
+und
+R=r=13Eqλrβrβr⊤.
+Der Term ci ist unabhängig von der Zustandsfolge, bei festgehaltenem globalem Variationsfaktor.
+Der lineare Term belohnt beziehungsweise bestraft bestimmte Kombinationen von Zustandsaufenthalten in Abhängigkeit von den Qualitätsmessungen. Der quadratische Term berücksichtigt ihre gemeinsamen Wirkungen und Unsicherheiten.
+Da hiZi=Ti−1t​eZit, enthält der quadratische Ausdruck nach dem Ausmultiplizieren auch Produkte der Zustandsindikatoren unterschiedlicher Zeitpunkte.
+Genau deshalb ist die unbeschränkte optimale lokale Variationsverteilung im Allgemeinen nicht mehr durch eine einfache Markov-Kette darstellbar.
+Unser Optimierungsweg
+Wir behalten deshalb unsere parametrisierte Markov-Verteilung
+qϕiZi=ρiZi1t=2TiQitZit∣Zi,t−1
+als beschränkte Variationsfamilie bei. Nun optimieren wir ihre Parameter ϕi bezüglich der vollständigen ELBO.
+Dabei können wir beispielsweise die Wahrscheinlichkeiten durch Softmax-parametrisierte, unbeschränkte Optimierungsparameter darstellen.
+Aus diesen Parametern berechnen wir:
+die normierten Anfangs- und Übergangswahrscheinlichkeiten,
+die marginalen Zustandswahrscheinlichkeiten γ,
+die benachbarten Übergangswahrscheinlichkeiten ξ,
+die ersten und zweiten Aufenthaltsmomente mi,Hi,
+die vollständigen HMM-, Qualitäts- und Entropieterme.
+Wenn wir sämtliche Rekursionen in einer differenzierbaren Implementierung formulieren, können wir grundsätzlich Gradienten der ELBO bezüglich der Variationsparameter berechnen.
+Dazu eignet sich automatische Differentiation, etwa innerhalb eines geeigneten Tensor-Frameworks.
+Damit erhält unsere B1-Zustandsaktualisierung eine konkrete numerische Form:
+ϕineu≈argmaxϕiLiϕi;qΘ.
+Gleichung (B.46): Numerisch optimiertes lokales B1-Update.
+Das Zeichen ≈ verdeutlicht, dass wir dieses innere Optimierungsproblem numerisch lösen und nicht bereits eine geschlossene analytische Aktualisierungsformel besitzen.
+In der gesamten Variational Inference wechseln wir somit zwischen konjugierten globalen Updates und numerischen strukturierten lokalen Updates.
+Das ist ein hybrider Optimierungsalgorithmus, bleibt aber weiterhin eine gemeinsame Variational-Inference-Optimierung unseres B1-Modells.
+B.12 Erster implementierungsnaher Trainingsablauf
+Wir können aus den bisher hergeleiteten Größen erstmals einen konkreten Ablauf formulieren.
+Schritt 1 – Initialisierung. Priors, globale Variationsfaktoren und ringspezifische Markov-Verteilungen festlegen.
+Schritt 2 – Lokale strukturierte VI, je Ring. qϕiZi aktualisieren und γ, ξ, mi und Hi berechnen. Gelabelte Ringe berücksichtigen zusätzlich den B1-Qualitätsterm; ungelabelte Ringe nur Prozess- und Zustandsinformation.
+Schritt 3 – Globale VI. Dirichlet- und Normal-Invers-Gamma-Faktoren anhand der erwarteten Statistiken aktualisieren.
+Schritt 4 – ELBO und Konvergenz. ELBO berechnen, Änderungen prüfen und Schritte 2–4 bis zum festgelegten Abbruchkriterium wiederholen.
+Schritt 5 – Gelernter approximierter gemeinsamer Posterior: q⋆Θ,Z.
+Damit müssen wir für die Bachelorarbeit nicht von Anfang an alle möglichen Rechenverfahren beliebig kombinieren. Wir besitzen jetzt einen methodisch konkreten Hauptpfad.
+Wichtig ist dabei, dass wir die numerische Optimierung der Zustandsfaktoren ausreichend gründlich durchführen und anhand der ELBO kontrollieren. Ein einzelner Gradienten-Schritt garantiert noch keine optimale Aktualisierung.
+Auch können verschiedene Initialisierungen zu unterschiedlichen lokalen Lösungen führen.
+Implementierungsgrößen
+ρi: Form: K. Verwendung: Anfangsverteilung von qϕi
+Qit: Form: K×K. Verwendung: Lokale Übergangsverteilung
+γit: Form: K. Verwendung: Erwartete Zustandszuordnung
+ξit: Form: K×K. Verwendung: Erwartete Übergänge
+mi: Form: K. Verwendung: Erster Aufenthaltsmoment
+Hi: Form: K×K. Verwendung: Zweiter Aufenthaltsmoment
+B: Form: 3×K. Verwendung: Globale Regressionskoeffizienten
+Σy: Form: 3×3, diagonal. Verwendung: Qualitätsfehlervarianzen
+Diese Datenstrukturen bilden eine erste direkte Verbindung zwischen der mathematischen Herleitung und einer späteren Python-Implementierung.
+B.13 Ist unsere B1-Inferenz damit tatsächlich implementierbar?
+Wir haben jetzt deutlich mehr als nur eine theoretische Idee.
+Aus der gemeinsamen Modellverteilung in Herleitung A konnten wir eine strukturierte Variationsfamilie entwickeln. Innerhalb dieser Familie haben wir anschließend die benötigten Statistiken und eine berechenbare ELBO hergeleitet.
+Trotzdem möchte ich die erreichten Ergebnisse sauber von den verbleibenden Schwierigkeiten trennen.
+B.13.1 Was mathematisch bereits geklärt ist
+Variationsfaktorisierung: Unser Ergebnis: qΘi​qϕiZi. Stand: Mathematisch definiert
+Zeitliche Abhängigkeit: Unser Ergebnis: Markov-Struktur innerhalb von qϕi. Stand: Erhalten
+Klassische HMM-Statistiken: Unser Ergebnis: γ und ξ. Stand: Berechenbar
+Erwartete Zustandsaufenthalte: Unser Ergebnis: mi. Stand: Berechenbar
+Zweite Aufenthaltsmomente: Unser Ergebnis: Hi. Stand: Rekursion hergeleitet; Kurzsequenztest separat möglich
+B1-Qualitätslikelihood: Unser Ergebnis: Erwarteter Log-Likelihood-Term. Stand: Analytisch auswertbar
+Globale Parameterupdates: Unser Ergebnis: Konjugierte Dirichlet- und Normal-Invers-Gamma-Faktoren. Stand: Grundform hergeleitet
+Gesamte ELBO: Unser Ergebnis: HMM-, Qualitäts-, Prior- und Entropieterme. Stand: Auswertbare Form definiert
+Lokale B1-Updates: Unser Ergebnis: Numerische Optimierung strukturierter Markov-Faktoren. Stand: Konkreter Lösungsweg; noch nicht vollständig implementiert
+Besonders wichtig sind dabei die Gleichungen (B.27), (B.29), (B.33) und (B.35).
+Sie bilden gemeinsam das mathematische Bindeglied zwischen der gesamten latenten Zustandsfolge und unserem Bayesian-Trainingsalgorithmus.
+B.13.2 Welche Schwierigkeiten bleiben?
+Auch wenn die wesentlichen Erwartungen berechenbar sind, ist die praktische Eignung noch nicht bewiesen.
+Erstens: Optimierung der Zustandsverteilungen. Wir müssen prüfen, wie stabil sich die Parameter ϕi durch numerische Gradientenoptimierung aktualisieren lassen. Die optimale lokale Verteilung ist wegen des globalen Qualitätsterms im Allgemeinen keine einfache Markov-Kette.
+Zweitens: Rechenaufwand. Unsere Rekursion für die zweiten Momente kann bei langen Ringsequenzen teuer werden. Die tatsächliche Laufzeit hängt besonders von Ti, K und der konkreten Tensorimplementierung ab.
+Drittens: Identifizierbarkeit. Die Zustandskoeffizienten der Qualitätsregression können nur zuverlässig unterschieden werden, wenn die Trainingsringe hinreichend unterschiedliche Zustandsaufenthalte aufweisen. Außerdem können die Bezeichnungen latenter HMM-Zustände vertauscht werden, ohne dass sich das beobachtbare Modell verändert. Wir müssen solche Label-Switching-Effekte bei der Interpretation berücksichtigen.
+Viertens: Physikalische Aussagekraft. Relative Zustandsaufenthalte enthalten nicht die vollständige zeitliche Reihenfolge und bei unterschiedlichen Sequenzlängen auch nicht automatisch die absolute Aufenthaltsdauer. Bei unterschiedlich dichter zeitlicher Abtastung entsprechen Anteile von Messzeitpunkten zudem nicht zwangsläufig tatsächlichen Zeitanteilen.
+Fünftens: Numerische Stabilität. Wir benötigen geeignete Parametrisierungen positiver Varianzen, normierte Übergangswahrscheinlichkeiten, stabile Berechnung logarithmischer Terme und vernünftige Initialisierungen.
+Diese Schwierigkeiten sind ernst zu nehmen. Sie bedeuten aber nicht, dass wir B1 bereits verwerfen müssten.
+B.13.3 Was ich vor einer Implementierung gezielt prüfen würde
+Unsere erste technische Prüfung sollte nicht unmittelbar mit sämtlichen realen Ringwalzdaten beginnen.
+Stattdessen entwickeln wir einen sehr kleinen synthetischen Testfall, beispielsweise mit zwei oder drei Zuständen und kurzen Sequenzen. Bei solchen Sequenzen können wir alle möglichen Zustandsfolgen noch vollständig aufzählen.
+Dadurch erhalten wir eine Referenz für die Überprüfung unserer eigenen Berechnungen.
+Wir kontrollieren dann insbesondere:
+Stimmen mi und Hi aus der Rekursion mit der vollständigen Enumeration überein?
+Entspricht der aus den Momenten berechnete Qualitätsterm dem direkt über alle Zustandsfolgen gemittelten Term?
+Stimmt die ELBO mit einer unabhängigen direkten Berechnung für den kleinen Testfall überein?
+Stimmen automatisch berechnete Gradienten mit numerischen Differenzenquotienten überein?
+Verbessert die Optimierung tatsächlich die ELBO, wenn die übrigen Variationsfaktoren festgehalten werden?
+Dabei müssen wir unterscheiden: Die Momente innerhalb der Markov-Variationsfamilie lassen sich exakt überprüfen. Der optimale strukturiert approximierte Zustandsfaktor muss dagegen nicht mit dem uneingeschränkten exakten Posterior identisch sein.
+Erst wenn diese Tests erfolgreich sind, sollten wir den Algorithmus auf längere Ringsequenzen übertragen.
+Das ist für die Bachelorarbeit besonders wertvoll, weil wir damit die mathematische Korrektheit einzelner Implementierungsbausteine getrennt von der späteren Vorhersageleistung überprüfen.
+B.14 Was bedeutet Herleitung B für unsere bisherige Modellentscheidung?
+Unsere bevorzugte Architektur bleibt unverändert:
+Xi→Zi,1:Ti→hiZi→yi.
+Neu ist, dass wir jetzt einen konkreten probabilistischen Rechenweg für die Modellkopplung besitzen.
+Verbindung zwischen Herleitung A und B
+Herleitung A: Vollständiges Bayesian-Modell pDL,DU,Z,Θ.
+Variationsfamilie: qΘi​qϕiZi.
+Strukturierte Zustandsinferenz: γ, ξ, mi, Hi.
+B1-Qualitätskopplung: Erwartete logarithmische Gauß-Likelihood unter Zustands- und Parameterunsicherheit.
+Herleitung C: Vollständige ELBO-Optimierung, Trainingsupdates und Algorithmus.
+Erste Schlussfolgerung zur Machbarkeit von B1
+Die zentrale Frage lautete am Anfang:
+Ist eine vollständig gemeinsame B1-Modellierung mit strukturierter Variational Inference möglich, obwohl die Qualitätsvorhersage von der gesamten verborgenen Zustandsfolge abhängt?
+Auf Basis der bisherigen Herleitung können wir eine differenzierte Antwort geben.
+Ja, wir haben eine mathematisch konsistente, auswertbare Variationszielfunktion und einen konkreten Optimierungsweg für eine strukturierte Markov-Approximation gefunden.
+Das ist jedoch etwas anderes als die Behauptung, dass die exakte lokale Posteriorverteilung weiterhin ein HMM sei oder dass wir bereits einen vollständig getesteten Trainingsalgorithmus besitzen.
+Die qualitative Schwierigkeit bleibt: Unsere Qualitätskopplung enthält einen globalen Faktor über die Zustandsfolge. Wir lösen dies nicht durch ein unverändertes Forward-Backward-Update, sondern durch eine Markov-beschränkte Variationsfamilie, deren Parameter unter Verwendung der berechenbaren Aufenthaltsmomente optimiert werden.
+Der größte Fortschritt liegt darin, dass die Berechnung des erwarteten B1-Qualitätsterms nicht mehr die vollständige Aufzählung aller Zustandsfolgen erfordert.
+Damit behalten wir B1 als Hauptpfad bei. B2 bleibt weiterhin ausschließlich unser begründeter Rückfallpfad, sollte die numerische Optimierung oder der Rechenaufwand an den tatsächlichen Daten nicht vertretbar sein.
+Quellenstatus und eigene mathematische Beiträge
+Für Herleitung B haben wir insbesondere die folgenden Originalquellen verwendet:
+****Beal (2003): Gestützter Inhalt: Bayesian-HMM-Posterior, ELBO, Variationsfaktorisierung, Dirichlet-Updates, Forward-Backward innerhalb der VB-HMM-Inferenz. Abgrenzung: Behandelt nicht unsere zeitübergreifende B1-Endqualitätslikelihood
+****Shao et al. (2022), P112: Gestützter Inhalt: Direkte SSR bei fehlenden Qualitätsmessungen, konjugierte Priors, VI-Faktoren und Zustandsupdates. Abgrenzung: Qualität wird dort zeitpunktbezogen behandelt
+****Chen et al. (2010): Gestützter Inhalt: Asynchrone Kopplung einer Batchsequenz an eine Endqualitätsmessung. Abgrenzung: Kein identisches fully Bayesian SSR-Modell mit Aufenthaltsmomenten
+****Unsere B1-Herleitung: Gestützter Inhalt: Rekursion für erste und zweite Zustandszählmomente; erwartete B1-Qualitätslikelihood; Kombination mit konjugierten Qualitätsregressionsfaktoren. Abgrenzung: Eigene mathematische Konstruktion, noch nicht vollständig implementiert oder empirisch validiert
+Die wesentlichen Quellenabschnitte wurden für die hier verwendeten Grundlagen erneut überprüft. Nicht vollständig abgeschlossen sind die formelweise Auswertung aller möglichen Supplementary Materials sowie der Abgleich unserer numerischen Optimierung mit einer bereits publizierten Implementierung derselben speziellen B1-Kopplung.
+Wir behaupten ausdrücklich nicht, dass die Momentenrekursion eine neue mathematische Methode im wissenschaftlichen Sinne sei. Sie ist eine für unsere additive Zustandsstatistik hergeleitete dynamische Berechnung. Ob entsprechende Rekursionen bereits in anderer Literatur formuliert sind, müssten wir vor möglichen Neuheitsbehauptungen gesondert prüfen.
+Unser nächster Haltepunkt: Herleitung C
+Wir haben mit Herleitung A das vollständige Modell festgelegt und mit Herleitung B eine geeignete Variationsfamilie und die erforderlichen Momentenberechnungen entwickelt.
+In Herleitung C müssen wir daraus den tatsächlich ausführbaren Trainingsalgorithmus machen.
+Dort arbeiten wir die ELBO bis auf die einzelnen implementierbaren Terme aus, definieren die konkreten globalen Updates, parametrisieren die lokalen Markov-Verteilungen, legen den numerischen Optimierungsablauf fest und prüfen Stabilität, Laufzeit und Konvergenz.
+Besonders wichtig wird die Frage, ob wir die lokalen Zustandsparameter mit einer effizienten Gradientenoptimierung aktualisieren können und ob dieser Optimierungsweg auf den tatsächlichen Sequenzlängen der Ringwalzdaten praktikabel bleibt.
+Erst danach können wir das vollständige Blockschaltbild endgültig festlegen.
+Das wichtigste Ergebnis aus Herleitung B bleibt: Unsere gewählte B1-Kopplung ist nicht länger nur eine konzeptionelle Idee. Wir haben eine konkrete mathematische Grundlage dafür, die Unsicherheit der gesamten verborgenen Zustandsfolge innerhalb einer gemeinsamen Bayesian-Variationsoptimierung zu berücksichtigen – ohne Pseudo-Labels und ohne die Zustandsaufenthalte auf eine einzige feste Schätzung zu reduzieren.
