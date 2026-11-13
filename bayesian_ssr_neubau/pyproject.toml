@@ -10,7 +10,8 @@ requires-python = ">=3.11,<3.13"
 dependencies = ["numpy>=2.0,<3", "scipy>=1.13,<2", "scikit-learn>=1.5,<2", "pandas>=2.2,<3.1", "numba>=0.61,<0.69", "threadpoolctl>=3.1,<4"]
 
 [project.optional-dependencies]
-audit = ["pytest>=8,<10", "pypdf>=5,<7"]
+audit = ["pytest>=8,<10"]
+notebook = ["pytest>=8,<10", "nbformat>=5.10,<6", "nbclient>=0.10,<1", "ipykernel>=6.29,<8", "matplotlib>=3.9,<4", "tzdata>=2025.1; sys_platform == 'win32'"]
 
 [project.scripts]
 bayesian-ring-ssr = "bayesian_ring_ssr.cli:main"

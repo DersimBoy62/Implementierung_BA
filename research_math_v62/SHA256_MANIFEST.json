@@ -1,9 +1,0 @@
-{
-  "purpose": "V6.2 within-ring HMM diagnostic",
-  "files": {
-    "README.md": "79490e7f66787c242fe2deb19e41485c98a041b9b6da5645583095f4720b7cda",
-    "V62_VORLAEUFIGE_LOKALE_ENTWICKLUNGSDIAGNOSTIK.json": "770f12c803162f5d59d2fa29ace71aa5c36e555e0e85710c956a95c36d16162a",
-    "hmm_dynamics_audit_v62.py": "0a3df4ca6a43eca56988a0b2ae89903ae2273d55c4aa38011fcfc5b5f118a3f8"
-  },
-  "upstream_v61_sha256": "be17e95a4c87da9ecb1f79b2d93587e6f7920a12fd4ded3f1d84c2fb07b751c2"
-}

@@ -1,6 +1,7 @@
 """Reproducible PowerShell-compatible command line entry points."""
 import argparse
 import json
+import os
 from pathlib import Path
 from .config import Config
 from .data_io import audit_data,load_development,DATA_SHA256,read_process_file,export_development_logger
@@ -13,13 +14,14 @@ from .evaluation import cross_validate,ARMS
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Eigenständiger DM Bayesian SSR Neubau")
+    default_input = os.environ.get("BAYESIAN_SSR_DATA", "input/DM_16_aktive_Ringe.pkl")
     sub = parser.add_subparsers(dest="command",required=True)
     audit = sub.add_parser("audit-data")
-    audit.add_argument("--input",default="input/DM_16_aktive_Ringe.pkl")
+    audit.add_argument("--input",default=default_input)
     audit.add_argument("--out")
     train = sub.add_parser("train")
     train.add_argument("--config",required=True)
-    train.add_argument("--input",default="input/DM_16_aktive_Ringe.pkl")
+    train.add_argument("--input",default=default_input)
     train.add_argument("--out",required=True)
     pred = sub.add_parser("predict")
     pred.add_argument("--model",required=True)
@@ -27,11 +29,11 @@ def main(argv=None):
     pred.add_argument("--ring-id")
     pred.add_argument("--out")
     export = sub.add_parser("export-process")
-    export.add_argument("--input",default="input/DM_16_aktive_Ringe.pkl")
+    export.add_argument("--input",default=default_input)
     export.add_argument("--ring-id",required=True)
     export.add_argument("--out",required=True)
     cv = sub.add_parser("evaluate")
-    cv.add_argument("--input",default="input/DM_16_aktive_Ringe.pkl")
+    cv.add_argument("--input",default=default_input)
     cv.add_argument("--config",required=True)
     cv.add_argument("--out",required=True)
     cv.add_argument("--arms",nargs="+",choices=ARMS,default=ARMS)

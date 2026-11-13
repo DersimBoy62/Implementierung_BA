@@ -27,9 +27,9 @@ frisch über 30 Epochen und erstellt neue Vorhersagen sowie eine vollständige
 vierfache Entwicklungsevaluation mit fünf Vergleichsarmen.
 
 **Bedienung in VS Code:** Als Kernel die Python-Umgebung `.venv` des Projekts
-auswählen und **Restart Kernel → Run All** ausführen. Die gespeicherte Ausgabe
-zeigt einen tatsächlich ausgeführten Lauf. Jeder neue Gesamtlauf erzeugt einen
-eigenen Ausgabeordner; die vorhandene Referenz wird nicht überschrieben.
+auswählen und **Restart Kernel → Run All** ausführen. Die versionierte Vorlage
+enthält keine gespeicherten Ausgaben. Jeder Gesamtlauf berechnet die Ergebnisse
+neu und erzeugt einen eigenen lokalen Ausgabeordner.
 
 Der vollständige Lauf dauert deutlich länger als die Tests, insbesondere durch
 die zwölf zusätzlichen HMM-Fits der Cross-Validation. Es werden keine alten
@@ -63,18 +63,18 @@ import xml.etree.ElementTree as ET
 def find_workspace():
     here = Path.cwd().resolve()
     for candidate in (here, *here.parents):
-        if ((candidate / "input/DM_16_aktive_Ringe.pkl").is_file()
-                and (candidate / "bayesian_ssr_neubau/pyproject.toml").is_file()):
+        if (candidate / "bayesian_ssr_neubau/pyproject.toml").is_file():
             return candidate
     raise FileNotFoundError("Notebook innerhalb des Workspace Implementierung_BA öffnen.")
 
 ROOT = find_workspace()
 PROJECT = ROOT / "bayesian_ssr_neubau"
 NOTEBOOKS = PROJECT / "notebooks"
-DATA = ROOT / "input/DM_16_aktive_Ringe.pkl"
-if (ROOT / ".venv").is_dir():
-    assert Path(sys.prefix).resolve() == (ROOT / ".venv").resolve(), (
-        "Bitte in VS Code den Python-Kernel der Projekt-.venv auswählen."
+DATA = Path(os.environ.get("BAYESIAN_SSR_DATA", ROOT / "input/DM_16_aktive_Ringe.pkl")).expanduser().resolve()
+if not DATA.is_file():
+    raise FileNotFoundError(
+        f"Private Rohdaten fehlen: {DATA}. Die freigegebene Datei lokal unter "
+        "input/DM_16_aktive_Ringe.pkl bereitstellen oder BAYESIAN_SSR_DATA setzen."
     )
 sys.path.insert(0, str(PROJECT / "src"))
 
@@ -134,27 +134,45 @@ print("Neuer Lauf:", RUN_DIR)
 """)
 
 md(r"""
-## 1. Umgebung und unveränderte Modellreferenz
+## 1. Umgebung und geprüfte Modellquellen
 
 Die zusätzlichen Jupyter-Pakete ändern keine Modellgleichungen oder
-Hyperparameter. Die Hashprüfung kontrolliert alle Dateien des vorhandenen
-Baseline-Releases. Die nachfolgenden Ergebnisse werden separat neu berechnet.
+Hyperparameter. Die Hashprüfung kontrolliert die versionierten Modellquellen
+und Konfigurationen in `SOURCE_SHA256.json`. Gespeicherte Trainingsausgaben
+werden dafür nicht benötigt. Die nachfolgenden Ergebnisse werden neu berechnet.
 """)
 
 code(r"""
-release_manifest = read_json(PROJECT / "RELEASE_SHA256.json")
-changed = [name for name, expected in release_manifest["files"].items()
-           if not (PROJECT / name).is_file() or sha256(PROJECT / name) != expected]
-assert not changed, f"Referenzdateien verändert: {changed}"
+def validate_source_manifest():
+    manifest = read_json(PROJECT / "SOURCE_SHA256.json")
+    if manifest.get("schema") != "bayesian-ring-ssr-source-sha256/1":
+        raise ValueError("Unbekanntes Schema des Quellenmanifests.")
+    recorded = manifest.get("files")
+    if not isinstance(recorded, dict) or not recorded:
+        raise ValueError("Quellenmanifest enthält keine gültige Dateiliste.")
+    if not (PROJECT / "src/bayesian_ring_ssr/__init__.py").is_file():
+        raise FileNotFoundError("Modellquellen fehlen.")
+    paths = [PROJECT / "pyproject.toml"]
+    paths.extend(sorted((PROJECT / "src").rglob("*.py")))
+    paths.extend(sorted((PROJECT / "configs").rglob("*.json")))
+    actual = {path.relative_to(PROJECT).as_posix(): sha256(path) for path in sorted(paths)}
+    differences = [name for name in sorted(set(recorded) | set(actual))
+                   if recorded.get(name) != actual.get(name)]
+    if differences:
+        raise ValueError("Quellenmanifest weicht ab: " + ", ".join(differences))
+    return manifest
+
+source_manifest = validate_source_manifest()
+source_manifest_sha256 = sha256(PROJECT / "SOURCE_SHA256.json")
 source_hashes = {str(p.relative_to(ROOT)): sha256(p) for p in sorted((PROJECT / "src").rglob("*.py"))}
 package_names = ["numpy", "scipy", "scikit-learn", "pandas", "numba", "pytest",
                  "nbformat", "nbclient", "ipykernel", "matplotlib"]
 versions = {name: metadata.version(name) for name in package_names}
 display(pd.DataFrame({"Paket": versions.keys(), "Version": versions.values()}))
-print(f"Unveränderte Referenz: {len(release_manifest['files'])} Dateien geprüft.")
+print(f"Modellquellen: {len(source_manifest['files'])} Dateien geprüft.")
 write_json(RUN_DIR / "environment.json", {
     "python": sys.version, "executable": sys.executable, "packages": versions,
-    "baseline_manifest_sha256": sha256(PROJECT / "RELEASE_SHA256.json"),
+    "source_manifest_sha256": source_manifest_sha256,
     "source_sha256": source_hashes,
 })
 installed = {d.metadata["Name"]: d.version for d in metadata.distributions()
@@ -278,6 +296,7 @@ Diese Zelle startet pytest mit **dem aktuellen Notebook-Python**. Die aktuelle
 Testanzahl und der Exitcode stammen aus diesem neuen Aufruf und seiner neuen
 JUnit-Datei. Die Suite umfasst T1–T10, synthetisches End-to-End-Training,
 Leakage-/Persistenzprüfungen sowie getrennte read-only-V6.0-Oracletests.
+Die dafür benötigten Referenzquellen liegen vollständig unter `tests/`.
 Der Produktivcode importiert keine alten Modellkerne.
 """)
 
@@ -288,7 +307,8 @@ test_command = [sys.executable, "-m", "pytest", str(PROJECT / "tests"), "-q",
 test_start = time.perf_counter()
 test_run = subprocess.run(test_command, cwd=ROOT, capture_output=True, text=True,
                           encoding="utf-8", errors="replace",
-                          env={**os.environ, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"})
+                          env={**os.environ, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1",
+                               "BAYESIAN_SSR_DATA": str(DATA)})
 test_output = test_run.stdout + test_run.stderr
 (RUN_DIR / "pytest_output.log").write_text(test_output, encoding="utf-8")
 print(test_output)
@@ -659,11 +679,11 @@ Generalisierung. Der Optimierungsfahrplan wird hier nicht umgesetzt.
 """)
 
 code(r"""
-final_changed = [name for name, expected in release_manifest["files"].items()
-                 if sha256(PROJECT / name) != expected]
-assert not final_changed
+final_manifest = validate_source_manifest()
+assert final_manifest == source_manifest, "Quellenmanifest wurde während des Laufs verändert."
+assert sha256(PROJECT / "SOURCE_SHA256.json") == source_manifest_sha256
 status_rows = [
-    ("Originalreferenz", f"{len(release_manifest['files'])} Hashes unverändert"),
+    ("Modellquellen", f"{len(source_manifest['files'])} Hashes unverändert"),
     ("Daten", "SHA256 und 8L/4U-Vertrag geprüft"),
     ("Kurze Zustandskette", "Pfadenumeration stimmt mit Rekursion überein"),
     ("Mathematische Tests", f"{test_counts['tests']} bestanden, Exitcode 0"),

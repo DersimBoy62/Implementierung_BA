@@ -6,9 +6,12 @@ Am 13.11.2026 ausgeführt:
 .\.venv\Scripts\python.exe -m pytest bayesian_ssr_neubau\tests\reference_parity\test_v60_oracle.py -q
 ```
 
-Ergebnis: **12 passed in 34.27 s**, Exitcode 0. Das Oracle ist die tatsächliche
-Datei `research_math_v60/m2_prior_reduction_v60.py`. Ihr Hash wird zusätzlich
-gegen die mitgelieferte Übergabekopie geprüft. Die originale Funktion
+Historisches Ergebnis vor der Projektbereinigung: **12 passed in 34.27 s**,
+Exitcode 0. Das Oracle ist die bytegleiche Kopie von
+`research_math_v60/m2_prior_reduction_v60.py` unter
+`tests/reference_parity/fixtures/legacy/`. Vor der Übernahme wurde sie gegen die
+Übergabekopie geprüft; im aktiven Projekt sichert das Fixture-Manifest ihre
+Integrität ohne eine zweite Übergabekopie. Die originale Funktion
 `dependencies()` prüft ihrerseits SHA256 der V5.9-/V5.8-Dateien und aller zehn
 V5.2-Kernmodule. Nur der Test importiert diesen alten Code. Alte Modellzustände,
 Posterioren, Zentren, Skalierer oder Ergebnisdateien werden nicht gelesen.

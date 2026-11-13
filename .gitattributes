@@ -1,0 +1,5 @@
+# Preserve the exact bytes checked by the source and reference SHA256 manifests.
+bayesian_ssr_neubau/src/** -text
+bayesian_ssr_neubau/configs/** -text
+bayesian_ssr_neubau/pyproject.toml -text
+bayesian_ssr_neubau/tests/reference_parity/fixtures/legacy/** -text

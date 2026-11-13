@@ -1,8 +1,0 @@
-{
-  "files": {
-    "phase_emission_audit_v63.py": "c0389cb5239e267674f16a2a32fdfa7b4f61b87a1bfe90917681243b7abb921b",
-    "README.md": "7360430fc54165aad9097cd9f4c40b9c5733a1d8e9c16061cecedb500a1d8c54",
-    "V63_VORLAEUFIGE_LOKALE_ENTWICKLUNGSDIAGNOSTIK.json": "8064fc2ca23d5f41732854dbe7702bd6c74205968af0a3156f1d47f733bd084a"
-  },
-  "depends_on_v62_sha256": "0a3df4ca6a43eca56988a0b2ae89903ae2273d55c4aa38011fcfc5b5f118a3f8"
-}

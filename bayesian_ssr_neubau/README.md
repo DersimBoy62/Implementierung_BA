@@ -1,120 +1,131 @@
-# Bayesian Ring SSR – eigenständiger Basismodell-Neubau
+# Bayesian Ring SSR
 
-Neuer Python-Code für vollständige DM-Loggersequenzen, mit zwei ringweiten
-Bayesian-NIG-Qualitätsköpfen und einem gemeinsamen variationalen Bayesian-HMM.
-Die alten Modellkerne dienen ausschließlich als separat geprüfte Test-Oracles.
-Der Produktivcode unter `src/` importiert keinen davon.
+Eigenständiges variationales Bayesian-SSR-HMM für vollständige DM-Ringsequenzen:
+volle Normal-Wishart-Emissionen, gemeinsame Markov-Zustände und zwei ringweite
+Bayesian-NIG-Qualitätsköpfe. Produktivcode unter `src/` importiert keine alten
+Modellkerne. Die bytegleich übernommenen historischen Referenzen liegen
+ausschließlich bei den Tests.
 
-Die Basis verwendet K=2, M2, C=0,2, Seed20261111, 30 Epochen und acht lokale
-L-BFGS-B-Iterationen. C gewichtet den gesamten U-Prozessbeitrag einschließlich
-Entropie: für C≠1 ist dies eine generalisierte Variationszielfunktion. Alle Fits
-starten frisch. Die induzierten M2-Priors erhalten beide Aufenthaltsmerkmale und
-entfernen nur die letzte Delta-Komponente; die Kopfgrößen sind 9 und 8.
+Die Basiskonfiguration bleibt K=2, M2, C=0,2, Seed 20261111, 30 Epochen und acht
+lokale L-BFGS-B-Iterationen. C gewichtet den gesamten U-Prozessbeitrag
+einschließlich Entropie; für C≠1 ist dies eine generalisierte Variationszielfunktion.
+Alle Fits starten frisch. Die induzierten M2-Priors behalten alle Aufenthaltsmerkmale
+und entfernen nur die letzte Delta-Komponente; die Kopfgrößen sind 9 und 8.
 
-Der tatsächlich ausgeführte 8L+4U-Lauf liegt unter
-`outputs/baseline_8L4U_001`. Nach 30 Epochen beträgt J_C
-−22028,914444073278; keine Blockabnahme überschreitet die festgelegte
-Toleranz1e-6. Das ist ein Rechen-/Trainingsbefund. Die Entwicklungsevaluation wird
-gesondert in `outputs/development_cv_001/development_cv.json` dokumentiert.
+## Installation
 
-## Installation und echte Befehle
-
-Alle Befehle vom bisherigen Workspace-Root `Implementierung_BA` aus ausführen.
-Python3.11.9 und die vorhandene `.venv` wurden verwendet. Fehlende Pakete und
-Buildwerkzeuge wurden ergänzt; alte Daten, Kernmodule und Ergebnisdateien wurden
-nicht überschrieben. Ein plattformspezifischer vollständiger Versionslock wird
-mit `scripts/run_verification.py` als `requirements-lock-windows-py311.txt` erfasst.
-`pyproject.toml` enthält die unterstützten Versionsbereiche. Für eine frische
-Umgebung zuerst den Lock installieren, danach das lokale Paket:
+Python 3.11 oder 3.12 verwenden. Die folgenden Befehle laufen vom
+Repository-Root `Implementierung_BA` aus:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r bayesian_ssr_neubau\requirements-lock-windows-py311.txt
-.\.venv\Scripts\python.exe -m pip install --no-deps --no-build-isolation -e .\bayesian_ssr_neubau
-.\.venv\Scripts\python.exe -m pytest bayesian_ssr_neubau\tests -q
-.\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli audit-data --input input\DM_16_aktive_Ringe.pkl
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".\bayesian_ssr_neubau[audit,notebook]"
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Der folgende Trainingsbefehl wurde mit `baseline_8L4U_001` ausgeführt. Für eine
-Wiederholung **einen neuen Namen** verwenden, beispielsweise `_002`:
+Für die festgehaltene Windows-/Python-3.11-Umgebung zuerst
+`requirements-lock-windows-py311.txt` installieren und danach das lokale Paket
+mit `--no-deps -e .\bayesian_ssr_neubau`. Das optionale Extra `audit` enthält
+pytest; `notebook` ergänzt die Pakete für die Demonstration. Für reine
+Modellnutzung genügt `pip install -e .\bayesian_ssr_neubau`.
+
+## Lokale Daten
+
+Die freigegebenen Rohdaten gehören nach `input/DM_16_aktive_Ringe.pkl` im
+Repository-Root und werden nicht versioniert. Alternativ:
+
+```powershell
+$env:BAYESIAN_SSR_DATA = 'C:\Daten\DM_16_aktive_Ringe.pkl'
+.\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli audit-data
+```
+
+Ein explizites `--input PFAD` hat Vorrang vor der Umgebungsvariable. Vor jeder
+Deserialisierung muss die Datei SHA256
+`bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5`
+haben. Ziele sind `ovality.ovality_radial_mm` und
+`planarity.height_deviation_mm` aus `zielwerte`. U-Trainingsobjekte enthalten
+keine Qualitätslabels. Die historischen Außenringe DM07/08/11/15 bleiben gesperrt.
+Die technische Deserialisierung des Sammelpickles materialisiert dessen Inhalt;
+erst danach werden ausschließlich die freigegebenen L-Ziele weitergereicht.
+
+## Training und Evaluation
+
+Für jeden Lauf einen neuen Ausgabeordner wählen:
 
 ```powershell
 .\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli train --config bayesian_ssr_neubau\configs\baseline_k2_m2.json --out bayesian_ssr_neubau\outputs\baseline_8L4U_002
-```
-
-Für die ebenfalls ausgeführte vierfache Entwicklungs-CV:
-
-```powershell
 .\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli evaluate --config bayesian_ssr_neubau\configs\baseline_k2_m2.json --out bayesian_ssr_neubau\outputs\development_cv_002
 ```
 
-Arme: TRAIN-Mean; physikalische NIG-Regression mit Intercept und denselben
-Deskriptorgruppen; strict-C0 mit ausschließlich L-Preprocessing/Initialisierung;
-shared-C0 mit U-X-Preprocessing/Initialisierung; SSL mit C=0,2. Jeder Fold hält
-zwei der acht L-Ringe zurück, alle Trainingsnormalisierer werden neu gefittet.
-Es gibt keine automatische Hyperparameterwahl und keinen äußeren Testscore.
+Die deterministische vierfache Ring-CV vergleicht TRAIN-Mean, physikalische
+NIG-Regression, strict-C0, shared-C0 und SSL mit C=0,2. Jeder Fold hält zwei
+der acht L-Ringe zurück und fittet alle Normalisierer erneut ausschließlich auf
+dem jeweils erlaubten TRAIN-Anteil. Es gibt keine automatische Hyperparameterwahl
+und keinen unabhängigen äußeren Testscore.
 
-## Vorhersage ohne Endqualitätszugriff
+Ausgaben enthalten Modellfaktoren, Split-/Featureverträge, TRAIN-Scaler,
+Blockbilanzen, Checkpoints, Diagnostik und Integritätsmanifest. Laden prüft
+Integrität und semantische Verträge. Checkpoints dokumentieren den frischen Fit;
+sie sind kein automatischer Resume-Pfad. Vorhandene lokale Läufe bleiben
+verwendbar und werden nicht nach GitHub übertragen.
 
-Die Rohlogger-CSV enthält exakt diese Spalten, in dieser Reihenfolge:
+## Vorhersage
+
+Eine vollständige Rohlogger-CSV muss exakt diese Spalten in dieser Reihenfolge
+enthalten:
 
 ```text
 time,F_rad63,F_ax64,Ist_D150,Ist_s151,Ist_h152,RWG55,phase804,LaserOK,MessEin
 ```
 
-Sie enthält vollständigen Vor-/Nachlauf; F2 wird mit den gespeicherten Regeln
-ausgewählt. Keine Qualitätsfelder, Walzprotokoll-Endmessungen oder Pickles als
-neue Predict-Eingaben. Ein kontrolliertes bereits-F2-NPZ ist zusätzlich möglich;
-dessen Vertragsgrenzen sind in `docs/DATENPROVENIENZ.md` erklärt.
-
-Diese beiden Befehle wurden mit `_001` ausgeführt; neue Ausgabenamen verwenden:
+Vollständiger Vor-/Nachlauf und die gespeicherten F2-Regeln sind erforderlich.
+Keine Endqualitätsfelder oder beliebigen Pickles als neue Predict-Eingaben.
+Für kontrollierte bereits-F2-Daten ist zusätzlich NPZ möglich; die Grenzen
+stehen in [DATENPROVENIENZ.md](docs/DATENPROVENIENZ.md).
 
 ```powershell
-.\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli export-process --ring-id DM04 --out bayesian_ssr_neubau\outputs\prediction_process_DM04_002.csv
-.\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli predict --model bayesian_ssr_neubau\outputs\baseline_8L4U_001 --ring-file bayesian_ssr_neubau\outputs\prediction_process_DM04_002.csv --ring-id DM04 --out bayesian_ssr_neubau\outputs\prediction_DM04_002.json
+.\.venv\Scripts\python.exe -m bayesian_ring_ssr.cli predict --model bayesian_ssr_neubau\outputs\baseline_8L4U_002 --ring-file C:\Daten\neuer_ring.csv --ring-id NEU01 --out bayesian_ssr_neubau\outputs\prediction_NEU01.json
 ```
 
-Dieses Beispiel ist ein **Schnittstellen-/Persistenztest an einem Trainingsring**,
-keine Qualitätsvalidierung. Echte Train/Prediction-Trennung liefern die
-synthetischen zurückgehaltenen Ringe und die vollständigen VAL-Ringe der CV.
-Die Funktion `predict_new_ring(model, process_ring)` akzeptiert kein
-`LabeledRing`-Objekt. Bei vorhandenen Labels ist `.process_only()` explizit nötig.
-Vorhersage liefert die beiden marginalen Mittelwerte und SD in mm.
+Die API `predict_new_ring(model, process_ring)` akzeptiert keine
+`LabeledRing`-Objekte. Ein explizites `.process_only()` entfernt vorhandene
+Labels. Ergebnisse sind marginale Mittelwerte und Standardabweichungen in mm.
 
-## Daten- und Artefaktvertrag
+## Tests, Quellprüfung und Notebook
 
-- Genau die SHA-verifizierte Datei `input/DM_16_aktive_Ringe.pkl` wird importiert.
-  SHA256: `bf29db68e7d89b14bfe0cc7b75915abd4414fc05221e2258015f80a79dcf1db5`.
-- Ziele: `ovality.ovality_radial_mm`, `planarity.height_deviation_mm`; der reale
-  Pickle-Container heißt `zielwerte`. Die Bedeutung einer normativen
-  Höhenschlagmessung ist damit noch nicht metrologisch belegt.
-- Die vier historisch geöffneten Außenringe DM07/08/11/15 sind gesperrt.
-  U-Trainingsobjekte besitzen weder `y` noch `targets`. Das SHA-freigegebene
-  Sammelpickle materialisiert beim Deserialisieren physisch alle enthaltenen
-  Werte; ausschließlich die freigegebenen L-Ziele werden danach ausgelesen und
-  weitergereicht. Dieser Importgrenze wird keine stärkere Eigenschaft unterstellt.
-- Jedes Trainingsverzeichnis ist neu, mit JSON-Faktoren, Split, Feature-/Gate-
-  Vertrag, TRAIN-Scalern, Daten-QA, Update-JSONL, 30 Epochen-Checkpoints,
-  Diagnostik und SHA256-Manifest. Laden prüft Integrität und semantische Verträge.
-- Checkpoints dokumentieren den laufenden frischen Fit. Automatisches Resume
-  aus alten oder neuen Checkpoints ist bewusst kein Basismodell-Trainingspfad.
-- Vollständige Exportartefakte sind lesbare JSON/CSV/NPZ; Modelle werden nicht
-  als beliebige Python-Pickles gespeichert oder geladen.
+```powershell
+.\.venv\Scripts\python.exe bayesian_ssr_neubau\scripts\check_source_manifest.py
+.\.venv\Scripts\python.exe bayesian_ssr_neubau\scripts\audit_importgraph.py
+.\.venv\Scripts\python.exe bayesian_ssr_neubau\scripts\run_verification.py
+.\.venv\Scripts\python.exe bayesian_ssr_neubau\notebooks\execute_notebook.py
+```
 
-## Mathematik, Tests und Forschungsgrenzen
+Die synthetischen Mathematik-/Persistenztests und historischen Paritätstests
+funktionieren ohne private Rohdaten oder alte Workspace-Ordner. Tests mit
+echten Ringen werden ohne Daten ausdrücklich übersprungen; mit verfügbarer
+freigegebener Datei müssen sie vollständig laufen. Das Notebook benötigt die
+Rohdaten und erzeugt frische Trainings-/CV-Ergebnisse. Seine Vorlage enthält
+keine früheren Ausgaben. Details: [Testanleitung](docs/TESTPROTOKOLL.md) und
+[Notebook-Anleitung](notebooks/README.md).
 
-Die Dokumente unter `docs/` enthalten das mathematische Modell, den A–D/V6.0-
-Abgleich, Herkunftsinventur und Originalquellenstatus, Datenprovenienz, reale
-Testprotokolle und Abschlussbefunde. `tests/reference_parity/` darf den alten
-Oracle read-only importieren; unabhängige Enumeration, Dichteintegrale und
-Finite-Differenzen stehen zusätzlich in den übrigen Tests.
+`SOURCE_SHA256.json` bindet aktuelle Produktivquellen, Konfiguration und
+Paketdefinition; frühere Ausgabedateien sind keine Startvoraussetzung. Nach
+bewusst geprüften Quelländerungen aktualisiert
+`scripts/check_source_manifest.py --write` dieses Manifest. Die historischen
+Testreferenzen haben ein getrenntes unveränderliches Fixture-Manifest.
 
-Die Emissionen haben volle Kanalkovarianz, sind zeitlich bedingt unabhängig.
-Starke serielle Residualkorrelation bleibt eine wesentliche Modellgrenze. Kein
-AR-HMM wurde ergänzt. Die Prediction verwendet erwartete Logpotenziale und
-exakte Markov-Mischungsmomente innerhalb der gewählten VI-Approximation. Sie
-liefert keine volle globale Posteriorintegration und keine kalibrierten
-95%-Mischungsquantile. Acht wiederholt benutzte Entwicklungslabels erlauben
-keine neue unabhängige Generalisierungs- oder Überlegenheitsbehauptung.
+## Fachliche Grenzen und Archiv
 
-Der Optimierungsfahrplan unter `handover/08_OPTIMIERUNG_NACH_NEUBAU` bleibt ein
-separater Folgeauftrag. Dieses Paket ist ein Basismodell, kein finaler Freeze.
+Die volle Emissionskovarianz erfasst keine zeitliche Residualabhängigkeit.
+Die Prediction integriert Markov-Mischungsmomente innerhalb der gewählten
+VI-Approximation, keine vollständige globale Posteriorverteilung. Die
+Unsicherheiten sind nicht kalibriert. Acht wiederholt verwendete Entwicklungslabels
+erlauben keinen neuen unabhängigen Generalisierungs- oder Überlegenheitsnachweis.
+Die metrologische Gleichsetzung der Planaritätshöhenabweichung mit normativem
+Höhenschlag bleibt offen. Das Paket ist ein Basismodell, kein finaler Freeze.
+
+Die mathematische Herleitung, Datenverträge und Forschungsgrenzen stehen in
+`docs/`. Der vollständige frühere Projektstand mit Originalinventuren,
+historischen Befunden und Optimierungsplanung liegt im Git-Branch
+`archive/vollstand-2026-11-13`. Die [Projektstruktur](docs/PROJEKTSTRUKTUR.md)
+erklärt die Bereinigung und die zusätzliche lokale Sicherung.

@@ -1,7 +1,45 @@
+import hashlib
+import json
+import os
+from pathlib import Path
+
 import numpy as np
 import pytest
 from bayesian_ring_ssr.schema import LabeledRing,UnlabeledRing,RingProcessSequence
 from bayesian_ring_ssr.config import Config
+
+
+@pytest.fixture(scope="session")
+def private_data_path():
+    """Only real-data tests need the separately supplied private input file."""
+    workspace = Path(__file__).resolve().parents[2]
+    configured = os.environ.get("BAYESIAN_SSR_DATA")
+    path = Path(configured).expanduser() if configured else workspace / "input/DM_16_aktive_Ringe.pkl"
+    path = path.resolve()
+    if not path.is_file():
+        pytest.skip(
+            f"Private Rohdaten fehlen: {path}. Datei lokal unter input/ ablegen "
+            "oder BAYESIAN_SSR_DATA auf DM_16_aktive_Ringe.pkl setzen."
+        )
+    return path
+
+
+@pytest.fixture(scope="session")
+def legacy_root():
+    """Check every immutable reference source before executing historical code."""
+    fixtures = Path(__file__).resolve().parent / "reference_parity/fixtures"
+    manifest = json.loads((fixtures / "SHA256_MANIFEST.json").read_text(encoding="utf-8"))
+    assert manifest["schema"] == "bayesian-ring-ssr-reference-fixtures/1"
+    root = fixtures / "legacy"
+    expected_files = manifest["files"]
+    actual_files = {p.relative_to(root).as_posix() for p in root.rglob("*.py")}
+    assert actual_files == set(expected_files), "Historical reference source inventory changed"
+    for relative, expected_hash in expected_files.items():
+        path = root / relative
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected_hash, (
+            f"Historical reference source changed: {relative}"
+        )
+    return root
 
 
 @pytest.fixture

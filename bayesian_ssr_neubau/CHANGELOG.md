@@ -1,5 +1,16 @@
 # Änderungen
 
+## Projektbereinigung – 13.11.2026
+
+Der vollständige ursprüngliche Git-Stand ist auf `archive/vollstand-2026-11-13`
+gesichert. `main` enthält den Neubau mit 13 bytegleichen lokalen Testreferenzen,
+eigenständigen Prüfskripten und einer ausgabefreien Notebookvorlage. Alte
+Workspace-Verzeichnisse und gespeicherte Rechenläufe sind keine Voraussetzung
+für die synthetischen oder mathematischen Referenztests mehr. Reale Datentests
+überspringen ausschließlich bei fehlender privater Rohdatei mit Begründung.
+`BAYESIAN_SSR_DATA` ergänzt den CLI-Datenpfad; explizites `--input` hat Vorrang.
+Die mathematische Implementierung und Basishyperparameter bleiben unverändert.
+
 ## 0.1.0 – 13.11.2026
 
 Eigenständiger Neubau in `src/bayesian_ring_ssr`, ohne Imports alter Modellkerne.

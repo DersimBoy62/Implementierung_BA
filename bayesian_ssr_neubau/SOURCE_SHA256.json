@@ -1,0 +1,31 @@
+{
+  "schema": "bayesian-ring-ssr-source-sha256/1",
+  "scope": "Production Python sources, JSON configurations and pyproject.toml; no run artifacts",
+  "files": {
+    "configs/baseline_k2_m2.json": "5017904730ea6b986a37082671a7e0b4e6c58984e96a66665faf8ade079ff9d1",
+    "pyproject.toml": "3a0379d3d3330021b503a2f513522eff78463de3fc75f28abf24cb91f700965c",
+    "src/bayesian_ring_ssr/__init__.py": "897064fef8387f21058ad25799223cbc123aa853dc0759a81ece43c84f861335",
+    "src/bayesian_ring_ssr/cli.py": "b40b6a4de6f4d43092b51bcb6dcdae3f5af1e43356f5326833849aea8b5f8874",
+    "src/bayesian_ring_ssr/config.py": "4f7b1c68c5deebed09742e8e52a4233b845b20d0595fbdb7c30cde2d0349c965",
+    "src/bayesian_ring_ssr/coordinate_train.py": "f99384abda13d26d9070dbed38d40fa55e99d11785ad980112c6f3c19f3a81d7",
+    "src/bayesian_ring_ssr/data_io.py": "080a012d97f8eec00db4dba1c46e7e0066c0b291c2f72c2ee19139a01340527c",
+    "src/bayesian_ring_ssr/diagnostics.py": "88c349c2a79867dbbec042b1acc52b52fa29b0ad3ec39bf1197dff2c3a2dec9e",
+    "src/bayesian_ring_ssr/elbo.py": "4af275f84b482a55395f8031f080d954ecd857186111d164451a272265d2bc1d",
+    "src/bayesian_ring_ssr/evaluation.py": "5cd5cea83a181520ffda980e0b7408be9203d96aed2f308a34e7c7fd2e7ee320",
+    "src/bayesian_ring_ssr/forward_backward.py": "b9d6a3b6a314a418e10c41abe6acc97865df4274661c152d915d4991ad5df2af",
+    "src/bayesian_ring_ssr/hmmmoments.py": "f57d7de912c40abb00d768086f7ab8a8c2c7606579425be4f659d77d837bfa0c",
+    "src/bayesian_ring_ssr/linalg.py": "c27b9541032a640d43b47edf017b82611951343e8bfa80d36027339ef8fc3f03",
+    "src/bayesian_ring_ssr/local_vi.py": "aaad5cb32660cd864a80d8cfea7f3accab3cb662f9428e5220055c10c3b28f8c",
+    "src/bayesian_ring_ssr/metrics.py": "32946186739300fcce6057b49d8193dda5e23b0f01f746a5b37bea25dadba8cd",
+    "src/bayesian_ring_ssr/nig_heads.py": "7b2f44f4fd896691b535a63c988a99ec0c32cb68ec0c03a131bc299b2d703e09",
+    "src/bayesian_ring_ssr/normal_wishart.py": "96e27f4da73d4ba6445520bd55926ee9148a101965b0e637b8f02acd271539c0",
+    "src/bayesian_ring_ssr/persistence.py": "ab76a0d28a4cffb680ba14d127287fe1d0be0faafb2bf894c32058d46b383d08",
+    "src/bayesian_ring_ssr/physics_descriptors.py": "5f84ef2d4aff202e286e6d0c4f83a8610f0e36c74432aa1c8fbc89c8180afc08",
+    "src/bayesian_ring_ssr/posterior_predictive.py": "8458d0ea6c05e5528ad3f3f33ffdb73d5e24186a9d5fb67a52394d628f9850d1",
+    "src/bayesian_ring_ssr/preprocessing.py": "e733a6ae8a8c15def49f8a0cd800ed3ae6455e23ca07708231ef855230f0f696",
+    "src/bayesian_ring_ssr/priors.py": "3ad8cb5ec30d2055fbd4fbbd551a37ccaf3187d046e7b6d47e498cd86fad81e6",
+    "src/bayesian_ring_ssr/reduced_markov.py": "be71a468521a3a754e030e5ebe3770d81843bff2b7d6d4fa0eddfa2e8e1fd077",
+    "src/bayesian_ring_ssr/schema.py": "21c1f204f773b0e5984308e21c428952655e14588990124ce6ce913f10f18651",
+    "src/bayesian_ring_ssr/split_guard.py": "8324cd5ffaf1586326f5c6bd2d6b1feb6d75eda1079447e3ffd0282537214f79"
+  }
+}

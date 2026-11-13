@@ -1,0 +1,21 @@
+{
+    "schema":  "bayesian-ring-ssr-reference-fixtures/1",
+    "source_commit":  "e1a15ca6f808cc16bf863472a552e3c1dea33394",
+    "source_branch":  "archive/vollstand-2026-11-13",
+    "v60_handover_copy_verified":  true,
+    "files":  {
+                  "research_math_v60/m2_prior_reduction_v60.py":  "051987b95f83ecd4170154622cecda389fe0962dc7e9842f4c1fc169d0859d13",
+                  "research_math_v59/reduced_markov_logits_v59.py":  "ed2de4bc67631701071ef9a84570a1682fe863cb6617a63f2e2f55cdfdcd570d",
+                  "research_math_v58/math_train_audit_v58.py":  "585d51325443a7ef222f9afec4610779137372441263b1071c3317b247dde1bd",
+                  "final_candidate_v52/final_core/compare_dynamic_quality_cv4.py":  "90a6f474081c5ab4d11f81da5ebf86d9841efa8119eaf4c8d61ee95bd9c51eab",
+                  "final_candidate_v52/final_core/compare_two_head_cv4.py":  "79ef34dbb97981425e4d28d0765d172f9b8d932855302864b099556ab2882467",
+                  "final_candidate_v52/final_core/dm_data.py":  "cafe07406e125c253d7cf9de0aef9440c68a90810a0d60d839451852c36598b1",
+                  "final_candidate_v52/final_core/dynamic_markov_v2.py":  "db481edcad1497e448cd6b63591da08fe8e189962346837eda0d5973f66d5924",
+                  "final_candidate_v52/final_core/dynamic_quality_v2.py":  "fdfecbe62c12271cbbecdb269cfe69be56c1097755c2cb9d7d4bc6e73beb2348",
+                  "final_candidate_v52/final_core/full_markov_b1.py":  "3509e7e0c529f57492708619b46025163ab283a2ece2a7286ec32d67c540afba",
+                  "final_candidate_v52/final_core/fullcov_b1.py":  "701b0dfa099338e24226736fb6f1d263ad103d94ffa10b12a298770b0b739aab",
+                  "final_candidate_v52/final_core/quality_link_challenge.py":  "1a69d044f2c22fec843e53c75d2820f2d19d35677829040df9fe8260dd858197",
+                  "final_candidate_v52/final_core/two_head_b1.py":  "75705fe3090ca78d7b062f182ae991503d51b12e8081126a18cb99fc427c539b",
+                  "final_candidate_v52/final_core/vb_b1.py":  "d59ba4caaabfdb1ca2079ceefc14b918ac6eef83e90a2d7abe231d7be91e1e7f"
+              }
+}

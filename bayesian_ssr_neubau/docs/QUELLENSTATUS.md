@@ -1,9 +1,12 @@
 # Quellenstatus und tatsächlich gelesene Originalstellen
 
-Stand: 13.11.2026. Maßgeblich sind die unveränderten Dateien in
-`handover/07_ORIGINALQUELLEN_PDF`. Vollständige SHA256 und Dateinamen stehen in
-[Inventur.csv](Inventur.csv); die bytegleiche Zuordnung zu den fünf Nutzerarchiven
-steht in [ARCHIV_HERKUNFT.json](ARCHIV_HERKUNFT.json). Die historischen 133
+Historischer Lesestand des Neubaus: 13.11.2026. Maßgeblich waren die unveränderten
+lokalen Dateien in `handover/07_ORIGINALQUELLEN_PDF`; diese Literaturkopien
+liegen jetzt im lokalen Archiv und werden nicht versioniert. Vollständige
+SHA256 und Dateinamen stehen in der archivierten
+[Inventur.csv](https://github.com/DersimBoy62/Implementierung_BA/blob/archive/vollstand-2026-11-13/bayesian_ssr_neubau/docs/Inventur.csv);
+die bytegleiche Zuordnung zu den fünf Nutzerarchiven steht in
+[ARCHIV_HERKUNFT.json](https://github.com/DersimBoy62/Implementierung_BA/blob/archive/vollstand-2026-11-13/bayesian_ssr_neubau/docs/ARCHIV_HERKUNFT.json). Die historischen 133
 Literaturkarten sind kein Nachweis für 133 gelesene Volltexte.
 
 Es werden drei Statusklassen unterschieden:

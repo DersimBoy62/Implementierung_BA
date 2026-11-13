@@ -1,6 +1,6 @@
 # Semantische Persistenz- und Leakage-Prüfung
 
-Ausgeführt am 13.11.2026:
+Historischer Lauf vor der Projektbereinigung am 13.11.2026:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest bayesian_ssr_neubau\tests\test_persistence_contract.py bayesian_ssr_neubau\tests\test_data_and_leakage.py -q
@@ -25,9 +25,12 @@ liefert nach JSON-Laden dieselbe prozessbasierte Prediction wie im Speicher.
 
 Der getrennte AST-Audit wurde mit
 `.\.venv\Scripts\python.exe bayesian_ssr_neubau\scripts\audit_importgraph.py`
-ausgeführt. `IMPORTGRAPH.json` erfasst **23 Produktivmodule**, ihre Quellhashes
+ausgeführt. Der damalige Bericht `IMPORTGRAPH.json` erfasst **23 Produktivmodule**, ihre Quellhashes
 und Imports: **keine Altmodellimporte, keine dynamischen Imports**.
 Historische Oracles werden ausschließlich in den dafür benannten Tests gelesen.
+Der Originalbericht liegt auf `archive/vollstand-2026-11-13`. Neue Auditberichte
+werden unter `outputs/verification/` erzeugt; Referenzen liegen jetzt lokal
+unter `tests/reference_parity/fixtures/legacy/`.
 
 Zusätzlich wurde `evaluation.py` unabhängig gelesen: alle vier Folds trennen
 Ring-IDs; der Fit erhält sechs L-TRAIN- und die erlaubten U-Prozessobjekte,

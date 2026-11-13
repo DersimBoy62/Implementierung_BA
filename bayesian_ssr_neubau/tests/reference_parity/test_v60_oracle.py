@@ -5,9 +5,7 @@ Nur dieser Test importiert die historische Implementierung.
 """
 from __future__ import annotations
 
-import hashlib
 import importlib.util
-from pathlib import Path
 import sys
 import numpy as np
 import pytest
@@ -23,29 +21,28 @@ from bayesian_ring_ssr.priors import m2_lift, process_prior, update_process
 from bayesian_ring_ssr.reduced_markov import dimensions, unpack
 from bayesian_ring_ssr.schema import LabeledRing, UnlabeledRing
 
-ROOT = Path(__file__).resolve().parents[3]
 PHYSICAL_VAR = 0.38526108747593474
 
 
 @pytest.fixture(scope="module")
-def oracle(tmp_path_factory):
+def oracle(tmp_path_factory, legacy_root):
     """Originalcode-Hierarchie prüfen; Numba-Caches in TEST-TEMP schreiben."""
     from numba import config as numba_config
     saved_path, saved_cache = list(sys.path), numba_config.CACHE_DIR
     saved_bytecode = sys.dont_write_bytecode
     sys.dont_write_bytecode = True
     numba_config.CACHE_DIR = str(tmp_path_factory.mktemp("oracle_numba_cache"))
-    source = ROOT / "research_math_v60/m2_prior_reduction_v60.py"
-    handover = ROOT / "handover/04_REFERENZCODE_READ_ONLY/V60/research_math_v60/m2_prior_reduction_v60.py"
-    assert hashlib.sha256(source.read_bytes()).digest() == hashlib.sha256(handover.read_bytes()).digest()
+    source = legacy_root / "research_math_v60/m2_prior_reduction_v60.py"
     module_spec = importlib.util.spec_from_file_location("readonly_v60_parity_oracle", source)
     v60 = importlib.util.module_from_spec(module_spec)
-    module_spec.loader.exec_module(v60)
-    v59, v58, mods = v60.dependencies()  # SHA-gated V58/V59 und alle zehn V52-Kerne
-    yield v60, v59, v58, mods
-    sys.path[:] = saved_path
-    numba_config.CACHE_DIR = saved_cache
-    sys.dont_write_bytecode = saved_bytecode
+    try:
+        module_spec.loader.exec_module(v60)
+        v59, v58, mods = v60.dependencies()  # SHA-gated V58/V59 und alle zehn V52-Kerne
+        yield v60, v59, v58, mods
+    finally:
+        sys.path[:] = saved_path
+        numba_config.CACHE_DIR = saved_cache
+        sys.dont_write_bytecode = saved_bytecode
 
 
 @pytest.mark.parametrize("K", [2, 3, 4])

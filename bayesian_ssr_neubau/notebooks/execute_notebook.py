@@ -1,4 +1,4 @@
-"""Execute all cells with this exact Python and save actual notebook outputs."""
+"""Execute all cells into a local output copy with this exact Python."""
 from pathlib import Path
 import argparse
 import asyncio
@@ -37,17 +37,21 @@ async def execute(path):
             cell.outputs = []
     started = time.perf_counter()
     identifier = uuid.uuid4().hex[:10]
-    report_path = HERE / f"{path.stem}.execution_{identifier}.json"
+    execution_dir = PROJECT / "outputs/notebook_executions" / identifier
+    execution_dir.mkdir(parents=True, exist_ok=False)
+    executed_path = execution_dir / path.name
+    report_path = execution_dir / "execution.json"
+    source_hash = sha(path)
     notebook.metadata["execution_evidence"] = {
         "status": "RUNNING", "python": sys.executable,
         "started_utc": datetime.now(timezone.utc).isoformat(),
-        "report_file": report_path.name,
+        "report_file": report_path.name, "source_notebook_sha256": source_hash,
     }
     run_parent = PROJECT / "outputs/notebook_demos"
     runs_before = set(run_parent.iterdir()) if run_parent.exists() else set()
 
     def save():
-        nbformat.write(notebook, path)
+        nbformat.write(notebook, executed_path)
 
     def on_cell_start(cell, cell_index, **kwargs):
         if cell.cell_type == "code":
@@ -105,7 +109,9 @@ async def execute(path):
             summaries = [p / "notebook_summary.json" for p in new_runs if (p / "notebook_summary.json").is_file()]
             summary = json.loads(summaries[0].read_text(encoding="utf-8")) if len(summaries) == 1 else None
             report = {
-                "status": status, "notebook": str(path.relative_to(ROOT)), "notebook_sha256": sha(path),
+                "status": status, "notebook": str(executed_path.relative_to(ROOT)),
+                "notebook_sha256": sha(executed_path),
+                "source_notebook": str(path), "source_notebook_sha256": source_hash,
                 "python": sys.executable, "code_cells": code_count,
                 "executed_code_cells": sum(c.cell_type == "code" and c.execution_count is not None for c in notebook.cells),
                 "error_outputs": sum(o.output_type == "error" for c in notebook.cells if c.cell_type == "code" for o in c.outputs),
@@ -115,6 +121,8 @@ async def execute(path):
             with report_path.open("x", encoding="utf-8") as handle:
                 json.dump(report, handle, ensure_ascii=False, indent=2)
             print(json.dumps({k: report[k] for k in ("status", "executed_code_cells", "error_outputs", "elapsed_seconds", "run_directories")}, indent=2), flush=True)
+            print(f"Executed notebook: {executed_path}", flush=True)
+            print(f"Execution report: {report_path}", flush=True)
             if km.has_kernel:
                 await km.shutdown_kernel(now=True)
 

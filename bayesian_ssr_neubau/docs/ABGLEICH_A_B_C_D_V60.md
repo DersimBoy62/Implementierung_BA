@@ -5,7 +5,11 @@ Dokumente, die Original-A–D-Word-Dateien einschließlich OMML-Text, die alte
 Abgleichmatrix, die Entscheidungsmatrix, der konsolidierte Projektstatus und
 die READMEs V5.8–V6.3. Die extrahierten Word-Leseansichten unter `leseansichten/`
 sind Hilfsmittel; Originaldateien wurden nicht geändert. SHA256/Leseumfang stehen
-in [Inventur.csv](Inventur.csv) und [READ_STATUS.json](READ_STATUS.json).
+in der historischen [Inventur.csv](https://github.com/DersimBoy62/Implementierung_BA/blob/archive/vollstand-2026-11-13/bayesian_ssr_neubau/docs/Inventur.csv)
+und [READ_STATUS.json](https://github.com/DersimBoy62/Implementierung_BA/blob/archive/vollstand-2026-11-13/bayesian_ssr_neubau/docs/READ_STATUS.json).
+Diese Lesebasis beschreibt den ursprünglichen Neubau. Der vollständige
+Gesamtbestand ist auf `archive/vollstand-2026-11-13` archiviert; das aktive
+Projekt enthält die daraus benötigten mathematischen Testreferenzen.
 
 Es gelten folgende Vorränge: expliziter Nutzerauftrag vom 13.11.2026; dort
 übernommene V5.8-/V5.9-/V6.0-Korrekturen; verifizierter Daten-/Codevertrag;

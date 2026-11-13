@@ -1,8 +1,0 @@
-{
-  "overlay": "DM-V54-READONLY-HISTORY-2026-11-12-v1",
-  "user_model_sha256_locked": "56c3605ba3e0157125ecb7b2adaaddcb160a15c16edf22f2e28e5b232f2ae3c4",
-  "file_sha256": {
-    "audit_model_history_v54.py": "f851c17e9e88cca1c53eddaabd2a9fee0e981a296844e4ad7e24231a61b1dd64",
-    "README.md": "4a5ef8353d43a60f968bee506186dbab903a9db934b86f01c0cd365a5e7aa6d3"
-  }
-}

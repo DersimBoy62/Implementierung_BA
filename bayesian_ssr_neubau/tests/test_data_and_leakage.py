@@ -1,10 +1,7 @@
 """T7/T9 plus reale F2- und Merkmalsparität gegen unabhängige Alt-Oracles."""
 from __future__ import annotations
 import ast
-import importlib.util
 import json
-from pathlib import Path
-import sys
 import numpy as np
 import pytest
 
@@ -17,13 +14,9 @@ from bayesian_ring_ssr.physics_descriptors import extract_descriptors
 from bayesian_ring_ssr.split_guard import (DEVELOPMENT_IDS, LABELED_IDS, UNLABELED_IDS,
                                           LOCKED_IDS, development_folds, guard_training_ids)
 
-ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "input/DM_16_aktive_Ringe.pkl"
-
-
 @pytest.fixture(scope="module")
-def development():
-    return load_development(DATA)
+def development(private_data_path):
+    return load_development(private_data_path)
 
 
 def _synthetic(rid, offset=0, labeled=False):
@@ -32,9 +25,9 @@ def _synthetic(rid, offset=0, labeled=False):
     return LabeledRing(rid, t, x, targets=np.array([1 + offset, 2 + offset])) if labeled else UnlabeledRing(rid, t, x)
 
 
-def _old_function(filename, function):
+def _old_function(legacy_root, filename, function):
     """Read-only Oracle: nur konkrete alte Funktion, keine Architekturimportabhängigkeit."""
-    tree = ast.parse((ROOT / "final_candidate_v52/final_core" / filename).read_text(encoding="utf-8"))
+    tree = ast.parse((legacy_root / "final_candidate_v52/final_core" / filename).read_text(encoding="utf-8"))
     definition = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == function)
     module = ast.Module(body=[definition], type_ignores=[])
     env = {"np": np}
@@ -42,8 +35,8 @@ def _old_function(filename, function):
     return env[function]
 
 
-def test_trusted_data_sha_and_ids(development):
-    assert sha256(DATA) == DATA_SHA256
+def test_trusted_data_sha_and_ids(development, private_data_path):
+    assert sha256(private_data_path) == DATA_SHA256
     labeled, unlabeled = development
     assert tuple(labeled) == LABELED_IDS
     assert tuple(unlabeled) == UNLABELED_IDS
@@ -72,12 +65,12 @@ def test_unlabeled_interface_contains_no_quality(development):
         assert ring.targets.shape == (2,)
 
 
-def test_exact_f2_times_rows_and_features_vs_historical_oracle(development):
+def test_exact_f2_times_rows_and_features_vs_historical_oracle(development, private_data_path, legacy_root):
     # Hash checked before the explicitly authorized local deserialization.
     import pickle
-    assert sha256(DATA) == DATA_SHA256
-    raw = pickle.loads(DATA.read_bytes())
-    old_view = _old_function("dm_data.py", "view")
+    assert sha256(private_data_path) == DATA_SHA256
+    raw = pickle.loads(private_data_path.read_bytes())
+    old_view = _old_function(legacy_root, "dm_data.py", "view")
     class OldRing:
         def __init__(self, rid, t, x, y, names):
             self.ring_id, self.t, self.x, self.y, self.names = rid, t, x, y, names
@@ -96,8 +89,8 @@ def test_exact_f2_times_rows_and_features_vs_historical_oracle(development):
             assert np.array_equal(new[rid].targets, old[rid].y)
 
 
-def test_descriptor_values_bitwise_equal_to_readonly_reference(development):
-    old = _old_function("quality_link_challenge.py", "extract_descriptors")
+def test_descriptor_values_bitwise_equal_to_readonly_reference(development, legacy_root):
+    old = _old_function(legacy_root, "quality_link_challenge.py", "extract_descriptors")
     pre = fit_preprocessing(*development)
     for ring in dict(development[0], **development[1]).values():
         x = pre.x_scaler.transform(ring.X)
@@ -138,9 +131,9 @@ def test_scaler_roundtrip_and_process_only_transform(development):
                                rtol=1e-15, atol=1e-15)
 
 
-def test_complete_ring_csv_process_only_roundtrip(tmp_path, development):
+def test_complete_ring_csv_process_only_roundtrip(tmp_path, development, private_data_path):
     f = tmp_path / "DM04.csv"
-    export_development_logger(DATA, "DM04", f)
+    export_development_logger(private_data_path, "DM04", f)
     assert tuple(f.read_text().splitlines()[0].split(",")) == LOGGER_COLUMNS
     assert "ovality" not in f.read_text() and "planarity" not in f.read_text()
     ring = read_process_csv(f)
@@ -148,9 +141,9 @@ def test_complete_ring_csv_process_only_roundtrip(tmp_path, development):
     np.testing.assert_array_equal(ring.times, development[0]["DM04"].times)
     assert not hasattr(ring, "targets")
     with pytest.raises(FileExistsError):
-        export_development_logger(DATA, "DM04", f)
+        export_development_logger(private_data_path, "DM04", f)
     with pytest.raises(ValueError):
-        export_development_logger(DATA, "DM07", tmp_path / "locked.csv")
+        export_development_logger(private_data_path, "DM07", tmp_path / "locked.csv")
 
 
 def test_process_npz_never_exports_targets(tmp_path, development):
@@ -221,8 +214,8 @@ def test_f2_missing_boundary_islands_channels_and_clock_fail():
     with pytest.raises(ValueError, match="Raster"): f2_indices(b, LOGGER_COLUMNS)
 
 
-def test_data_audit_accesses_no_quality_or_locked_processes():
-    qa = audit_data(DATA)
+def test_data_audit_accesses_no_quality_or_locked_processes(private_data_path):
+    qa = audit_data(private_data_path)
     assert qa["active_ring_count"] == 16 and qa["development_ring_count"] == 12
     assert qa["locked_processes_accessed"] is False
     assert all(not row["quality_values_accessed"] for row in qa["rings"])

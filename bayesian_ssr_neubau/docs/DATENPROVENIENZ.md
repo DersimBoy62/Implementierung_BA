@@ -54,7 +54,8 @@ Phasenbezeichnungen 1 und 2 werden nicht erfunden.
 
 ## F2 und Sicherheitsgrenzen
 
-Die Auswahl rekonstruiert exakt `final_candidate_v52/final_core/dm_data.py`:
+Die Auswahl rekonstruiert exakt das historische `final_candidate_v52/final_core/dm_data.py`
+(jetzt als Testreferenz unter `tests/reference_parity/fixtures/legacy/`):
 `phase804` in {1,2} und `LaserOK == 1` und `MessEin == 1`. Keine Phase-6-Zeile
 wird in das Modell übernommen. Zeilen bleiben in Originalreihenfolge, ohne
 Interpolation, Imputation, Clipping oder Aneinanderhängen getrennter Inseln.
@@ -81,8 +82,10 @@ die tatsächlichen Entwicklungssequenzen sind deutlich länger.
 
 Gesamt: 7440 Zeilen; 6068 L und 1372 U. Bei C=0,2 entspricht dies einer
 gewichteten Summe von 6342,4 Prozessbeobachtungen, nicht unabhängigen
-Qualitätslabels. Das neue `docs/DATEN_QA.json` enthält Originalindizes,
-Zeitgrenzen, Phasengrenze, fehlende Werte und Kanalbandbreiten pro Dev-Ring.
+Qualitätslabels. Der historische Bericht `docs/DATEN_QA.json` auf dem Branch
+`archive/vollstand-2026-11-13` enthält Originalindizes, Zeitgrenzen,
+Phasengrenze, fehlende Werte und Kanalbandbreiten pro Dev-Ring.
+Neue Audits erzeugen die CLI oder das Notebook aus der lokal freigegebenen Datei.
 
 Für vollständige Rohlogger-CSV verlangt `read_process_csv` exakt
 `time,F_rad63,F_ax64,Ist_D150,Ist_s151,Ist_h152,RWG55,phase804,LaserOK,MessEin`.
