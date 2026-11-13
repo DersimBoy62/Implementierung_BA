@@ -19,30 +19,84 @@ def code(source):
 
 
 md(r"""
-# Bayesian-SSR-HMM: vollständige Ausführung und Funktionsnachweis
+# Unser Bayesian-SSR-HMM Schritt für Schritt verstehen und ausführen
 
-Dieses Notebook führt das **bestehende Basismodell ohne Optimierung** aus.
-Es prüft die Daten, startet die mathematischen Tests, trainiert das Modell
-frisch über 30 Epochen und erstellt neue Vorhersagen sowie eine vollständige
-vierfache Entwicklungsevaluation mit fünf Vergleichsarmen.
+Dieses Notebook ist eine geführte Demonstration unseres Modells. Du kannst es
+von oben nach unten lesen und ausführen, ohne jeden Python-Befehl verstehen zu
+müssen. Die Texte erklären jeweils das Ziel, die nächste Berechnung und die
+Bedeutung der Ausgabe.
 
-**Bedienung in VS Code:** Als Kernel die Python-Umgebung `.venv` des Projekts
-auswählen und **Restart Kernel → Run All** ausführen. Die versionierte Vorlage
-enthält keine gespeicherten Ausgaben. Jeder Gesamtlauf berechnet die Ergebnisse
-neu und erzeugt einen eigenen lokalen Ausgabeordner.
+**Die Aufgabe des Modells:** Aus dem zeitlichen Verlauf eines Ringwalzprozesses
+sollen zwei gemessene Endgrößen geschätzt werden: Außenunrundheit und
+Höhenabweichung, jeweils in Millimetern. Ein Ring ist dabei **ein vollständiger
+Versuch** mit vielen Zeitpunkten. Viele Messzeitpunkte desselben Rings sind
+keine vielen unabhängigen Beispiele für die Endqualität.
 
-Der vollständige Lauf dauert deutlich länger als die Tests, insbesondere durch
-die zwölf zusätzlichen HMM-Fits der Cross-Validation. Es werden keine alten
-Gewichte oder fertigen CV-Ergebnisse als Ersatz für einen neuen Fit geladen.
+Das Modell verbindet drei Ideen:
 
-Das Notebook unterscheidet:
+- **Hidden Markov Model, kurz HMM:** Es beschreibt den Prozess mit verborgenen
+  Zuständen, zwischen denen sich die Zugehörigkeit im Zeitverlauf ändern kann.
+- **Semi-supervised Regression, kurz SSR:** Es nutzt acht Ringe mit bekannten
+  Endqualitäten und zusätzlich vier Ringe, von denen nur die Prozessdaten
+  verwendet werden.
+- **Bayesian:** Unbekannte Größen werden durch Wahrscheinlichkeitsverteilungen
+  beschrieben. Die Rechnung verwendet dafür eine berechenbare Näherung,
+  die Variationsinferenz, kurz VI.
 
-1. **Rechenkorrektheit:** unabhängige Tests, exakte kurze Pfade, ELBO-Bilanz.
-2. **Funktionsfähigkeit:** frisches Training, Prozess-only-Prediction, Persistenz.
-3. **Vorhersagefehler:** zurückgehaltene vollständige Ringe in Entwicklungs-CV.
+Wir prüfen hier drei verschiedene Aussagen:
 
-Die acht Labelringe wurden historisch bereits zur Entwicklung verwendet.
-Diese Ausführung ist deshalb keine neue unabhängige externe Validierung.
+| Aussage | Nachweis im Notebook |
+|---|---|
+| Die untersuchten Rechnungen liefern die erwarteten Ergebnisse. | Kleines vollständig nachrechenbares Beispiel und automatisierte Tests, Abschnitte 3–4. |
+| Der ganze Modellablauf funktioniert. | Frisches Training, Vorhersage und identisches Ergebnis nach Speichern/Laden, Abschnitte 5–9. |
+| Die Vorhersagen haben einen bestimmten Fehler. | Vergleich mit gemessenen Werten zurückgehaltener Ringe, Abschnitte 10–11. |
+
+Ein bestandener Rechentest bedeutet noch keinen kleinen Vorhersagefehler.
+Deshalb sind alle drei Teile enthalten.
+
+## 0. Starten und den Ablauf verfolgen
+
+1. Wähle in VS Code oben rechts den Kernel **`.venv` des Projekts**. Der Kernel
+   ist der Python-Prozess, der die Codezellen ausführt.
+2. Wähle **Kernel neu starten / Restart Kernel**, danach **Alle ausführen / Run All**.
+3. Lies die Erklärungen und Ausgaben der Reihe nach. Spätere Zellen benötigen
+   die Ergebnisse früherer Zellen.
+
+Textzellen wie diese erklären den Ablauf. Codezellen führen die Berechnungen
+aus; darunter erscheinen Tabellen, Meldungen oder Diagramme. Ein `[*]` an
+einer Codezelle zeigt, dass sie noch läuft. Während des Trainings erscheinen
+Epochenmeldungen, während der Vergleichsläufe Meldungen zu Fold und Verfahren.
+Ohne Fehlermeldung kann eine Zelle trotzdem längere Zeit rechnen.
+
+Der gesamte Lauf erstellt ein neues Hauptmodell mit 30 Trainingsrunden und
+zwölf weitere HMMs für die Vergleichsauswertung. Es gibt keine Suche nach neuen
+Modelleinstellungen; innerhalb jedes Trainings werden die Modellgrößen aber
+wie vorgesehen optimiert. Alte Modelle oder fertige Vergleichsergebnisse
+ersetzen keine dieser Rechnungen. Die Dauer hängt von deinem Rechner ab.
+
+Du kannst zunächst bis Abschnitt 4 mitlesen und die Daten- und Rechenprüfungen
+ansehen. Für die abschließenden Fehlertabellen musst du auch die späteren
+Trainingszellen ausführen. Nach einem Neustart des Kernels beginnt der Ablauf
+wieder oben. Die leeren Ausgabefelder der Vorlage sind normal: Sie werden erst
+bei deinem eigenen Lauf gefüllt.
+
+### Begriffe, die in den Ausgaben wiederkehren
+
+| Begriff | Bedeutung in diesem Notebook |
+|---|---|
+| `X`, Features, Prozessdaten | Die sechs Eingangskanäle über die Zeit. |
+| `y`, Targets, Labels | Die beiden gemessenen Endqualitäten eines Rings. |
+| `L` / `U` | Ringe mit genutztem Qualitätslabel / Ringe, deren Qualität nicht verwendet wird. |
+| Fit oder Training | Anpassen der Modellgrößen an die erlaubten Trainingsdaten. |
+| Epoche | Eine vollständige Runde der vorgesehenen Modellupdates. |
+| Scaler | Eine aus Trainingsdaten berechnete Umrechnung der Größen auf vergleichbare Skalen. |
+| Fold, `VAL`, Out-of-Fold oder `OOF` | Eine Vergleichsrunde, die zurückgehaltenen Ringe und deren Vorhersagen durch ein ohne sie trainiertes Modell. |
+
+Die erste Codezelle richtet die Umgebung ein, sucht die lokale Rohdatei und
+legt einen neuen Ausgabeordner an. Danach zeigt sie den verwendeten Python,
+den Projektordner und den Ordner **dieses** Laufs. Fehlen die Rohdaten, stoppt
+sie mit einem Hinweis auf `input/DM_16_aktive_Ringe.pkl` beziehungsweise
+`BAYESIAN_SSR_DATA`. Es wird dann kein Training gestartet.
 """)
 
 code(r"""
@@ -136,10 +190,25 @@ print("Neuer Lauf:", RUN_DIR)
 md(r"""
 ## 1. Umgebung und geprüfte Modellquellen
 
-Die zusätzlichen Jupyter-Pakete ändern keine Modellgleichungen oder
-Hyperparameter. Die Hashprüfung kontrolliert die versionierten Modellquellen
-und Konfigurationen in `SOURCE_SHA256.json`. Gespeicherte Trainingsausgaben
-werden dafür nicht benötigt. Die nachfolgenden Ergebnisse werden neu berechnet.
+Damit Ergebnisse nachvollziehbar sind, halten wir fest, **mit welchen Dateien
+und Paketversionen** gerechnet wird. Zwei verschiedene Programmstände könnten
+sonst ähnlich aussehen und trotzdem andere Ergebnisse liefern.
+
+Die nächste Zelle vergleicht den Modellcode und seine Einstellungen mit
+`SOURCE_SHA256.json`. Eine SHA256-Prüfsumme ist ein digitaler Fingerabdruck
+einer Datei. Auch eine kleine Änderung führt normalerweise zu einer anderen
+Prüfsumme. Zusätzlich wird geprüft, dass keine Quelldatei hinzugekommen ist
+oder fehlt.
+
+**Die Ausgabe lesen:** Die Tabelle nennt die installierten Pakete und ihre
+Versionen. Die Meldung `Modellquellen: ... Dateien geprüft` bestätigt den
+Vergleich mit dem festgehaltenen Quellenstand. Das ist eine Prüfung der
+Dateiidentität; ob die Rechnungen richtig sind, untersuchen wir erst danach.
+
+Bei `Quellenmanifest weicht ab` den angezeigten Dateinamen prüfen und den
+gewünschten Projektstand klären. Das Manifest sollte nicht nur deshalb neu
+geschrieben werden, damit die Meldung verschwindet. Gespeicherte Modelle oder
+alte Trainingsausgaben werden für diesen Startschritt nicht benötigt.
 """)
 
 code(r"""
@@ -186,14 +255,36 @@ installed = {d.metadata["Name"]: d.version for d in metadata.distributions()
 md(r"""
 ## 2. Datenprüfung und Trennung der Ringgruppen
 
-Die Datei wird nur nach Übereinstimmung mit dem freigegebenen SHA256 gelesen.
-Das vertrauenswürdige Sammelpickle enthält physisch auch weitere Zielwerte;
-an Training und Prediction werden ausschließlich die erlaubten Datenverträge
-weitergegeben. U-Objekte besitzen weder `y` noch `targets`.
+Hier kontrollieren wir, welche Ringe das Modell bekommt und welche
+Informationen es von ihnen verwenden darf. Die lokale Datei enthält 16 aktive
+Ringe. Für diesen Lauf verteilen sie sich so:
 
-Die vier historischen Außenringe DM07/08/11/15 werden nicht trainiert oder neu
-gescort. F2 besteht aus den zusammenhängenden aktiven Phase-1/2-Zeitpunkten mit
-LaserOK=MessEin=1. Die Reihenfolge der sechs Features ist fest.
+| Gruppe | Anzahl und Ringe | Verwendete Information |
+|---|---|---|
+| L: gelabelte Entwicklungsringe | 8: DM04, DM05, DM06, DM09, DM12, DM16, DM17, DM18 | Prozessverlauf und zwei Endqualitäten. |
+| U: ungelabelte Entwicklungsringe | 4: DM01, DM02, DM10, DM14 | Nur Prozessverlauf; keine Qualitätslabels. |
+| Historische Außenringe | 4: DM07, DM08, DM11, DM15 | Für diesen Lauf gesperrt; kein Training und keine neue Bewertung. |
+
+Die Datei wird erst nach passender SHA256-Prüfsumme eingelesen. Technisch
+enthält das Sammelpickle auch weitere Endwerte, die beim Laden materialisiert
+werden. Anschließend werden nur die erlaubten Informationen weitergereicht:
+Ein U-Trainingsobjekt besitzt weder `y` noch `targets`. Die Trennung in der
+Trainingsschnittstelle ist damit ausdrücklich geprüft.
+
+**F2** ist der hier festgelegte aktive Ausschnitt aus dem Loggerverlauf:
+Phase 1 oder 2, `LaserOK=1` und `MessEin=1`. Die ausgewählten Zeitpunkte müssen
+zusammenhängen und die weiteren gespeicherten Zeit-/Phasenregeln erfüllen.
+Es wird nicht beliebig geglättet oder ein fehlender Zeitpunkt ergänzt.
+
+**Die Tabelle lesen:** Jede Zeile gehört zu einem Entwicklungsring. Die Zahl
+der F2-Zeitpunkte zeigt seine Sequenzlänge; Start und Ende sind Loggerzeiten in
+Sekunden. Die Phasengrenze ist eine beobachtete Loggergrenze. `Fehlende Werte`
+soll für die hier freigegebenen Sequenzen null sein. Die sechs anschließend
+genannten Features sind Eingaben, die zwei Targets sind die Endgrößen.
+
+Diese Prüfung verhindert unter anderem, dass ein gesperrter Ring oder ein
+U-Qualitätslabel versehentlich im Training landet. Sie beweist noch keine
+gute Vorhersage.
 """)
 
 code(r"""
@@ -224,10 +315,25 @@ ring_table.to_csv(RUN_DIR / "ring_overview.csv", index=False, encoding="utf-8")
 md(r"""
 ### Beispiel einer vollständigen F2-Prozesssequenz
 
-DM04 wird hier als Eingangssignal gezeigt. Die Kraftkanäle sind laut
-Loggerheader **Prozentwerte**, die Geometriekanäle Meter und RWG55 eine
-Ringwachstumsrate in m/s. Die gestrichelte Linie markiert die beobachtete
-Loggerphasengrenze; sie ist kein zusätzliches Modellfeature.
+Jetzt sehen wir die **Eingabedaten** eines Rings, bevor das Modell daraus eine
+Endqualität schätzt. Das Beispiel DM04 besitzt sechs Diagramme, eines für
+jeden verwendeten Kanal.
+
+| Kanal | Bedeutung laut Loggerheader | Einheit der dargestellten Rohwerte |
+|---|---|---|
+| `F_rad63`, `F_ax64` | Radialer und axialer Kraftkanal | Prozent; keine hier verifizierten kN. |
+| `Ist_D150`, `Ist_s151`, `Ist_h152` | Außendurchmesser, Wanddicke, Höhe | Meter. |
+| `RWG55` | Ringwachstumsrate | Meter pro Sekunde. |
+
+Auf der waagerechten Achse steht die Zeit, auf der senkrechten der jeweilige
+Messwert. Die sechs Kurven haben verschiedene Einheiten und Skalen; ihre
+Zahlenhöhen sind deshalb nicht unmittelbar vergleichbar. Intern werden sie
+später mit auf Trainingsdaten bestimmten Scalern umgerechnet.
+
+Die gestrichelte Linie markiert die beobachtete Grenze der Loggerphasen. Sie
+ist eine Orientierung im Diagramm, kein zusätzliches Modellfeature und keine
+vorgegebene Grenze zwischen den versteckten HMM-Zuständen. Auch eine plausible
+Kurve liefert für sich allein keinen Nachweis guter Qualitätsvorhersagen.
 """)
 
 code(r"""
@@ -247,11 +353,40 @@ show_figure(fig, "01_prozesssequenz_DM04")
 md(r"""
 ## 3. Anschaulicher Mathematikcheck: alle kurzen Zustandspfade
 
-Für eine kleine Kette mit K=2 und T=4 werden alle 16 Pfade unabhängig
-aufgezählt. Verglichen werden Forward-Backward-Marginalen und die exakten
-ersten/zweiten M2-Momente. Die reduzierte Statistik lautet
-`g=(h_1,h_2,Delta_1)`. Insbesondere wird die zweite Momentenmatrix nicht durch
-das äußere Produkt des Mittelwerts ersetzt.
+Bevor wir lange echte Sequenzen berechnen, prüfen wir einen winzigen Fall,
+den man vollständig durchgehen kann: **zwei mögliche Zustände und vier
+Zeitpunkte**. Ein möglicher Zustandspfad lautet beispielsweise `1 → 1 → 2 → 2`.
+Insgesamt gibt es `2⁴ = 16` mögliche Pfade.
+
+Die nächste Zelle berechnet dasselbe Ergebnis auf zwei Wegen:
+
+1. Sie zählt alle 16 Pfade auf und gewichtet sie mit ihren Wahrscheinlichkeiten.
+2. Sie verwendet die effizienten Rekursionen, die auch im Modell eingesetzt werden.
+
+Beide Wege sollen übereinstimmen. Das Beispiel arbeitet mit künstlichen
+Zahlen; es lernt dabei nichts über die Qualität eines echten Rings.
+
+Die drei zusammengefassten Zustandsmerkmale sind:
+
+| Merkmal | Einfache Bedeutung |
+|---|---|
+| `h1` | Anteil der Zeit in Zustand 1. |
+| `h2` | Anteil der Zeit in Zustand 2; zusammen ergeben `h1` und `h2` immer 1. |
+| `Delta1` | Anteil von Zustand 1 in der späteren Hälfte minus seinem Anteil in der frühen Hälfte. |
+
+Beim Beispielpfad `1 → 1 → 2 → 2` wären das `h1=0,5`, `h2=0,5` und
+`Delta1=−1`. In der Tabelle stehen allerdings die **über alle Pfade gemittelten**
+Werte, nicht die Merkmale nur dieses einen Pfads.
+
+**Die Ausgabe lesen:** `Rekursion` und `Pfadenumeration` sollen bis auf sehr
+kleine Rundungsfehler gleich sein. `Max. Momentenabweichung` soll nahe null
+liegen; eine Zahl wie `1e-16` ist etwa 0,0000000000000001.
+
+Die zusätzliche Matrix beschreibt `E[ggᵀ]`, also gemittelte Produkte der
+Merkmale. Sie enthält Informationen, die im Mittelwert allein fehlen. Der
+danach ausgegebene Unterschied `||E[ggᵀ] − E[g]E[g]ᵀ||` **darf positiv sein**:
+Er zeigt gerade die Merkmalsunsicherheit und ist kein Rechenfehler. Für
+unsichere Zustände darf man diese beiden Ausdrücke nicht einfach gleichsetzen.
 """)
 
 code(r"""
@@ -292,12 +427,32 @@ print("Kurze Pfadenumeration und Markov-Rekursion stimmen überein.")
 md(r"""
 ## 4. Die vollständige Testsuite tatsächlich ausführen
 
-Diese Zelle startet pytest mit **dem aktuellen Notebook-Python**. Die aktuelle
-Testanzahl und der Exitcode stammen aus diesem neuen Aufruf und seiner neuen
-JUnit-Datei. Die Suite umfasst T1–T10, synthetisches End-to-End-Training,
-Leakage-/Persistenzprüfungen sowie getrennte read-only-V6.0-Oracletests.
-Die dafür benötigten Referenzquellen liegen vollständig unter `tests/`.
-Der Produktivcode importiert keine alten Modellkerne.
+Ein automatisierter Test gibt einer Funktion kontrollierte Eingaben und
+vergleicht ihre Ausgabe mit einer erwarteten Antwort oder einer unabhängig
+formulierten Rechnung. Viele unterschiedliche Tests untersuchen verschiedene
+Fehlermöglichkeiten.
+
+Die nächste Zelle startet das Testprogramm **pytest neu mit dem Python dieses
+Notebooks**. Sie liest keinen alten Erfolgsbericht ein. Geprüft werden unter
+anderem Zustandswahrscheinlichkeiten und Gradienten, die bayesschen Updates,
+Trainingsdaten-Trennung sowie Speichern und Laden. Manche Tests benutzen
+synthetische, also künstlich erzeugte Ringe; andere prüfen die echten Daten
+oder vergleichen mit den bytegleich gesicherten historischen Testreferenzen.
+
+**Die Ausgabe lesen:** Im aktuellen Stand erwarten wir `107 passed`. Ein Punkt
+steht normalerweise für einen bestandenen Test. Die genaue Zahl stammt aus
+deinem tatsächlichen Aufruf und kann sich nach bewussten Testerweiterungen
+ändern. In der Tabelle sollen `exitcode`, `failures`, `errors` und `skipped`
+jeweils null sein. Dieses vollständige Notebook hat die Rohdatei bereits
+geprüft und verlangt deshalb auch die tatsächliche Ausführung der Datentests.
+
+Bei einem Fehler stoppt die Ausführung. Die letzte Meldung und
+`pytest_output.log` im neuen Laufordner helfen beim Einordnen. Das Notebook
+setzt den Ablauf nicht mit einem behaupteten Testerfolg fort.
+
+Bestandene Tests sind konkrete Belege für die untersuchten Eigenschaften.
+Sie garantieren weder absolute Fehlerfreiheit noch kleine Vorhersagefehler
+bei neuen Ringen. Letzteres untersuchen wir ab Abschnitt 10.
 """)
 
 code(r"""
@@ -329,13 +484,30 @@ display(pd.DataFrame([test_report]).drop(columns=["command", "junit_sha256"]))
 md(r"""
 ## 5. Festgelegte Baselinekonfiguration
 
-Es werden keine Hyperparameter gesucht oder optimiert. Die bestehende
-Konfiguration K2/M2/C0,2 mit 30 Epochen wird unverändert verwendet. Die ersten
-K Aufenthaltsmerkmale bleiben erhalten; nur das letzte Delta wird mit
-induziertem Prior entfernt. Dadurch haben die Qualitätsköpfe Dimension 9 und 8.
+Vor dem Training sehen wir nach, welche Einstellungen tatsächlich verwendet
+werden. Das ist unser festgelegtes Ausgangsmodell, hier **Baseline** genannt.
+Das Notebook sucht nicht automatisch nach einer besseren Einstellung.
 
-Für C≠1 ist J_C eine **gewichtete/generaliserte Variationszielfunktion**.
-Ein größerer Wert belegt keine bessere Vorhersage oder kalibrierte Unsicherheit.
+| Einstellung | Bedeutung |
+|---|---|
+| `K=2` | Zwei verborgene Prozesszustände. Das sind keine zwei Zielgrößen oder zwei vorher festgelegten Loggerphasen. |
+| `variant=M2` | Die Qualitätsrechnung verwendet Aufenthaltsanteile und den Unterschied zwischen später und früher Zustandsbelegung. |
+| `C=0,2` | Der gesamte Prozessbeitrag eines U-Rings zur Trainingszielfunktion wird mit 0,2 gewichtet. Das ist weder eine Erfolgswahrscheinlichkeit noch ein Anteil künstlicher Labels. |
+| `train_epochs=30` | 30 vollständige Runden der Modellupdates. |
+| `local_maxiter=8` | Höchstens acht interne Optimiereriterationen pro lokalem L-Update; keine Vorgabe von acht Gesamtepochen. |
+| `seed=20261111` | Festgelegter Startwert für die verwendeten Zufallsverfahren. |
+
+Die M2-Darstellung entfernt nur das letzte überflüssige Delta-Merkmal.
+Die Aufenthaltsmerkmale bleiben erhalten; ihre Summe trägt den konstanten
+Regressionsanteil. Der Prior, also die vor dem Fit festgelegte Verteilung,
+wird passend in die reduzierte Darstellung übertragen. Die beiden
+Qualitätsköpfe haben dadurch interne Vektorlängen 9 und 8. Es werden weiterhin
+genau **zwei** Qualitätswerte vorhergesagt.
+
+Die Trainingszielfunktion heißt `J_C`. Für `C≠1` ist sie eine gewichtete,
+generalisierte Variationszielfunktion. Merke dir für die nächsten Diagramme:
+**Größer ist für dieses Trainingsziel besser; daraus folgt noch kein kleinerer
+Vorhersagefehler.**
 """)
 
 code(r"""
@@ -350,10 +522,35 @@ print("Initialisierung: frischer Prior und frische K-Means-Zentren aus TRAIN-X."
 md(r"""
 ## 6. Frisches vollständiges Training auf 8L + 4U
 
-Die nächste Zelle berechnet alle 30 Epochen neu. Pro lokalem Update,
-Prozessupdate und Kopfupdate wird dieselbe vollständige J_C auf Nichtabnahme
-geprüft. Ereignisse und Epochen-Checkpoints werden in einen neuen Modellordner
-geschrieben. Erst nach Abschluss aller Dateien wird dieser versiegelt.
+Hier beginnt das eigentliche Lernen aus allen acht L- und vier U-Ringen.
+Die Modellgrößen werden frisch initialisiert; ein alter trainierter Zustand
+wird nicht als Startpunkt geladen. Die L-Ringe liefern Prozess- und
+Qualitätsinformation, die U-Ringe nur den erlaubten Prozessbeitrag.
+
+Eine **Epoche** durchläuft nacheinander diese Updates:
+
+1. Für jeden der zwölf Ringe wird seine Zustandsverteilung aktualisiert.
+2. Das gemeinsame Prozessmodell wird mit den erlaubten Informationen aktualisiert.
+3. Der Qualitätskopf für Außenunrundheit und der Qualitätskopf für
+   Höhenabweichung werden jeweils aktualisiert.
+
+Das ergibt `12 + 1 + 2 = 15` kontrollierte Updates pro Epoche und bei 30 Epochen
+insgesamt **450 Updates**. Die lokalen L-Rechnungen nutzen einen numerischen
+Optimierer; U-Zustände werden mit der dafür vorgesehenen Forward-Backward-
+Rechnung aktualisiert. Innerhalb einer Epoche baut jeder Schritt auf dem
+aktuellen Stand der anderen Modellteile auf.
+
+**Den Fortschritt lesen:** Nach jeder vollständigen Epoche erscheint etwa
+`Epoche 01/30: J_C = ...`. Negative Zahlen sind dabei normal. Beispielsweise
+ist `−900` größer als `−1000`; die Bewegung von `−1000` nach `−900` wäre also
+eine Verbesserung dieses Trainingsziels. Diese Beispielzahlen sind keine
+vorgegebenen Ergebnisse für deinen Lauf.
+
+Die Gesamtzielfunktion wird vor und nach den einzelnen Updates kontrolliert.
+Ein Schritt darf sie nicht stärker als die festgelegte numerische Toleranz
+verschlechtern. Pro Epoche wird außerdem ein Zwischenstand gespeichert.
+Die abschließende Meldung nennt Trainingsdauer und Modellordner. Dort liegen
+das neue Modell, seine Einstellungen und Prüfsummen zum späteren Laden.
 """)
 
 code(r"""
@@ -394,9 +591,30 @@ print(f"Training beendet: {training_seconds/60:.2f} Minuten; Modell gespeichert:
 md(r"""
 ## 7. Trainingsverlauf und kontrollierte Updateblöcke
 
-Die Diagramme zeigen den Rechenverlauf, nicht die Generalisierung. Kleine
-negative Rundungsreste bis zur vorab festgelegten Toleranz 10⁻⁶ sind erlaubt;
-eine echte Verletzung hätte das Training abgebrochen.
+Nach dem Training prüfen wir die gespeicherten Rechenschritte. Die nächste
+Zelle verlangt 30 Epochen und 450 Updateblöcke und kontrolliert, dass die Werte
+endlich sind und die erlaubte Verschlechterung nicht überschritten wurde.
+
+**Die Tabelle lesen:** `Updates` zählt die Schritte einer Gruppe.
+`Kleinster Gewinn` ist die kleinste Änderung von `J_C` in dieser Gruppe;
+`Gesamtgewinn` addiert ihre Änderungen. Ein Gewinn von null kann bedeuten,
+dass ein Update bereits nichts mehr verbessert oder ein schlechterer
+Optimierervorschlag nicht übernommen wurde.
+
+**Linkes Diagramm:** Die waagerechte Achse zählt Epochen, die senkrechte zeigt
+`J_C`. Die Kurve sollte im Rahmen der Rundungstoleranz steigen oder flach
+verlaufen. Eine flachere Kurve bedeutet kleinere Fortschritte dieses Fits;
+sie beweist noch kein global bestmögliches Modell.
+
+**Rechtes Diagramm:** Die Linien zerlegen die Verbesserung je Epoche nach
+Zustandsupdates, gemeinsamem Prozessmodell und Qualitätsköpfen. So sieht man,
+welcher Teil wie viel zum Trainingsziel beigetragen hat. Die Höhen sind keine
+prozentualen Wichtigkeiten der Sensoren.
+
+Eine Differenz bis `−1e-6`, also minus 0,000001, wird als numerische Toleranz
+akzeptiert. Größere Verletzungen würden zum Fehler führen. Auch ein sauber
+steigender Verlauf sagt noch nicht, wie gut unbekannte Ringe vorhergesagt
+werden; dafür folgt die getrennte Vergleichsauswertung.
 """)
 
 code(r"""
@@ -427,6 +645,27 @@ axes[1].legend()
 show_figure(fig, "02_training_und_blockgewinne")
 """)
 
+md(r"""
+### Die zusätzliche Optimierertabelle richtig einordnen
+
+Die nächste Tabelle betrachtet die internen Optimiereraufrufe für die acht
+L-Ringe über 30 Epochen. Bei unveränderter Konfiguration sind das
+`8 × 30 = 240` Aufrufe. Die vier U-Ringe haben eigene direkte Zustandsupdates
+und zählen hier nicht als solche Optimiereraufrufe.
+
+`Akzeptierte Optimiererschritte` zählt Aufrufe, deren Vorschlag tatsächlich
+übernommen wurde. `Ohne Erfolgsstatus` bedeutet, dass der Optimierer sein
+internes Abschlusskriterium nicht als erfüllt meldete; beispielsweise kann
+bereits die Grenze von acht Iterationen erreicht worden sein. Dieser Zähler
+allein bedeutet deshalb keinen Programmabbruch. Die Annahmekontrolle prüft
+zusätzlich, ob der vorgeschlagene Schritt die Zielfunktion verbessert.
+
+Der Abschlussgradient beschreibt, wie stark sich das lokale Ziel in der
+untersuchten Richtung noch ändern kann. Ein kleiner Gradient ist ein Hinweis
+auf lokale Ruhe, kein Beweis eines globalen Optimums. Die Tabelle hilft beim
+Einordnen des Rechenverlaufs; sie ist kein Vorhersagefehler in Millimetern.
+""")
+
 code(r"""
 local_optimizer_rows = [event["optimizer"] for event in model.update_history
                         if event["stage"] == "local" and "optimizer_success" in event["optimizer"]]
@@ -444,14 +683,31 @@ print("Nichtabnahme ist geprüft; lokale oder globale Optimalität wird nicht da
 md(r"""
 ## 8. Prozess-only-Prediction aus einer echten Loggerdatei
 
-Es wird eine neue CSV ausschließlich mit Loggerkanälen exportiert, wieder
-eingelesen und durch das frisch gespeicherte Modell vorhergesagt. Die API
-bekommt kein Qualitätslabel. **DM04 war im Vollfit enthalten**: dieses Beispiel
-prüft die Ein-/Ausgabeschnittstelle und die Persistenz, nicht die Vorhersagegüte.
-Die Qualitätsbewertung folgt ausschließlich mit den VAL-Ringen der CV.
+Jetzt testen wir den Weg, den eine Vorhersage im späteren Gebrauch nimmt:
 
-SD bedeutet die marginale Standardabweichung der gewählten Momentenprädiktion.
-Es handelt sich nicht um ein kalibriertes 95%-Intervall.
+1. Die Loggerdaten von DM04 werden als neue CSV ohne Endqualitätsfelder geschrieben.
+2. Die CSV wird als reine Prozesseingabe wieder eingelesen.
+3. Das aktuelle Modell erzeugt zwei Qualitätsvorhersagen.
+4. Das gespeicherte Modell wird neu geladen und muss genau dieselben Werte liefern.
+
+Die Vorhersagefunktion bekommt dabei keine gemessene Endqualität. Das verhindert,
+dass sie die gesuchte Antwort direkt aus ihrer Eingabe abliest.
+**DM04 war allerdings im Training des Hauptmodells enthalten.** Dieses Beispiel
+zeigt daher, dass Datenübergabe, Vorhersage und Speichern/Laden funktionieren.
+Die echte Fehlermessung auf zurückgehaltenen Ringen folgt in Abschnitt 11.
+
+**Die Tabelle lesen:** Jede Zeile gehört zu einer Zielgröße. `Vorhersage [mm]`
+ist ihr geschätzter Mittelwert. `Marginale SD [mm]` ist die vom Modell
+berechnete Standardabweichung dieser einzelnen Zielgröße innerhalb seiner
+Näherung. Eine größere SD beschreibt eine breitere vorhergesagte Verteilung.
+Sie ist weder der bereits gemessene Fehler dieses Rings noch eine Garantie,
+dass der wahre Wert in einem bestimmten Abstand liegt. Insbesondere ist
+`Mittelwert ± 2 × SD` hier kein nachgewiesenes 95%-Intervall.
+
+Die Meldung `Vorhersage im Speicher und nach Laden: exakt gleich` bestätigt
+den Speicher-/Ladetest. Die anschließende `Erwartete Eingabesicherung bei
+LabeledRing` ist **beabsichtigt**: Das Notebook probiert ausdrücklich eine
+unzulässige Eingabe mit Labels aus, fängt deren Ablehnung ab und läuft weiter.
 """)
 
 code(r"""
@@ -486,10 +742,35 @@ write_json(RUN_DIR / "process_only_prediction.json", prediction_loaded)
 md(r"""
 ## 9. Was macht die Hidden-Markov-Kette?
 
-Die folgende Inferenz wird **erneut nur aus dem Prozess X** mit den geladenen
-globalen Faktoren berechnet. Es ist keine qualitätskonditionierte lokale
-Trainingskette. Die Zustandsnummern sind permutierbar und nicht automatisch
-mit Loggerphase 1 oder 2 identisch.
+Das HMM beschreibt nicht direkt beobachtete Prozesszustände. Für jeden
+Zeitpunkt schätzt es, wie wahrscheinlich Zustand 1 beziehungsweise Zustand 2
+ist. Es muss dabei nicht zu jedem Zeitpunkt einen Zustand mit absoluter
+Sicherheit auswählen.
+
+Hier wird diese Zustandsrechnung für DM04 erneut durchgeführt, **nur aus den
+Prozessdaten und den geladenen Modellgrößen**. Während des Trainings können
+bei L-Ringen auch deren Qualitätslabels die lokale Zustandsverteilung
+beeinflussen; die hier gezeigte Vorhersagerechnung bekommt diese Labels nicht.
+
+**Die Übergangstabelle lesen:** Eine Zeile beginnt bei `Von Z1` oder `Von Z2`,
+die Spalten zeigen den nächsten Zustand. Ein großer Diagonaleintrag steht für
+eine hohe modellierte Wahrscheinlichkeit, beim nächsten Zeitpunkt im selben
+Zustand zu bleiben. Die Einträge einer Zeile summieren sich zu eins.
+
+**Oberes Diagramm:** Für jeden Zeitpunkt werden zwei Wahrscheinlichkeiten
+zwischen 0 und 1 gezeigt, die zusammen eins ergeben. Liegen sie etwa bei
+0,5 und 0,5, ist die Zuordnung unsicher. Liegt eine nahe eins, bevorzugt das
+Modell dort diesen Zustand. Der angegebene erwartete Wechselzähler darf eine
+Kommazahl sein, weil er über unsichere Zustandsfolgen mittelt.
+
+**Unteres Diagramm:** Die beiden Kraftkanäle zeigen den beobachteten Prozess
+zum selben Zeitverlauf. So kannst du Zustandsänderungen und Signalverlauf
+nebeneinander betrachten.
+
+`Z1` und `Z2` bedeuten nicht automatisch „gut/schlecht“ oder Loggerphase 1/2.
+Die Zustandsnummern sind grundsätzlich vertauschbar. Die gestrichelte
+Loggergrenze ist Orientierung; eine Übereinstimmung mit Zustandsänderungen
+müsste inhaltlich untersucht werden.
 """)
 
 code(r"""
@@ -522,10 +803,31 @@ show_figure(fig, "03_prozess_only_zustandsverlauf")
 md(r"""
 ### Sichtbare Modellgrenze: serielle Residualstruktur
 
-Diese Heatmap zeigt die bereits im Basismodell implementierte deskriptive
-Lag1-Diagnose an den Trainingsfaktoren. Die Residuen hängen über gamma selbst
-von X und bei L auch von der Qualitätskopplung ab. Sie sind kein formaler
-Innovationstest und kein bereits implementiertes AR-Modell.
+Ein **Residuum** ist hier die Differenz zwischen einem beobachteten
+Prozesskanal und seinem vom Zustandsmodell beschriebenen Mittelwert. Gemeint
+sind somit die sechs Prozesssignale, nicht die Fehler der zwei Endqualitäten.
+
+Die farbige Tabelle, eine Heatmap, betrachtet pro Ring und Kanal, wie stark
+benachbarte Residuen zeitlich zusammenhängen. `Lag1` bedeutet einen Abstand
+von genau einem Messschritt.
+
+| Farbe beziehungsweise Wert | Bedeutung dieser Beschreibung |
+|---|---|
+| Rot, nahe +1 | Benachbarte Residuen hängen stark in gleicher Richtung zusammen. |
+| Blau, nahe −1 | Benachbarte Residuen hängen stark in entgegengesetzter Richtung zusammen. |
+| Nahe 0 | Geringer linearer Zusammenhang bei genau diesem Zeitabstand. |
+
+Unser Basismodell behandelt die Emissionen bei gegebenem Zustand und gegebenen
+globalen Parametern als zeitlich unabhängig. Deutliche Restmuster sind deshalb
+ein Hinweis darauf, dass zeitliche Struktur übrigbleibt. Kanalzusammenhänge
+am selben Zeitpunkt und Zusammenhänge zwischen Zeitpunkten sind verschiedene
+Dinge.
+
+Die Darstellung ist eine beschreibende Trainingsdiagnose. Die verwendeten
+Zustandsgewichte hängen selbst von den Prozessdaten und bei L auch von der
+Qualitätskopplung ab. Die Heatmap ist daher weder ein formaler statistischer
+Test noch eine externe Qualitätsbewertung. Sie ergänzt auch kein neues
+autoregressives Modell, sondern macht eine Grenze des Basismodells sichtbar.
 """)
 
 code(r"""
@@ -543,17 +845,44 @@ show_figure(fig, "04_residualdiagnose")
 md(r"""
 ## 10. Vollständige ringgetrennte Entwicklungsevaluation neu ausführen
 
-In jedem der vier Folds werden sechs L-Ringe zum Fit und zwei andere L-Ringe
-ausschließlich zur Bewertung verwendet. U darf gemäß dem jeweiligen Arm nur
-die erlaubten Prozessanteile beitragen. Alle Scaler werden foldlokal angepasst.
+Hier beginnt der Teil zur **Vorhersagegüte auf zurückgehaltenen Ringen**.
+Die Qualität eines bereits zum Fit verwendeten Rings wiederzugeben wäre
+einfacher und könnte einen zu guten Eindruck vermitteln.
 
-Die fünf festen Arme sind TRAIN-Mittelwert, physikalische NIG-Regression,
-HMM strict-C0, HMM shared-C0 und HMM SSL C=0,2. Die HMM-Arme werden in jedem
-Fold frisch über 30 Epochen trainiert. Diese Zelle lädt keine alten CV-Berichte.
+Wir teilen die acht L-Ringe deshalb in vier feste Vergleichsrunden, die
+**Folds**, auf. In jeder Runde werden sechs L-Ringe zum Training verwendet.
+Die zwei übrigen heißen `VAL`: Ihre Prozesse und Endqualitäten dürfen weder
+in den Fit noch in die Berechnung der Scaler dieses Modells gelangen. Erst
+nach dem jeweiligen Fit werden ihre Prozessverläufe dem Modell zur Vorhersage
+übergeben und die Ergebnisse mit ihren gemessenen Endwerten verglichen.
 
-Die Baselines sind Vergleichsverfahren. Insbesondere ist die physikalische
-NIG-Regression wegen abweichendem Design-/Prior- und teils Scalervertrag keine
-vollständig isolierte Ablation des HMM-Nutzens.
+Nach vier Runden war jeder der acht L-Ringe genau einmal zurückgehalten.
+So entstehen acht **Out-of-Fold-Vorhersagen pro Verfahren**: Jede stammt aus
+einem Modell, das diesen Ring nicht zum Lernen benutzt hat. Die vier U-Ringe
+können je nach Verfahren ihre erlaubten Prozessinformationen beitragen.
+
+Wir vergleichen fünf festgelegte Verfahren. Ein „Arm“ in den Ausgaben ist
+einfach eines dieser Verfahren:
+
+| Name in den Ausgaben | Vorgehen |
+|---|---|
+| `TRAIN-Mittelwert` / `train_mean` | Sagt immer den Durchschnitt der sechs L-TRAIN-Qualitäten des jeweiligen Folds vorher. Das ist der einfachste Vergleich. |
+| `Physikalisches NIG` / `physical_nig` | Bayessche Regression mit zusammengefassten Prozessmerkmalen, etwa ausgewählten Mittelwerten und Änderungen; ohne HMM-Zustandsmodell. |
+| `HMM strict-C0` / `strict_c0` | HMM mit Qualitätsköpfen, aber ohne U-Einfluss auf Fit, Skalierung oder Initialisierung. |
+| `HMM shared-C0` / `shared_c0` | U-Prozesse helfen bei Vorverarbeitung und Initialisierung; ihr Beitrag zur eigentlichen Trainingszielfunktion bleibt null. |
+| `HMM SSL` / `ssl` | Unser Basismodell: U-Prozesse werden zusätzlich mit `C=0,2` in der Trainingszielfunktion verwendet. |
+
+Für jeden Fold beginnt jeder Fit neu. Drei Verfahren sind HMMs, also entstehen
+**4 × 3 = 12 neue HMM-Trainingsläufe** über jeweils 30 Epochen. Zusammen mit
+den einfacheren Vergleichen ergeben sich 4 × 5 = 20 Fold-/Verfahrensberichte.
+Diese Zelle ist daher oft der längste Teil des Notebooks. Die Meldungen
+`started` und `complete` zeigen, welches Verfahren in welchem Fold gerade
+berechnet wird. Alte CV-Berichte werden nicht anstelle neuer Fits geladen.
+
+Die NIG-Regression ist ein nützlicher Vergleich, unterscheidet sich jedoch
+auch bei Design und Priors. Ein Unterschied zu ihr misst deshalb nicht
+isoliert nur den Nutzen des HMM. Ebenso können die acht historisch schon zur
+Entwicklung verwendeten Ringe keine neue unabhängige externe Studie ersetzen.
 """)
 
 code(r"""
@@ -572,6 +901,24 @@ cv_seconds = time.perf_counter()-cv_start
 seal_directory(CV_DIR)
 assert len(cv_report["folds"]) == 20
 print(f"Alle vier Folds und fünf Arme abgeschlossen: {cv_seconds/60:.2f} Minuten.")
+""")
+
+md(r"""
+### Kontrollieren, dass die Trennung wirklich eingehalten wurde
+
+Nach den Fits kontrolliert die nächste Zelle für jeden Fold und jedes
+Verfahren die Ringzuordnung. In der Tabelle sollen pro Zeile sechs
+`L-TRAIN`-Ringe und zwei andere `VAL`-Ringe stehen. `geprüft` wird erst nach
+den entsprechenden Programmprüfungen eingetragen.
+
+Ein **Scaler** lernt ebenfalls aus Daten, auch wenn er nur Mittelwerte und
+Streuungen zur Umrechnung bestimmt. Deshalb wird kontrolliert, dass auch er
+keinen VAL-Ring gesehen hat. Die erlaubte Einbeziehung von U bei den beiden
+gemeinsamen Vorverarbeitungsarmen wird dabei gesondert berücksichtigt.
+
+Zusätzlich wird geprüft, dass pro Verfahren genau die acht erwarteten
+zurückgehaltenen Ringe vorliegen und die gespeicherten Fehler mit den neu aus
+den Einzelvorhersagen berechneten Fehlern übereinstimmen.
 """)
 
 code(r"""
@@ -602,14 +949,38 @@ print("Je Arm: acht echte Out-of-Fold-Vorhersagen; kein VAL-Ring im Scalerfit.")
 md(r"""
 ## 11. Qualitätsfehler auf zurückgehaltenen Ringen
 
-RMSE und MAE werden gleichgewichtet über die acht vollständigen
-Out-of-Fold-Ringe berechnet und für beide Ziele in mm angegeben. Jeder Punkt
-stammt aus einem Fit, der das Label und die Prozesssequenz dieses VAL-Rings
-nicht zum Training oder Scalerfit verwendet hat.
+Jetzt stehen für jeden zurückgehaltenen Ring Vorhersage und Messwert fest.
+Ihr Unterschied ist der Vorhersagefehler. Die Tabelle fasst diese Fehler
+getrennt für Außenunrundheit und Höhenabweichung zusammen.
 
-Die Ergebnisse sind explorativ: Die acht Ringe und die Ausgangskonfiguration
-haben eine historische Entwicklungsgeschichte. Es wird keine unabhängige
-Überlegenheit oder validierte 95%-Deckung behauptet.
+| Spalte | Bedeutung |
+|---|---|
+| `Ringe` | Zahl der ausgewerteten Ringe pro Verfahren; hier acht. |
+| `MAE ... [mm]` | Durchschnitt der absoluten Fehler. Vorzeichen heben sich dabei nicht auf. |
+| `RMSE ... [mm]` | Quadratwurzel aus dem Durchschnitt der quadrierten Fehler; große Einzelfehler fallen stärker ins Gewicht. |
+
+**Für beide Fehlermaße gilt: kleiner ist besser, null wäre perfekte
+Übereinstimmung.** Ein MAE von beispielsweise 0,5 mm hieße, dass der absolute
+Fehler im Mittel 0,5 mm beträgt. Das Beispiel ist keine Vorgabe für dein
+Ergebnis; einzelne Ringe können deutlich stärker abweichen. Jeder Ring zählt
+gleich viel, unabhängig von der Länge seiner Loggersequenz.
+
+Beginne beim Vergleich mit der Zeile `TRAIN-Mittelwert`. Hat das komplexere
+Modell kleinere Fehler als dieser einfache Vergleich? Untersuche dann auch
+die anderen Verfahren und beide Zielgrößen getrennt. Ein Vorteil bei
+Außenunrundheit muss kein Vorteil bei Höhe sein. Ist der Fehler größer, muss
+man das als solches festhalten; ein komplizierteres Modell ist nicht
+automatisch besser.
+
+**Die Balkendiagramme lesen:** Links steht der RMSE der Außenunrundheit,
+rechts der Höhenabweichung. Die Höhe eines Balkens entspricht dem Fehler in
+Millimetern, also ist innerhalb eines Diagramms ein niedrigerer Balken besser.
+Die Achsenskalierungen der beiden Diagramme können verschieden sein.
+
+Diese Zahlen beschreiben die beobachteten Entwicklungsringe. Wegen der kleinen,
+historisch wiederverwendeten Datenbasis sind sie keine allgemeine
+Überlegenheitsgarantie für künftig unbekannte Ringe. Für eine solche Aussage
+wäre eine zusätzliche unabhängig geplante Bewertung nötig.
 """)
 
 code(r"""
@@ -636,6 +1007,27 @@ for j, ax in enumerate(axes):
     ax.set(title=["Außenunrundheit", "Höhenabweichung"][j], ylabel="Out-of-Fold-RMSE [mm]", ylim=(0, values.max()*1.22))
     ax.bar_label(bars, fmt="%.3f", padding=3)
 show_figure(fig, "05_ring_cv_rmse_vergleich")
+""")
+
+md(r"""
+### Die einzelnen Ringe und das Streudiagramm lesen
+
+Ein Mittelwert kann verbergen, dass manche Ringe gut und andere schlecht
+vorhergesagt werden. Deshalb zeigt die nächste Tabelle jeden der acht Ringe
+einzeln für unser SSL-Modell. `Messwert` ist die bekannte Endqualität,
+`OOF` die Vorhersage aus dem Fold, der diesen Ring zurückgehalten hat.
+
+Im anschließenden Streudiagramm steht der **Messwert auf der waagerechten**
+und die **Vorhersage auf der senkrechten Achse**. Jeder beschriftete Punkt ist
+ein Ring. Die gestrichelte Diagonale bedeutet perfekte Übereinstimmung:
+
+- Nahe der Linie: kleiner Fehler dieses Rings.
+- Oberhalb der Linie: Die Vorhersage ist größer als der Messwert.
+- Unterhalb der Linie: Die Vorhersage ist kleiner als der Messwert.
+
+Die zwei Diagramme gehören zu den zwei Zielgrößen. Sie zeigen keine zusätzliche
+neue Testmenge und keine garantierten Unsicherheitsintervalle, sondern dieselben
+acht OOF-Vorhersagen, aus denen die SSL-Fehler in der vorherigen Tabelle stammen.
 """)
 
 code(r"""
@@ -667,15 +1059,39 @@ show_figure(fig, "06_ssl_out_of_fold_messwert_vorhersage")
 md(r"""
 ## 12. Zusammenfassung dieses tatsächlich berechneten Laufs
 
-Die folgende Übersicht wird aus den aktuellen Objekten und neu geschriebenen
-Artefakten erzeugt. Tests, Training und Prediction belegen die Funktionsfähigkeit
-im spezifizierten Basismodellvertrag. Die Ring-CV beschreibt die beobachteten
-Entwicklungsfehler. Sie beweist weder ein globales VI-Optimum noch allgemeine
-Überlegenheit oder Unsicherheitskalibrierung.
+Die letzte Zelle fasst zusammen, **was in deinem aktuellen Lauf wirklich
+berechnet und geprüft wurde**. Ihre Ergebnisse stammen aus den gerade
+erzeugten Objekten und Dateien. Zu Beginn und am Ende müssen die geprüften
+Modellquellen übereinstimmen.
 
-Offen bleiben insbesondere serielle Emissionsfehlstruktur, echte Multistart-
-Robustheit, vollständig kontrollierte HMM-/Bayes-Ablationen und externe
-Generalisierung. Der Optimierungsfahrplan wird hier nicht umgesetzt.
+Wenn die Zelle ohne Fehler endet, wurden die vorherigen Programmprüfungen
+erfüllt. Die neue Übersicht nennt unter anderem die tatsächliche Testanzahl,
+die Epochen und Updates sowie die identische Vorhersage vor und nach dem
+Laden. Die Datei `notebook_summary.json` erhält dann den Status `COMPLETE`.
+Beim Terminal-Hilfsskript steht der Abschlussstatus außerdem im gesonderten
+Ausführungsbericht.
+
+Für deine Beurteilung bleiben diese drei Aussagen getrennt:
+
+1. **Rechenprüfung:** Die kontrollierten mathematischen Beispiele und Tests bestehen.
+2. **Ablaufprüfung:** Training, prozessbasierte Vorhersage und Speichern/Laden
+   funktionieren für die hier festgelegten Verträge.
+3. **Beobachteter Vorhersagefehler:** Die Fehlertabellen zeigen, wie die fünf
+   Verfahren auf den zurückgehaltenen Entwicklungsringen abschneiden. Ob das
+   SSL-Modell dort besser ist, liest du aus diesen Zahlen, nicht aus `COMPLETE`.
+
+Die Abschlussmeldungen nennen den Ordner dieses Laufs. Darin findest du
+Diagramme als PNG und SVG unter `figures/`, das trainierte Modell unter
+`model_8L4U/`, Vergleichsergebnisse unter `development_cv/` und Tabellen als CSV.
+Die Dateien bleiben lokal unter `outputs/notebook_demos/<lauf_id>/`; ein neuer
+Gesamtlauf erzeugt einen neuen Ordner.
+
+Offen bleiben unter anderem zeitliche Restmuster, Empfindlichkeit gegenüber
+anderen Initialisierungen und eine unabhängige externe Bewertung. Die
+berechneten Standardabweichungen haben keine nachgewiesene Intervallabdeckung.
+Das Notebook belegt damit einen ausgeführten, geprüften Basismodellablauf und
+seine beobachteten Entwicklungsfehler; weitere Optimierungsversuche sind ein
+eigener Arbeitsschritt.
 """)
 
 code(r"""
